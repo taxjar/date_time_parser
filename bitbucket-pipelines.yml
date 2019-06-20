@@ -1,0 +1,17 @@
+# This is a sample build configuration for Other.
+# Check our guides at https://confluence.atlassian.com/x/5Q4SMw for more examples.
+# Only use spaces to indent your .yml configuration.
+# -----
+# You can specify a custom docker image from Docker Hub as your build environment.
+image: elixir:1.5.3-alpine
+
+pipelines:
+  default:
+    - step:
+        script:
+          - mix local.hex --force
+          - mix local.rebar --force
+          - mix deps.get
+          - mix compile
+          - mix test
+
