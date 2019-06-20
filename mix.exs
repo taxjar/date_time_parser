@@ -34,13 +34,15 @@ defmodule DateTimeParser.MixProject do
     cond do
       Version.match?(System.version(), ">= 1.6.0") ->
         [
+          {:credo, "~> 1.0", only: [:dev, :test]},
           {:dialyxir, "~> 1.0.0-rc.6", only: [:dev, :test], runtime: false},
-          {:credo, "~> 1.0", only: [:dev, :test]}
+          {:junit_formatter, "~> 3.0", only: :test}
         ]
 
       Version.match?(System.version(), ">= 1.5.0") ->
         [
-          {:credo, "~> 1.0", only: [:dev, :test]}
+          {:credo, "~> 1.0", only: [:dev, :test]},
+          {:junit_formatter, "~> 3.0", only: :test}
         ]
 
       true ->
