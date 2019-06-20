@@ -1,26 +1,88 @@
 defmodule DateTimeParser do
   @moduledoc """
-  Documentation for DateTimeParser.
-  """
+  DateTimeParser is a tokenizer for strings that attempts to parse into a
+  DateTime, NaiveDateTime if timezone is not determined, Date, or Time.
 
-  # TODO:
-  #   - Natural language.
+  The biggest ambiguity between datetime formats is whether it's `ymd` (year month
+  day), `mdy` (month day year), or `dmy` (day month year); this is resolved by
+  checking if there are slashes or dashes. If slashes, then it will try `dmy`
+  first. All other cases will use the international format `ymd`. Sometimes, if
+  the conditions are right, it can even parse `dmy` with dashes if the month is a
+  vocal month (eg, `"Jan"`).
+
+  ## Examples
+
+    iex> DateTimeParser.parse_datetime("19 September 2018 08:15:22 AM")
+    {:ok, ~N[2018-09-19 08:15:22]}
+
+    iex> DateTimeParser.parse_datetime("2034-01-13")
+    {:ok, ~N[2034-01-13 00:00:00]}
+
+    iex> DateTimeParser.parse_date("2034-01-13")
+    {:ok, ~D[2034-01-13]}
+
+    iex> DateTimeParser.parse_date("01/01/2017")
+    {:ok, ~D[2017-01-01]}
+
+    iex> DateTimeParser.parse_datetime("1/1/18 3:24 PM")
+    {:ok, ~N[2018-01-01T15:24:00]}
+
+    iex> DateTimeParser.parse_datetime(~s|"Dec 1, 2018 7:39:53 AM PST"|)
+    {:ok, DateTime.from_naive!(~N[2018-12-01T14:39:53Z], "Etc/UTC")}
+    # Notice that the date is converted to UTC
+
+    iex> DateTimeParser.parse_time("10:13pm")
+    {:ok, ~T[22:13:00]}
+
+    iex> DateTimeParser.parse_time("10:13:34")
+    {:ok, ~T[10:13:34]}
+
+    iex> DateTimeParser.parse_datetime(nil)
+    {:error, "Could not parse nil"}
+  """
 
   import NimbleParsec
 
   @days_map %{
-    "sun" => "Sunday", "mon" => "Monday", "tue" => "Tuesday", "tues" => "Tuesday", "wed" =>
-    "Wednesday", "thurs" => "Thursday", "thur" => "Thursday", "thu" => "Thursday", "fri" =>
-    "Friday", "sat" => "Saturday"
+    "sun" => "Sunday",
+    "mon" => "Monday",
+    "tue" => "Tuesday",
+    "tues" => "Tuesday",
+    "wed" => "Wednesday",
+    "thurs" => "Thursday",
+    "thur" => "Thursday",
+    "thu" => "Thursday",
+    "fri" => "Friday",
+    "sat" => "Saturday"
   }
   @days_num ~w(01 02 03 04 05 06 07 08 09) ++ Enum.map(31..1, &to_string/1)
   @months_map %{
-    "january" => 1, "february" => 2, "march" => 3, "april" => 4, "may" => 5, "june" => 6, "july" =>
-    7, "august" => 8, "september" => 9, "october" => 10, "november" => 11, "december"=> 12, "jan" =>
-    1, "feb" => 2, "mar" => 3, "apr" => 4, "jun" => 6, "jul" => 7, "aug" => 8, "sep" => 9, "sept" =>
-    9, "oct" => 10, "nov" => 11, "dec"=> 12
+    "january" => 1,
+    "february" => 2,
+    "march" => 3,
+    "april" => 4,
+    "may" => 5,
+    "june" => 6,
+    "july" => 7,
+    "august" => 8,
+    "september" => 9,
+    "october" => 10,
+    "november" => 11,
+    "december" => 12,
+    "jan" => 1,
+    "feb" => 2,
+    "mar" => 3,
+    "apr" => 4,
+    "jun" => 6,
+    "jul" => 7,
+    "aug" => 8,
+    "sept" => 9,
+    "sep" => 9,
+    "oct" => 10,
+    "nov" => 11,
+    "dec" => 12
   }
-  @months_num ~w(01 02 03 04 05 06 07 08 09) ++  Enum.map(12..0, &to_string/1)
+  @months_num ~w(01 02 03 04 05 06 07 08 09) ++ Enum.map(12..0, &to_string/1)
   @hour_num ~w(00 01 02 03 04 05 06 07 08 09) ++ Enum.map(24..0, &to_string/1)
   @minute_num ~w(00 01 02 03 04 05 06 07 08 09) ++ Enum.map(59..0, &to_string/1)
   @second_num ~w(00 01 02 03 04 05 06 07 08 09) ++ Enum.map(59..0, &to_string/1)
@@ -30,14 +92,19 @@ defmodule DateTimeParser do
   @time_separator ":"
 
   @utc ~w(utc gmt z)
-  @eastern ~w(est edt et eastern)
-  @pacific ~w(pst pdt pt pacific)
-  @central ~w(cst cdt ct central)
-  @mountain ~w(mst mdt mt mountain)
-  @alaska ~w(akst akdt akt alaska)
-  @hawaii ~w(hast hadt hat hst hawaii)
-  @timezone_abbreviations @utc ++ @eastern ++ @pacific ++ @central ++ @mountain ++ @alaska ++
-    @hawaii
+  @eastern ~w(eastern est edt et)
+  @pacific ~w(pacific pst pdt pt)
+  @central ~w(central cst cdt ct)
+  @mountain ~w(mountain mst mdt mt)
+  @alaska ~w(alaska akst akdt akt)
+  @hawaii ~w(hawaii hast hadt hat hst)
+  @timezone_abbreviations @utc ++
+                            @eastern ++
+                            @pacific ++
+                            @central ++
+                            @mountain ++
+                            @alaska ++
+                            @hawaii
 
   defp vocal_month_to_numeric_month(val), do: Map.get(@months_map, val)
   defp to_integer({token, value}), do: {token, String.to_integer(value)}
@@ -160,8 +227,7 @@ defmodule DateTimeParser do
     |> label("timezone with offset")
     |> unwrap_and_tag(:zone_abbr)
 
-  utc_plus_offset =
-    concat(utc, offset)
+  utc_plus_offset = concat(utc, offset)
 
   timezone_abbreviation =
     @timezone_abbreviations
@@ -174,7 +240,10 @@ defmodule DateTimeParser do
     @timezone_abbreviations
     |> Enum.map(fn abbr -> abbr |> String.codepoints() |> Enum.at(1) end)
     |> Enum.reject(&is_nil/1)
-    |> Enum.map(fn char -> <<codepoint::utf8>> = char; codepoint end)
+    |> Enum.map(fn char ->
+      <<codepoint::utf8>> = char
+      codepoint
+    end)
     |> ascii_char
 
   am_pm =
@@ -185,10 +254,11 @@ defmodule DateTimeParser do
     |> label("am or pm")
     |> unwrap_and_tag(:am_pm)
 
-  month = choice([
-    numeric_month,
-    vocal_month
-  ])
+  month =
+    choice([
+      numeric_month,
+      vocal_month
+    ])
 
   month_day =
     month
@@ -240,24 +310,26 @@ defmodule DateTimeParser do
     |> concat(space_separator |> optional() |> ignore())
     |> concat(am_pm |> optional())
 
-  formal_date = choice([
-    day_long_month_year,
-    day_month_year4,
-    year_month_day,
-    day_month_year,
-    month_day_year,
-    day_month,
-    month_day
-  ])
+  formal_date =
+    choice([
+      day_long_month_year,
+      day_month_year4,
+      year_month_day,
+      day_month_year,
+      month_day_year,
+      day_month,
+      month_day
+    ])
 
-  us_date = choice([
-    day_long_month_year,
-    month_day_year,
-    day_month_year,
-    year_month_day,
-    day_month,
-    month_day
-  ])
+  us_date =
+    choice([
+      day_long_month_year,
+      month_day_year,
+      day_month_year,
+      year_month_day,
+      day_month,
+      month_day
+    ])
 
   vocal_month_day_time_year =
     vocal_month
@@ -303,18 +375,12 @@ defmodule DateTimeParser do
     |> choice()
     |> unwrap_and_tag(:vocal_day)
     |> label("vocal day spelled out")
-    |> concat(
-      choice([
-        string(" "),
-        concat(string(","), string(" "))
-      ])
-      |> optional()
-      |> ignore()
-    )
+    |> concat(" " |> string() |> optional() |> ignore())
 
-  defparsecp :do_parse_time, time
+  defparsecp(:do_parse_time, time)
 
-  defparsecp :do_parse_datetime,
+  defparsecp(
+    :do_parse_datetime,
     vocal_day
     |> optional()
     |> choice([
@@ -322,8 +388,10 @@ defmodule DateTimeParser do
       formal_date_time,
       formal_date
     ])
+  )
 
-  defparsecp :do_parse_us_datetime,
+  defparsecp(
+    :do_parse_us_datetime,
     vocal_day
     |> optional()
     |> choice([
@@ -331,29 +399,37 @@ defmodule DateTimeParser do
       us_date_time,
       us_date
     ])
+  )
 
-  defparsecp :do_parse_us_date,
+  defparsecp(
+    :do_parse_us_date,
     vocal_day
     |> optional()
     |> concat(us_date)
+  )
 
-  defparsecp :do_parse_date,
+  defparsecp(
+    :do_parse_date,
     vocal_day
     |> optional()
     |> concat(formal_date)
+  )
 
   def parse_datetime(string, opts \\ [])
+
   def parse_datetime(string, opts) when is_binary(string) do
-    parser = if String.contains?(string, "/"), do: &do_parse_us_datetime/1, else: &do_parse_datetime/1
+    parser =
+      if String.contains?(string, "/"), do: &do_parse_us_datetime/1, else: &do_parse_datetime/1
+
     with {:ok, tokens, _, _, _, _} <- string |> clean() |> parser.() do
       {:ok,
-        tokens
-        |> to_naive_datetime()
-        |> to_datetime(tokens)
-        |> maybe_convert_to_utc(opts)
-      }
+       tokens
+       |> to_naive_datetime()
+       |> to_datetime(tokens)
+       |> maybe_convert_to_utc(opts)}
     end
   end
+
   def parse_datetime(nil, _opts), do: {:error, "Could not parse nil"}
   def parse_datetime(value, _opts), do: {:error, "Could not parse #{value}"}
 
@@ -361,6 +437,7 @@ defmodule DateTimeParser do
     {:ok, tokens, _, _, _, _} = string |> clean |> do_parse_time()
     to_time(tokens)
   end
+
   def parse_time(nil), do: {:error, "Could not parse nil"}
   def parse_time(value), do: {:error, "Could not parse #{value}"}
 
@@ -369,6 +446,7 @@ defmodule DateTimeParser do
     {:ok, tokens, _, _, _, _} = string |> clean |> parser.()
     to_date(tokens)
   end
+
   def parse_date(nil), do: {:error, "Could not parse nil"}
   def parse_date(value), do: {:error, "Could not parse #{value}"}
 
@@ -423,6 +501,7 @@ defmodule DateTimeParser do
   end
 
   defp maybe_convert_to_utc(%NaiveDateTime{} = naive_datetime, _opts), do: naive_datetime
+
   defp maybe_convert_to_utc(%DateTime{} = datetime, opts) do
     case Keyword.get(opts, :to_utc, true) do
       true -> Timex.Timezone.convert(datetime, "Etc/UTC")
@@ -434,12 +513,13 @@ defmodule DateTimeParser do
     string
     |> String.trim()
     |> String.replace(" @ ", "T")
-    |> String.replace(~r/[[:space:]]+/, " ")
+    |> String.replace(~r{[[:space:]]+}, " ")
     |> String.replace(" - ", "-")
     |> String.replace("//", "/")
-    |> String.replace(~r/\"|'|,|=|\\/, "")
+    |> String.replace(~r{=|"|'|,|\\}, "")
     |> String.downcase()
   end
+
   defp clean(%{} = map) do
     map
     |> Enum.reject(fn {_k, v} -> is_nil(v) end)
@@ -449,23 +529,27 @@ defmodule DateTimeParser do
   defp format_token(tokens, :hour) do
     case tokens |> find_token(:hour) do
       {:hour, hour} ->
-         if tokens |> find_token(:am_pm) |> format == "PM" && hour <= 12 do
-           hour + 12
-         else
-           hour
-         end
+        if tokens |> find_token(:am_pm) |> format == "PM" && hour <= 12 do
+          hour + 12
+        else
+          hour
+        end
+
       _ ->
         nil
     end
   end
+
   defp format_token(tokens, :year) do
     case tokens |> find_token(:year) |> format() do
       nil ->
         nil
+
       year ->
         year |> to_4_year() |> String.to_integer()
     end
   end
+
   defp format_token(tokens, token) do
     tokens |> find_token(token) |> format()
   end
@@ -487,7 +571,6 @@ defmodule DateTimeParser do
   #    returned year are 1 less than the first 2 digits of the current year.
   #  - If the last two digits of the current year are 50 to 99, then the returned year has the same
   #    first two digits as the current year.
-  defp to_4_year(parsed_year) when byte_size(parsed_year) == 4, do: parsed_year
   defp to_4_year(parsed_3yr) when byte_size(parsed_3yr) == 3 do
     [current_millenia | _rest] =
       DateTime.utc_now()
@@ -496,16 +579,18 @@ defmodule DateTimeParser do
 
     "#{current_millenia}#{parsed_3yr}"
   end
+
   defp to_4_year(parsed_2yr) when byte_size(parsed_2yr) == 2 do
     [current_millenia, current_century, current_decade, current_year] =
       DateTime.utc_now()
       |> Map.get(:year)
       |> Integer.digits()
+
     parsed_2yr = String.to_integer(parsed_2yr)
     current_2yr = String.to_integer("#{current_decade}#{current_year}")
 
     cond do
-      parsed_2yr < 50 && current_2yr < 50  ->
+      parsed_2yr < 50 && current_2yr < 50 ->
         "#{current_millenia}#{current_century}#{parsed_2yr}"
 
       parsed_2yr < 50 && current_2yr >= 50 ->
@@ -514,28 +599,32 @@ defmodule DateTimeParser do
           |> Integer.undigits()
           |> Kernel.+(1)
           |> Integer.digits()
+
         "#{current_millenia}#{parsed_century}#{parsed_2yr}"
 
-      parsed_2yr >= 50 && current_2yr < 50  ->
+      parsed_2yr >= 50 && current_2yr < 50 ->
         [parsed_millenia, parsed_century] =
           [current_millenia, current_century]
           |> Integer.undigits()
           |> Kernel.-(1)
           |> Integer.digits()
+
         "#{parsed_millenia}#{parsed_century}#{parsed_2yr}"
 
       parsed_2yr >= 50 && current_2yr >= 50 ->
         "#{current_millenia}#{current_century}#{parsed_2yr}"
     end
   end
-  defp to_4_year(parsed_year) when byte_size(parsed_year) == 1, do: []
+
+  defp to_4_year(parsed_year), do: parsed_year
 
   defp format({:microsecond, value}) do
     {
-      value |> to_string |> String.to_integer,
+      value |> to_string |> String.to_integer(),
       value |> to_string |> String.graphemes() |> length()
     }
   end
+
   defp format({:zone_abbr, value}), do: String.upcase(value)
   defp format({:utc_offset, offset}), do: to_string(offset)
   defp format({:year, value}), do: to_string(value)

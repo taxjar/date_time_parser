@@ -23,9 +23,10 @@ defmodule DateTimeParser.MixProject do
 
   defp deps do
     [
-      {:timex, "~> 3.1"},
       {:nimble_parsec, "~> 0.5.0", runtime: false},
-      {:benchee, "~> 1.0", only: [:dev]}
+      {:timex, "~> 3.1"},
+      {:benchee, "~> 1.0", only: [:dev]},
+      {:credo, "~> 1.0", only: [:dev]}
     ]
   end
 end

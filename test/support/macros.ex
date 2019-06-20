@@ -1,4 +1,5 @@
 defmodule DateTimeParserTestMacros do
+  @moduledoc false
   alias DateTimeParser
 
   defmacro test_datetime_parsing(string_datetime, expected_result, opts \\ []) do

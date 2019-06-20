@@ -3,6 +3,8 @@ defmodule DateTimeParserTest do
   import DateTimeParserTestMacros
   alias DateTimeParser
 
+  doctest DateTimeParser
+
   describe "compare with Ruby/Rails datetime parsing" do
     test_datetime_parsing " 01 Feb 2013", "2013-02-01T00:00:00"
     test_datetime_parsing " 03 Jan 2013 10:15:26 -0800", "2013-01-03T18:15:26Z"
