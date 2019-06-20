@@ -314,7 +314,7 @@ defmodule DateTimeParser do
 
   defparsecp :do_parse_time, time
 
-  defparsecp :do_parse,
+  defparsecp :do_parse_datetime,
     vocal_day
     |> optional()
     |> choice([
@@ -323,7 +323,7 @@ defmodule DateTimeParser do
       formal_date
     ])
 
-  defparsecp :do_us_parse,
+  defparsecp :do_parse_us_datetime,
     vocal_day
     |> optional()
     |> choice([
@@ -332,11 +332,20 @@ defmodule DateTimeParser do
       us_date
     ])
 
-  def parse(string, opts \\ [])
-  def parse(string, opts) when is_binary(string) do
-    parser = if String.contains?(string, "/"), do: &do_us_parse/1, else: &do_parse/1
+  defparsecp :do_parse_us_date,
+    vocal_day
+    |> optional()
+    |> concat(us_date)
+
+  defparsecp :do_parse_date,
+    vocal_day
+    |> optional()
+    |> concat(formal_date)
+
+  def parse_datetime(string, opts \\ [])
+  def parse_datetime(string, opts) when is_binary(string) do
+    parser = if String.contains?(string, "/"), do: &do_parse_us_datetime/1, else: &do_parse_datetime/1
     with {:ok, tokens, _, _, _, _} <- string |> clean() |> parser.() do
-      IO.inspect tokens, label: "TOKENS"
       {:ok,
         tokens
         |> to_naive_datetime()
@@ -345,14 +354,23 @@ defmodule DateTimeParser do
       }
     end
   end
-  def parse(nil, _opts), do: {:error, "Could not parse nil"}
-  def parse(value, _opts), do: {:error, "Could not parse #{value}"}
+  def parse_datetime(nil, _opts), do: {:error, "Could not parse nil"}
+  def parse_datetime(value, _opts), do: {:error, "Could not parse #{value}"}
 
-  def parse_time(string) do
+  def parse_time(string) when is_binary(string) do
     {:ok, tokens, _, _, _, _} = string |> clean |> do_parse_time()
-    IO.inspect tokens, label: "TOKENS"
     to_time(tokens)
   end
+  def parse_time(nil), do: {:error, "Could not parse nil"}
+  def parse_time(value), do: {:error, "Could not parse #{value}"}
+
+  def parse_date(string) when is_binary(string) do
+    parser = if String.contains?(string, "/"), do: &do_parse_us_date/1, else: &do_parse_date/1
+    {:ok, tokens, _, _, _, _} = string |> clean |> parser.()
+    to_date(tokens)
+  end
+  def parse_date(nil), do: {:error, "Could not parse nil"}
+  def parse_date(value), do: {:error, "Could not parse #{value}"}
 
   defp to_time(tokens) do
     Time.new(
@@ -360,6 +378,14 @@ defmodule DateTimeParser do
       format_token(tokens, :minute) || 0,
       format_token(tokens, :second) || 0,
       format_token(tokens, :microsecond) || {0, 0}
+    )
+  end
+
+  defp to_date(tokens) do
+    Date.new(
+      format_token(tokens, :year) || 0,
+      format_token(tokens, :month) || 0,
+      format_token(tokens, :day) || 0
     )
   end
 
@@ -398,7 +424,7 @@ defmodule DateTimeParser do
 
   defp maybe_convert_to_utc(%NaiveDateTime{} = naive_datetime, _opts), do: naive_datetime
   defp maybe_convert_to_utc(%DateTime{} = datetime, opts) do
-    case Keyword.get(opts, :convert_to_utc, true) do
+    case Keyword.get(opts, :to_utc, true) do
       true -> Timex.Timezone.convert(datetime, "Etc/UTC")
       _ -> datetime
     end
