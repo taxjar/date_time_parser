@@ -2,6 +2,22 @@ defmodule DateTimeParserTestMacros do
   @moduledoc false
   alias DateTimeParser
 
+  @example_file "EXAMPLES.md"
+
+  def to_iso(%NaiveDateTime{} = datetime), do: NaiveDateTime.to_iso8601(datetime)
+  def to_iso(%DateTime{} = datetime), do: DateTime.to_iso8601(datetime)
+  def to_iso(%Date{} = date), do: Date.to_iso8601(date)
+  def to_iso(%Time{} = time), do: Time.to_iso8601(time)
+  def to_iso(string) when is_binary(string), do: string
+
+  def record_result!(method, input, output) do
+    File.write!(
+      @example_file,
+      "|#{method}|`#{input}`|`#{to_iso(output)}`|\n",
+      [:append]
+    )
+  end
+
   defmacro test_datetime_parsing(string_datetime, expected_result, opts \\ []) do
     quote do
       test_name =
@@ -16,18 +32,13 @@ defmodule DateTimeParserTestMacros do
                  DateTimeParser.parse_datetime(unquote(string_datetime), unquote(opts))
 
         case unquote(expected_result) do
-          %{} = expected_result ->
-            assert datetime == expected_result
+          %{} = expected ->
+            assert datetime == expected
 
-          expected_result when is_binary(expected_result) ->
-            result =
-              case datetime do
-                %NaiveDateTime{} = datetime -> NaiveDateTime.to_iso8601(datetime)
-                %DateTime{} = datetime -> DateTime.to_iso8601(datetime)
-              end
-
-            assert result == expected_result
+          expected when is_binary(expected) ->
+            assert to_iso(datetime) == expected
         end
+        record_result!("parse_datetime", unquote(string_datetime), unquote(expected_result))
       end
     end
   end
@@ -37,6 +48,7 @@ defmodule DateTimeParserTestMacros do
       test "parses time #{unquote(string_time)}" do
         assert {:ok, time} = DateTimeParser.parse_time(unquote(string_time))
         assert time == unquote(expected_result)
+        record_result!("parse_time", unquote(string_time), unquote(expected_result))
       end
     end
   end
@@ -46,6 +58,7 @@ defmodule DateTimeParserTestMacros do
       test "parses date #{unquote(string_date)}" do
         assert {:ok, date} = DateTimeParser.parse_date(unquote(string_date))
         assert date == unquote(expected_result)
+        record_result!("parse_date", unquote(string_date), unquote(expected_result))
       end
     end
   end

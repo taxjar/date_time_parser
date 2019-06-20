@@ -12,6 +12,7 @@ defmodule DateTimeParser do
 
   ## Examples
 
+    ```elixir
     iex> DateTimeParser.parse_datetime("19 September 2018 08:15:22 AM")
     {:ok, ~N[2018-09-19 08:15:22]}
 
@@ -39,6 +40,7 @@ defmodule DateTimeParser do
 
     iex> DateTimeParser.parse_datetime(nil)
     {:error, "Could not parse nil"}
+    ```
   """
 
   import NimbleParsec

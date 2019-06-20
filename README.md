@@ -10,6 +10,10 @@ first. All other cases will use the international format `ymd`. Sometimes, if
 the conditions are right, it can even parse `dmy` with dashes if the month is a
 vocal month (eg, `"Jan"`).
 
+## Documentation
+
+[Online Documentation](https://hexdocs.pm/date_time_parser)
+
 ## Examples
 
 ```elixir
@@ -48,6 +52,20 @@ def deps do
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/date_time_parser](https://hexdocs.pm/date_time_parser).
+## Changelog
+
+[View changelog](./CHANGELOG.md)
+
+## Contributing
+
+To run tests:
+```shell
+$ # This will run tests, regenerate EXAMPLES.md, and run Credo in strict mode
+$ mix tests
+```
+
+To build a release:
+```shell
+$ # bin/release {old_version} {new_version}
+$ bin/release 0.1.0 0.2.0
+```

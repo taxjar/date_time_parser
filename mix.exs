@@ -1,16 +1,23 @@
 defmodule DateTimeParser.MixProject do
   use Mix.Project
+  @version "0.1.0"
 
   def project do
     [
       app: :date_time_parser,
-      version: "0.1.0",
+      name: "DateTimeParser",
+      version: @version,
+      source_url: "https://github.com/taxjar/date_time_parser",
+      homepage_url: "https://github.com/taxjar/date_time_parser",
       elixir: ">= 1.3.0",
       elixirc_paths: elixirc_paths(Mix.env()),
       aliases: aliases(),
+      package: package(),
+      docs: docs(),
       start_permanent: Mix.env() == :prod,
       preferred_cli_env: [tests: :test],
-      deps: deps() ++ dev_deps()
+      deps: deps(),
+      description: "Parse a string into %DateTime{}, %NaiveDateTime{}, %Time{}, or %Date{}"
     ]
   end
 
@@ -23,31 +30,49 @@ defmodule DateTimeParser.MixProject do
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
 
-  defp deps() do
+  defp package do
     [
-      {:nimble_parsec, "~> 0.5.0", runtime: false},
-      {:timex, "~> 3.2"}
+      files: ["lib", "mix.exs", "CHANGELOG*", "README*", "LICENSE*"],
+      maintainers: ["David Bernheisel"],
+      licenses: [],
+      links: %{
+        "GitHub" => "https://github.com/taxjar/date_time_parser",
+        "readme" => "https://github.com/taxjar/date_time_parser/blob/#{@version}/README.md",
+        "changelog" => "https://github.com/taxjar/date_time_parser/blob/#{@version}/CHANGELOG.md"
+      }
     ]
   end
 
-  defp dev_deps() do
-    cond do
-      Version.match?(System.version(), ">= 1.6.0") ->
-        [
-          {:credo, "~> 1.0", only: [:dev, :test]},
-          {:dialyxir, "~> 1.0.0-rc.6", only: [:dev, :test], runtime: false},
-          {:junit_formatter, "~> 3.0", only: :test}
-        ]
+  defp deps() do
+    [
+      {:nimble_parsec, "~> 0.5.0", runtime: false},
+      {:timex, "~> 3.2"},
+    ]
+    |> add_dep_if({:credo, "~> 1.1", only: [:dev, :test], runtime: false}, ">= 1.5.0")
+    |> add_dep_if({:ex_doc, "~> 0.20.0", only: :dev, runtime: false}, ">= 1.7.0")
+    |> add_dep_if({:dialyxir, "~> 1.0.0-rc.6", only: [:dev, :test], runtime: false}, ">= 1.6.0")
+    |> add_dep_if({:junit_formatter, "~> 3.0", only: :test}, ">= 1.5.0")
+  end
 
-      Version.match?(System.version(), ">= 1.5.0") ->
-        [
-          {:credo, "~> 1.0", only: [:dev, :test]},
-          {:junit_formatter, "~> 3.0", only: :test}
-        ]
-
-      true ->
-        []
+  defp add_dep_if(deps, dep, version) do
+    if Version.match?(System.version(), version) do
+      [dep | deps]
+    else
+      deps
     end
+  end
+
+  defp docs() do
+    [
+      main: "readme",
+      source_ref: "v#{@version}",
+      extras: [
+        "README.md",
+        "CHANGELOG.md",
+        "EXAMPLES.md",
+        "LICENSE.md"
+      ]
+    ]
   end
 
   defp aliases() do
