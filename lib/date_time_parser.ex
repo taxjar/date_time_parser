@@ -42,379 +42,10 @@ defmodule DateTimeParser do
   """
 
   import NimbleParsec
+  import __MODULE__.Combinators
 
-  @days_map %{
-    "sun" => "Sunday",
-    "mon" => "Monday",
-    "tue" => "Tuesday",
-    "tues" => "Tuesday",
-    "wed" => "Wednesday",
-    "thurs" => "Thursday",
-    "thur" => "Thursday",
-    "thu" => "Thursday",
-    "fri" => "Friday",
-    "sat" => "Saturday"
-  }
-  @days_num ~w(01 02 03 04 05 06 07 08 09) ++ Enum.map(31..1, &to_string/1)
-  @months_map %{
-    "january" => 1,
-    "february" => 2,
-    "march" => 3,
-    "april" => 4,
-    "may" => 5,
-    "june" => 6,
-    "july" => 7,
-    "august" => 8,
-    "september" => 9,
-    "october" => 10,
-    "november" => 11,
-    "december" => 12,
-    "jan" => 1,
-    "feb" => 2,
-    "mar" => 3,
-    "apr" => 4,
-    "jun" => 6,
-    "jul" => 7,
-    "aug" => 8,
-    "sept" => 9,
-    "sep" => 9,
-    "oct" => 10,
-    "nov" => 11,
-    "dec" => 12
-  }
-  @months_num ~w(01 02 03 04 05 06 07 08 09) ++ Enum.map(12..0, &to_string/1)
-  @hour_num ~w(00 01 02 03 04 05 06 07 08 09) ++ Enum.map(24..0, &to_string/1)
-  @minute_num ~w(00 01 02 03 04 05 06 07 08 09) ++ Enum.map(59..0, &to_string/1)
-  @second_num ~w(00 01 02 03 04 05 06 07 08 09) ++ Enum.map(59..0, &to_string/1)
-  @am_pm ~w(am a.m a.m. a_m pm p.m p.m p_m a p)
-  @date_separator ~w(, . : / -) ++ [" "]
-  @datetime_separator ~w(t - +) ++ [" "]
-  @time_separator ":"
-
-  @utc ~w(utc gmt z)
-  @eastern ~w(eastern est edt et)
-  @pacific ~w(pacific pst pdt pt)
-  @central ~w(central cst cdt ct)
-  @mountain ~w(mountain mst mdt mt)
-  @alaska ~w(alaska akst akdt akt)
-  @hawaii ~w(hawaii hast hadt hat hst)
-  @timezone_abbreviations @utc ++
-                            @eastern ++
-                            @pacific ++
-                            @central ++
-                            @mountain ++
-                            @alaska ++
-                            @hawaii
-
-  defp vocal_month_to_numeric_month(val), do: Map.get(@months_map, val)
-  defp to_integer({token, value}), do: {token, String.to_integer(value)}
-
-  time_separator = string(@time_separator)
-
-  datetime_separator =
-    @datetime_separator
-    |> Enum.map(&string/1)
-    |> choice()
-
-  space_separator = string(" ")
-
-  year =
-    [?0..?9]
-    |> ascii_char()
-    |> times(max: 4, min: 2)
-    |> tag(:year)
-    |> label("2 or 4 digit year")
-
-  year4 =
-    [?0..?9]
-    |> ascii_char()
-    |> times(4)
-    |> tag(:year)
-
-  vocal_month =
-    @months_map
-    |> Map.keys()
-    |> Enum.sort_by(&byte_size/1)
-    |> Enum.reverse()
-    |> Enum.map(&string/1)
-    |> choice()
-    |> concat(string(".") |> optional() |> ignore())
-    |> map(:vocal_month_to_numeric_month)
-    |> unwrap_and_tag(:month)
-    |> label("word month either fully spelled or 3-letter abbreviation")
-
-  numeric_month =
-    @months_num
-    |> Enum.map(&string/1)
-    |> choice()
-    |> unwrap_and_tag(:month)
-    |> map(:to_integer)
-    |> label("numeric month from 00-12")
-
-  day_of_month =
-    @days_num
-    |> Enum.map(&string/1)
-    |> choice()
-    |> unwrap_and_tag(:day)
-    |> map(:to_integer)
-    |> label("numeric day from 00-31")
-
-  date_separator =
-    @date_separator
-    |> Enum.map(&string/1)
-    |> choice()
-    |> ignore()
-    |> label("date separator")
-
-  hour =
-    @hour_num
-    |> Enum.map(&string/1)
-    |> choice()
-    |> unwrap_and_tag(:hour)
-    |> map(:to_integer)
-    |> label("numeric hour from 00-24")
-
-  microsecond =
-    [?0..?9]
-    |> ascii_char()
-    |> times(min: 1, max: 6)
-    |> tag(:microsecond)
-    |> label("numeric microsecond up to 6 digits")
-
-  second =
-    @second_num
-    |> Enum.map(&string/1)
-    |> choice()
-    |> unwrap_and_tag(:second)
-    |> map(:to_integer)
-    |> label("numeric second from 00-59")
-    |> concat("." |> string() |> ignore() |> optional())
-    |> concat(microsecond |> optional())
-
-  minute =
-    @minute_num
-    |> Enum.map(&string/1)
-    |> choice()
-    |> unwrap_and_tag(:minute)
-    |> map(:to_integer)
-    |> label("numeric minute from 00-59")
-
-  hour_minute =
-    hour
-    |> concat(time_separator |> optional() |> ignore())
-    |> concat(minute |> optional())
-
-  hour_minute_second =
-    hour_minute
-    |> concat(time_separator |> optional() |> ignore())
-    |> concat(second |> optional())
-
-  offset =
-    ["+", "-"]
-    |> Enum.map(&string/1)
-    |> choice()
-    |> concat([?0..?9] |> ascii_char() |> times(min: 1, max: 2))
-    |> concat(time_separator |> optional() |> ignore())
-    |> concat([?0..?9] |> ascii_char() |> times(2) |> optional())
-    |> tag(:utc_offset)
-    |> label("offset with +/- and 4 digits")
-
-  utc =
-    @utc
-    |> Enum.map(&string/1)
-    |> choice()
-    |> replace("UTC")
-    |> label("timezone with offset")
-    |> unwrap_and_tag(:zone_abbr)
-
-  utc_plus_offset = concat(utc, offset)
-
-  timezone_abbreviation =
-    @timezone_abbreviations
-    |> Enum.map(&string/1)
-    |> choice()
-    |> label("timezone abbreviation")
-    |> unwrap_and_tag(:zone_abbr)
-
-  second_letter_of_timezone_abbreviation =
-    @timezone_abbreviations
-    |> Enum.map(fn abbr -> abbr |> String.codepoints() |> Enum.at(1) end)
-    |> Enum.reject(&is_nil/1)
-    |> Enum.map(fn char ->
-      <<codepoint::utf8>> = char
-      codepoint
-    end)
-    |> ascii_char
-
-  am_pm =
-    @am_pm
-    |> Enum.map(&string/1)
-    |> choice()
-    |> lookahead_not(second_letter_of_timezone_abbreviation)
-    |> label("am or pm")
-    |> unwrap_and_tag(:am_pm)
-
-  month =
-    choice([
-      numeric_month,
-      vocal_month
-    ])
-
-  month_day =
-    month
-    |> concat(date_separator |> optional())
-    |> concat(day_of_month)
-
-  day_month =
-    day_of_month
-    |> concat(date_separator |> optional())
-    |> concat(month)
-
-  day_long_month_year =
-    day_of_month
-    |> concat(date_separator |> optional())
-    |> concat(vocal_month)
-    |> concat(date_separator |> optional())
-    |> concat(year)
-
-  year_month_day =
-    year
-    |> concat(date_separator |> optional())
-    |> concat(month_day)
-
-  month_day_year =
-    month_day
-    |> concat(date_separator |> optional())
-    |> concat(year)
-
-  day_month_year4 =
-    day_month
-    |> concat(date_separator)
-    |> concat(year4)
-
-  day_month_year =
-    day_month
-    |> concat(date_separator |> optional())
-    |> concat(year)
-
-  timezone =
-    choice([
-      utc_plus_offset,
-      utc,
-      offset,
-      timezone_abbreviation
-    ])
-
-  time =
-    hour_minute_second
-    |> concat(space_separator |> optional() |> ignore())
-    |> concat(am_pm |> optional())
-
-  formal_date =
-    choice([
-      day_long_month_year,
-      day_month_year4,
-      year_month_day,
-      day_month_year,
-      month_day_year,
-      day_month,
-      month_day
-    ])
-
-  us_date =
-    choice([
-      day_long_month_year,
-      month_day_year,
-      day_month_year,
-      year_month_day,
-      day_month,
-      month_day
-    ])
-
-  vocal_month_day_time_year =
-    vocal_month
-    |> concat(space_separator |> ignore())
-    |> concat(day_of_month)
-    |> concat(space_separator |> ignore())
-    |> concat(time)
-    |> concat(space_separator |> optional() |> ignore())
-    |> concat(year4)
-
-  formal_date_time =
-    formal_date
-    |> concat(datetime_separator |> optional() |> ignore())
-    |> concat(time |> optional())
-    |> concat(space_separator |> optional() |> ignore())
-    |> concat(timezone |> optional())
-
-  us_date_time =
-    us_date
-    |> concat(datetime_separator |> optional() |> ignore())
-    |> concat(time |> optional())
-    |> concat(space_separator |> optional() |> ignore())
-    |> concat(timezone |> optional())
-
-  vocal_days_long =
-    @days_map
-    |> Map.values()
-    |> Enum.map(&String.downcase/1)
-    |> Enum.sort_by(&byte_size/1)
-    |> Enum.reverse()
-    |> Enum.map(&string/1)
-
-  vocal_days_short =
-    @days_map
-    |> Map.keys()
-    |> Enum.map(&String.downcase/1)
-    |> Enum.sort_by(&byte_size/1)
-    |> Enum.reverse()
-    |> Enum.map(&string/1)
-
-  vocal_day =
-    (vocal_days_long ++ vocal_days_short)
-    |> choice()
-    |> unwrap_and_tag(:vocal_day)
-    |> label("vocal day spelled out")
-    |> concat(" " |> string() |> optional() |> ignore())
-
-  defparsecp(:do_parse_time, time)
-
-  defparsecp(
-    :do_parse_datetime,
-    vocal_day
-    |> optional()
-    |> choice([
-      vocal_month_day_time_year,
-      formal_date_time,
-      formal_date
-    ])
-  )
-
-  defparsecp(
-    :do_parse_us_datetime,
-    vocal_day
-    |> optional()
-    |> choice([
-      vocal_month_day_time_year,
-      us_date_time,
-      us_date
-    ])
-  )
-
-  defparsecp(
-    :do_parse_us_date,
-    vocal_day
-    |> optional()
-    |> concat(us_date)
-  )
-
-  defparsecp(
-    :do_parse_date,
-    vocal_day
-    |> optional()
-    |> concat(formal_date)
-  )
-
+  @spec parse_datetime(String.t() | nil, Keyword.t()) ::
+          {:ok, DateTime.t() | NaiveDateTime.t()} | {:error, String.t()}
   def parse_datetime(string, opts \\ [])
 
   def parse_datetime(string, opts) when is_binary(string) do
@@ -433,6 +64,7 @@ defmodule DateTimeParser do
   def parse_datetime(nil, _opts), do: {:error, "Could not parse nil"}
   def parse_datetime(value, _opts), do: {:error, "Could not parse #{value}"}
 
+  @spec parse_time(String.t() | nil) :: {:ok, Time.t()} | {:error, String.t()}
   def parse_time(string) when is_binary(string) do
     {:ok, tokens, _, _, _, _} = string |> clean |> do_parse_time()
     to_time(tokens)
@@ -441,6 +73,7 @@ defmodule DateTimeParser do
   def parse_time(nil), do: {:error, "Could not parse nil"}
   def parse_time(value), do: {:error, "Could not parse #{value}"}
 
+  @spec parse_date(String.t() | nil) :: {:ok, Date.t()} | {:error, String.t()}
   def parse_date(string) when is_binary(string) do
     parser = if String.contains?(string, "/"), do: &do_parse_us_date/1, else: &do_parse_date/1
     {:ok, tokens, _, _, _, _} = string |> clean |> parser.()
@@ -632,4 +265,42 @@ defmodule DateTimeParser do
   defp format({_, value}) when is_integer(value), do: value
   defp format({_, value}), do: String.to_integer(value)
   defp format(_), do: nil
+
+  defparsecp(:do_parse_time, time())
+
+  defparsecp(
+    :do_parse_datetime,
+    vocal_day()
+    |> optional()
+    |> choice([
+      vocal_month_day_time_year(),
+      formal_date_time(),
+      formal_date()
+    ])
+  )
+
+  defparsecp(
+    :do_parse_date,
+    vocal_day()
+    |> optional()
+    |> concat(formal_date())
+  )
+
+  defparsecp(
+    :do_parse_us_date,
+    vocal_day()
+    |> optional()
+    |> concat(us_date())
+  )
+
+  defparsecp(
+    :do_parse_us_datetime,
+    vocal_day()
+    |> optional()
+    |> choice([
+      vocal_month_day_time_year(),
+      us_date_time(),
+      us_date()
+    ])
+  )
 end

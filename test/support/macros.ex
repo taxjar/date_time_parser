@@ -8,20 +8,24 @@ defmodule DateTimeParserTestMacros do
         if unquote(opts) == [] do
           "parses datetime #{unquote(string_datetime)}"
         else
-          "parses datetime #{unquote(string_datetime)} with opts #{inspect unquote(opts)}"
+          "parses datetime #{unquote(string_datetime)} with opts #{inspect(unquote(opts))}"
         end
 
       test test_name do
-        assert {:ok, datetime} = DateTimeParser.parse_datetime(unquote(string_datetime), unquote(opts))
+        assert {:ok, datetime} =
+                 DateTimeParser.parse_datetime(unquote(string_datetime), unquote(opts))
+
         case unquote(expected_result) do
           %{} = expected_result ->
             assert datetime == expected_result
 
           expected_result when is_binary(expected_result) ->
-            result = case datetime do
-              %NaiveDateTime{} = datetime -> NaiveDateTime.to_iso8601(datetime)
-              %DateTime{} = datetime -> DateTime.to_iso8601(datetime)
-            end
+            result =
+              case datetime do
+                %NaiveDateTime{} = datetime -> NaiveDateTime.to_iso8601(datetime)
+                %DateTime{} = datetime -> DateTime.to_iso8601(datetime)
+              end
+
             assert result == expected_result
         end
       end
