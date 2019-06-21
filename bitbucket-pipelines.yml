@@ -3,10 +3,22 @@ image: elixir:1.5.3-alpine
 pipelines:
   default:
     - step:
+        caches:
+          - mix
+          - hex
+          - deps
         script:
+          - export MIX_HOME="$BITBUCKET_CLONE_DIR/.cache/mix"
+          - export HEX_HOME="$BITBUCKET_CLONE_DIR/.cache/hex"
+          - export MIX_ENV="test"
           - mix local.hex --force
           - mix local.rebar --force
           - mix deps.get
           - mix compile
           - mix test
 
+definitions:
+  caches:
+    mix: .cache/mix
+    hex: .cache/hex
+    deps: deps
