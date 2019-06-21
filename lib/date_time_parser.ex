@@ -60,6 +60,9 @@ defmodule DateTimeParser do
        |> to_naive_datetime()
        |> to_datetime(tokens)
        |> maybe_convert_to_utc(opts)}
+    else
+      _ ->
+        {:error, "Could not parse #{string}"}
     end
   end
 

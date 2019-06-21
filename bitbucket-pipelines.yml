@@ -11,7 +11,7 @@ pipelines:
           - export MIX_HOME="$BITBUCKET_CLONE_DIR/.cache/mix"
           - export HEX_HOME="$BITBUCKET_CLONE_DIR/.cache/hex"
           - export MIX_ENV="test"
-          - mix local.hex --force
+          - mix local.hex --if-missing --force
           - mix local.rebar --force
           - mix deps.get
           - mix compile
