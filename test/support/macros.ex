@@ -38,6 +38,7 @@ defmodule DateTimeParserTestMacros do
           expected when is_binary(expected) ->
             assert to_iso(datetime) == expected
         end
+
         record_result!("parse_datetime", unquote(string_datetime), unquote(expected_result))
       end
     end

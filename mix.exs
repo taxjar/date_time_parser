@@ -15,7 +15,11 @@ defmodule DateTimeParser.MixProject do
       package: package(),
       docs: docs(),
       start_permanent: Mix.env() == :prod,
-      preferred_cli_env: [tests: :test],
+      preferred_cli_env: [
+        tests: :test,
+        benchmark: :bench,
+        profile: :bench
+      ],
       deps: deps(),
       description: "Parse a string into %DateTime{}, %NaiveDateTime{}, %Time{}, or %Date{}"
     ]
@@ -47,10 +51,12 @@ defmodule DateTimeParser.MixProject do
     [
       {:nimble_parsec, "~> 0.5.0", runtime: false},
       {:timex, "~> 3.2"},
+      {:exprof, "~> 0.2.0", only: :bench}
     ]
+    |> add_dep_if({:benchee, "~> 1.0", only: [:bench], runtime: false}, ">= 1.6.0")
     |> add_dep_if({:credo, "~> 1.1", only: [:dev, :test], runtime: false}, ">= 1.5.0")
-    |> add_dep_if({:ex_doc, "~> 0.20.0", only: :dev, runtime: false}, ">= 1.7.0")
     |> add_dep_if({:dialyxir, "~> 1.0.0-rc.6", only: [:dev, :test], runtime: false}, ">= 1.6.0")
+    |> add_dep_if({:ex_doc, "~> 0.20.0", only: :dev, runtime: false}, ">= 1.7.0")
     |> add_dep_if({:junit_formatter, "~> 3.0", only: :test}, ">= 1.5.0")
   end
 
@@ -65,7 +71,7 @@ defmodule DateTimeParser.MixProject do
   defp docs() do
     [
       main: "readme",
-      source_ref: "v#{@version}",
+      source_ref: @version,
       extras: [
         "README.md",
         "CHANGELOG.md",
@@ -77,7 +83,13 @@ defmodule DateTimeParser.MixProject do
 
   defp aliases() do
     [
-      tests: ["test", "credo --strict"]
+      tests: ["test", "credo --strict"],
+      profile: ["run bench/profile.exs"],
+      benchmark: [
+        "run bench/self.exs",
+        "cmd ruby bench/ruby.rb",
+        "cmd ruby bench/rails.rb"
+      ]
     ]
   end
 end

@@ -54,13 +54,14 @@ defmodule DateTimeParser do
     parser =
       if String.contains?(string, "/"), do: &do_parse_us_datetime/1, else: &do_parse_datetime/1
 
-    with {:ok, tokens, _, _, _, _} <- string |> clean() |> parser.() do
-      {:ok,
-        tokens
-        |> to_naive_datetime()
-        |> to_datetime(tokens)
-        |> maybe_convert_to_utc(opts)}
-    else
+    case string |> clean() |> parser.() do
+      {:ok, tokens, _, _, _, _} ->
+        {:ok,
+         tokens
+         |> to_naive_datetime()
+         |> to_datetime(tokens)
+         |> maybe_convert_to_utc(opts)}
+
       _ ->
         {:error, "Could not parse #{string}"}
     end
@@ -71,8 +72,13 @@ defmodule DateTimeParser do
 
   @spec parse_time(String.t() | nil) :: {:ok, Time.t()} | {:error, String.t()}
   def parse_time(string) when is_binary(string) do
-    {:ok, tokens, _, _, _, _} = string |> clean |> do_parse_time()
-    to_time(tokens)
+    case string |> clean |> do_parse_time() do
+      {:ok, tokens, _, _, _, _} ->
+        to_time(tokens)
+
+      _ ->
+        {:error, "Could not parse #{string}"}
+    end
   end
 
   def parse_time(nil), do: {:error, "Could not parse nil"}
@@ -81,8 +87,14 @@ defmodule DateTimeParser do
   @spec parse_date(String.t() | nil) :: {:ok, Date.t()} | {:error, String.t()}
   def parse_date(string) when is_binary(string) do
     parser = if String.contains?(string, "/"), do: &do_parse_us_date/1, else: &do_parse_date/1
-    {:ok, tokens, _, _, _, _} = string |> clean |> parser.()
-    to_date(tokens)
+
+    case string |> clean |> parser.() do
+      {:ok, tokens, _, _, _, _} ->
+        to_date(tokens)
+
+      _ ->
+        {:error, "Could not parse #{string}"}
+    end
   end
 
   def parse_date(nil), do: {:error, "Could not parse nil"}

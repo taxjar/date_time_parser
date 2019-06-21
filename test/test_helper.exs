@@ -8,6 +8,7 @@ end
 
 example_file = "EXAMPLES.md"
 File.rm(example_file)
+
 File.write!(example_file, """
 # Examples
 

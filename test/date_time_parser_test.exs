@@ -272,7 +272,9 @@ defmodule DateTimeParserTest do
 
   describe "errors" do
     test "returns an error when not recognized" do
-      assert DateTimeParser.parse_datetime("2017-24-32 16:09:53 UTC") == {:error, "Could not parse 2017-24-32 16:09:53 UTC"}
+      assert DateTimeParser.parse_datetime("2017-24-32 16:09:53 UTC") ==
+               {:error, "Could not parse 2017-24-32 16:09:53 UTC"}
+
       assert DateTimeParser.parse_datetime(nil) == {:error, "Could not parse nil"}
       assert DateTimeParser.parse_date(nil) == {:error, "Could not parse nil"}
       assert DateTimeParser.parse_time(nil) == {:error, "Could not parse nil"}

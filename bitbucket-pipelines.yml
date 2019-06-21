@@ -16,6 +16,7 @@ pipelines:
           - mix deps.get
           - mix compile
           - mix test
+          - mix credo --strict
 
 definitions:
   caches:
