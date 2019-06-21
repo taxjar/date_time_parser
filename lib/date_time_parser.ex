@@ -56,10 +56,10 @@ defmodule DateTimeParser do
 
     with {:ok, tokens, _, _, _, _} <- string |> clean() |> parser.() do
       {:ok,
-       tokens
-       |> to_naive_datetime()
-       |> to_datetime(tokens)
-       |> maybe_convert_to_utc(opts)}
+        tokens
+        |> to_naive_datetime()
+        |> to_datetime(tokens)
+        |> maybe_convert_to_utc(opts)}
     else
       _ ->
         {:error, "Could not parse #{string}"}

@@ -15,7 +15,6 @@ defmodule DateTimeParser.Combinators do
     "fri" => "Friday",
     "sat" => "Saturday"
   }
-  @days_num ~w(01 02 03 04 05 06 07 08 09) ++ Enum.map(31..1, &to_string/1)
   @months_map %{
     "january" => 1,
     "february" => 2,
@@ -42,7 +41,6 @@ defmodule DateTimeParser.Combinators do
     "nov" => 11,
     "dec" => 12
   }
-  @months_num ~w(01 02 03 04 05 06 07 08 09) ++ Enum.map(12..0, &to_string/1)
   @hour_num ~w(00 01 02 03 04 05 06 07 08 09) ++ Enum.map(23..0, &to_string/1)
   @second_minute_num ~w(00 01 02 03 04 05 06 07 08 09) ++ Enum.map(59..0, &to_string/1)
   @am_pm ~w(am a.m a.m. a_m pm p.m p.m p_m a p)
@@ -112,21 +110,51 @@ defmodule DateTimeParser.Combinators do
   end
 
   def numeric_month do
-    @months_num
-    |> Enum.map(&string/1)
-    |> choice()
+    choice([
+      numeric_month2(),
+      numeric_month1()
+    ])
     |> map(:to_integer)
     |> unwrap_and_tag(:month)
-    |> label("numeric month from 00-12")
+    |> label("numeric month from 01-12")
   end
 
-  def day_of_month do
-    @days_num
+  def numeric_month2 do
+    ~w(01 02 03 04 05 06 07 08 09 10 11 12)
     |> Enum.map(&string/1)
     |> choice()
+  end
+
+  def numeric_month1 do
+    1..9
+    |> Enum.map(&to_string/1)
+    |> Enum.map(&string/1)
+    |> choice()
+    |> lookahead_not(integer(min: 1))
+  end
+
+  def day do
+    choice([
+      day2(),
+      day1()
+    ])
     |> map(:to_integer)
     |> unwrap_and_tag(:day)
-    |> label("numeric day from 00-31")
+    |> label("numeric day from 01-31")
+  end
+
+  def day2 do
+    (~w(01 02 03 04 05 06 07 08 09) ++ Enum.map(10..31, &to_string/1))
+    |> Enum.map(&string/1)
+    |> choice()
+  end
+
+  def day1 do
+    1..9
+    |> Enum.map(&to_string/1)
+    |> Enum.map(&string/1)
+    |> choice()
+    |> lookahead_not(integer(min: 1))
   end
 
   def date_separator do
@@ -247,17 +275,17 @@ defmodule DateTimeParser.Combinators do
   def month_day do
     month()
     |> concat(date_separator() |> optional())
-    |> concat(day_of_month())
+    |> concat(day())
   end
 
   def day_month do
-    day_of_month()
+    day()
     |> concat(date_separator() |> optional())
     |> concat(month())
   end
 
   def day_long_month_year do
-    day_of_month()
+    day()
     |> concat(date_separator() |> optional())
     |> concat(vocal_month())
     |> concat(date_separator() |> optional())
@@ -332,7 +360,7 @@ defmodule DateTimeParser.Combinators do
   def vocal_month_day_time_year do
     vocal_month()
     |> concat(space_separator() |> ignore())
-    |> concat(day_of_month())
+    |> concat(day())
     |> concat(space_separator() |> ignore())
     |> concat(time())
     |> concat(space_separator() |> optional() |> ignore())
