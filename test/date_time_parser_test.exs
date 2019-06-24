@@ -225,6 +225,64 @@ defmodule DateTimeParserTest do
     test_date_parsing("2019-05-20 10:00:00PST", ~D[2019-05-20])
   end
 
+  describe "parse_datetime/2 - options" do
+    test "to_utc: false returns NaiveDateTime when undetermined timezone" do
+      string = "2019-01-01T00:00:00"
+      {:ok, result} = DateTimeParser.parse_datetime(string, to_utc: false)
+
+      assert result == ~N[2019-01-01 00:00:00]
+    end
+
+    test "to_utc: false returns DateTime when determined timezone" do
+      string = "2019-01-01T00:00:00Z"
+      {:ok, result} = DateTimeParser.parse_datetime(string, to_utc: false)
+
+      assert result == DateTime.from_naive!(~N[2019-01-01 00:00:00], "Etc/UTC")
+    end
+
+    test "to_utc: true returns converted DateTime when timezone is determined" do
+      string = "2019-01-01T00:00:00 PST"
+      {:ok, result} = DateTimeParser.parse_datetime(string, to_utc: true)
+
+      assert result == DateTime.from_naive!(~N[2019-01-01 07:00:00], "Etc/UTC")
+    end
+
+    test "to_utc: true returns NaiveDateTime when timezone is undetermined" do
+      string = "2019-01-01T08:00:00"
+      {:ok, result} = DateTimeParser.parse_datetime(string, to_utc: true)
+
+      assert result == ~N[2019-01-01 08:00:00]
+    end
+
+    test "assume_utc: false returns NaiveDateTime when undetermined timezone" do
+      string = "2019-01-01T00:00:00"
+      {:ok, result} = DateTimeParser.parse_datetime(string, assume_utc: false)
+
+      assert result == ~N[2019-01-01 00:00:00]
+    end
+
+    test "assume_utc: false returns DateTime when determined timezone" do
+      string = "2019-01-01T00:00:00Z"
+      {:ok, result} = DateTimeParser.parse_datetime(string, assume_utc: false)
+
+      assert result == DateTime.from_naive!(~N[2019-01-01 00:00:00], "Etc/UTC")
+    end
+
+    test "assume_utc: true returns converted DateTime when timezone is determined" do
+      string = "2019-01-01T00:00:00 PST"
+      {:ok, result} = DateTimeParser.parse_datetime(string, assume_utc: true)
+
+      assert result == DateTime.from_naive!(~N[2019-01-01 07:00:00], "Etc/UTC")
+    end
+
+    test "assume_utc: true returns NaiveDateTime when timezone is undetermined" do
+      string = "2019-01-01T08:00:00"
+      {:ok, result} = DateTimeParser.parse_datetime(string, assume_utc: true)
+
+      assert result == DateTime.from_naive!(~N[2019-01-01 08:00:00], "Etc/UTC")
+    end
+  end
+
   describe "parse_datetime/1 - vocal" do
     test_datetime_parsing("Sunday 01 January 2017 10:11:02 PM", ~N[2017-01-01 22:11:02])
     test_datetime_parsing("Sunday, 01 January 2017 10:11:02 PM", ~N[2017-01-01 22:11:02])

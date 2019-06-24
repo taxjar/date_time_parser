@@ -28,9 +28,17 @@ defmodule DateTimeParser do
     iex> DateTimeParser.parse_datetime("1/1/18 3:24 PM")
     {:ok, ~N[2018-01-01T15:24:00]}
 
+    iex> DateTimeParser.parse_datetime("1/1/18 3:24 PM", assume_utc: true)
+    {:ok, DateTime.from_naive!(~N[2018-01-01T15:24:00Z], "Etc/UTC")}
+    # or ~U[2018-01-01T15:24:00Z] in 1.9.0+
+
     iex> DateTimeParser.parse_datetime(~s|"Dec 1, 2018 7:39:53 AM PST"|)
     {:ok, DateTime.from_naive!(~N[2018-12-01T14:39:53Z], "Etc/UTC")}
-    # Notice that the date is converted to UTC
+    # Notice that the date is converted to UTC by default
+
+    iex> {:ok, datetime} = DateTimeParser.parse_datetime(~s|"Dec 1, 2018 7:39:53 AM PST"|, to_utc: false)
+    iex> datetime
+    #DateTime<2018-12-01 07:39:53-07:00 PDT PST8PDT>
 
     iex> DateTimeParser.parse_time("10:13pm")
     {:ok, ~T[22:13:00]}
@@ -43,16 +51,30 @@ defmodule DateTimeParser do
     ```
   """
 
-  import NimbleParsec
-  import __MODULE__.Combinators
+  @doc """
+  Parse a %DateTime{} or %NaiveDateTime{} from a string.
 
+  Options:
+    assume_utc: true/false. Default false.
+      Only applicable for strings where parsing could not determine a timezone. Instead of returning
+      a NaiveDateTime, this option will assume them to be in UTC timezone, and therefore return a
+      DateTime
+
+    to_utc: true/false. Default true.
+      If there's a timezone detected in the string, then attempt to convert to UTC timezone. This is
+      helpful for storing in databases with Ecto.
+  """
   @spec parse_datetime(String.t() | nil, Keyword.t()) ::
           {:ok, DateTime.t() | NaiveDateTime.t()} | {:error, String.t()}
   def parse_datetime(string, opts \\ [])
 
   def parse_datetime(string, opts) when is_binary(string) do
     parser =
-      if String.contains?(string, "/"), do: &do_parse_us_datetime/1, else: &do_parse_datetime/1
+      if String.contains?(string, "/") do
+        &DateTimeParser.DateTime.parse_us/1
+      else
+        &DateTimeParser.DateTime.parse/1
+      end
 
     case string |> clean() |> parser.() do
       {:ok, tokens, _, _, _, _} ->
@@ -70,9 +92,12 @@ defmodule DateTimeParser do
   def parse_datetime(nil, _opts), do: {:error, "Could not parse nil"}
   def parse_datetime(value, _opts), do: {:error, "Could not parse #{value}"}
 
+  @doc """
+  Parse %Time{} from a string.
+  """
   @spec parse_time(String.t() | nil) :: {:ok, Time.t()} | {:error, String.t()}
   def parse_time(string) when is_binary(string) do
-    case string |> clean |> do_parse_time() do
+    case string |> clean |> DateTimeParser.Time.parse() do
       {:ok, tokens, _, _, _, _} ->
         to_time(tokens)
 
@@ -84,9 +109,16 @@ defmodule DateTimeParser do
   def parse_time(nil), do: {:error, "Could not parse nil"}
   def parse_time(value), do: {:error, "Could not parse #{value}"}
 
+  @doc """
+  Parse %Date{} from a string.
+  """
   @spec parse_date(String.t() | nil) :: {:ok, Date.t()} | {:error, String.t()}
   def parse_date(string) when is_binary(string) do
-    parser = if String.contains?(string, "/"), do: &do_parse_us_date/1, else: &do_parse_date/1
+    parser = if String.contains?(string, "/") do
+      &DateTimeParser.Date.parse_us/1
+    else
+      &DateTimeParser.Date.parse/1
+    end
 
     case string |> clean |> parser.() do
       {:ok, tokens, _, _, _, _} ->
@@ -150,12 +182,21 @@ defmodule DateTimeParser do
     end
   end
 
-  defp maybe_convert_to_utc(%NaiveDateTime{} = naive_datetime, _opts), do: naive_datetime
+  defp maybe_convert_to_utc(%NaiveDateTime{} = naive_datetime, opts) do
+    if Keyword.get(opts, :assume_utc, false) do
+      naive_datetime
+      |> DateTime.from_naive!("Etc/UTC")
+      |> maybe_convert_to_utc(opts)
+    else
+      naive_datetime
+    end
+  end
 
   defp maybe_convert_to_utc(%DateTime{} = datetime, opts) do
-    case Keyword.get(opts, :to_utc, true) do
-      true -> Timex.Timezone.convert(datetime, "Etc/UTC")
-      _ -> datetime
+    if Keyword.get(opts, :to_utc, true) do
+      Timex.Timezone.convert(datetime, "Etc/UTC")
+    else
+      datetime
     end
   end
 
@@ -282,42 +323,4 @@ defmodule DateTimeParser do
   defp format({_, value}) when is_integer(value), do: value
   defp format({_, value}), do: String.to_integer(value)
   defp format(_), do: nil
-
-  defparsecp(:do_parse_time, time())
-
-  defparsecp(
-    :do_parse_datetime,
-    vocal_day()
-    |> optional()
-    |> choice([
-      vocal_month_day_time_year(),
-      formal_date_time(),
-      formal_date()
-    ])
-  )
-
-  defparsecp(
-    :do_parse_date,
-    vocal_day()
-    |> optional()
-    |> concat(formal_date())
-  )
-
-  defparsecp(
-    :do_parse_us_date,
-    vocal_day()
-    |> optional()
-    |> concat(us_date())
-  )
-
-  defparsecp(
-    :do_parse_us_datetime,
-    vocal_day()
-    |> optional()
-    |> choice([
-      vocal_month_day_time_year(),
-      us_date_time(),
-      us_date()
-    ])
-  )
 end
