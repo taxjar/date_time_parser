@@ -130,7 +130,7 @@ defmodule DateTimeParser.Combinators do
     |> Enum.map(&to_string/1)
     |> Enum.map(&string/1)
     |> choice()
-    |> lookahead_not(integer(min: 1))
+    |> lookahead_not(integer(1))
   end
 
   def day do
@@ -154,7 +154,7 @@ defmodule DateTimeParser.Combinators do
     |> Enum.map(&to_string/1)
     |> Enum.map(&string/1)
     |> choice()
-    |> lookahead_not(integer(min: 1))
+    |> lookahead_not(integer(1))
   end
 
   def date_separator do

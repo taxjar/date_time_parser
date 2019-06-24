@@ -1,3 +1,5 @@
+alias DateTimeParserTest.Recorder
+
 if System.get_env("CI") == "true" do
   "test-results/exunit"
   |> Path.relative()
@@ -6,14 +8,15 @@ if System.get_env("CI") == "true" do
   ExUnit.configure(formatters: [JUnitFormatter, ExUnit.CLIFormatter])
 end
 
-example_file = "EXAMPLES.md"
-File.rm(example_file)
+{:ok, _recorder_pid} = Recorder.start_link()
 
-File.write!(example_file, """
-# Examples
+write_examples = fn
+  %{excluded: excluded, skipped: skipped} when excluded > 0 or skipped > 0 ->
+    :ok
 
-|**Method**|**Input**|**Output (ISO 8601)**|
-|:--------:|:-------:|:--------:|
-""")
+  _ ->
+    Recorder.write_results()
+end
 
+if Version.match?(System.version(), ">= 1.8.0"), do: ExUnit.after_suite(write_examples)
 ExUnit.start()
