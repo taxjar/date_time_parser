@@ -14,9 +14,7 @@ pipelines:
           - mix local.hex --if-missing --force
           - mix local.rebar --force
           - mix deps.get
-          - mix compile
-          - mix test
-          - mix credo --strict
+          - mix tests
 
 definitions:
   caches:

@@ -52,17 +52,17 @@ defmodule DateTimeParser do
   """
 
   @doc """
-  Parse a %DateTime{} or %NaiveDateTime{} from a string.
+  Parse a `%DateTime{}` or `%NaiveDateTime{}` from a string.
 
   Options:
-    assume_utc: true/false. Default false.
-      Only applicable for strings where parsing could not determine a timezone. Instead of returning
-      a NaiveDateTime, this option will assume them to be in UTC timezone, and therefore return a
-      DateTime
+    * `:assume_utc` Default `false`.
+    Only applicable for strings where parsing could not determine a timezone. Instead of returning
+    a NaiveDateTime, this option will assume them to be in UTC timezone, and therefore return a
+    DateTime
 
-    to_utc: true/false. Default true.
-      If there's a timezone detected in the string, then attempt to convert to UTC timezone. This is
-      helpful for storing in databases with Ecto.
+    * `:to_utc` Default `true`.
+    If there's a timezone detected in the string, then attempt to convert to UTC timezone. This is
+    helpful for storing in databases with Ecto.
   """
   @spec parse_datetime(String.t() | nil, Keyword.t()) ::
           {:ok, DateTime.t() | NaiveDateTime.t()} | {:error, String.t()}
@@ -93,7 +93,7 @@ defmodule DateTimeParser do
   def parse_datetime(value, _opts), do: {:error, "Could not parse #{value}"}
 
   @doc """
-  Parse %Time{} from a string.
+  Parse `%Time{}` from a string.
   """
   @spec parse_time(String.t() | nil) :: {:ok, Time.t()} | {:error, String.t()}
   def parse_time(string) when is_binary(string) do
@@ -110,7 +110,7 @@ defmodule DateTimeParser do
   def parse_time(value), do: {:error, "Could not parse #{value}"}
 
   @doc """
-  Parse %Date{} from a string.
+  Parse `%Date{}` from a string.
   """
   @spec parse_date(String.t() | nil) :: {:ok, Date.t()} | {:error, String.t()}
   def parse_date(string) when is_binary(string) do

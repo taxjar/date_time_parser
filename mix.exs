@@ -36,7 +36,7 @@ defmodule DateTimeParser.MixProject do
 
   defp package do
     [
-      files: ["lib", "mix.exs", "CHANGELOG*", "README*", "LICENSE*"],
+      files: ["lib", "mix.exs", "CHANGELOG*", "README*", "LICENSE*", "EXAMPLES*"],
       maintainers: ["David Bernheisel"],
       licenses: [],
       links: %{
@@ -83,7 +83,11 @@ defmodule DateTimeParser.MixProject do
 
   defp aliases() do
     [
-      tests: ["test", "credo --strict"],
+      tests: [
+        "compile --force --warnings-as-errors",
+        "test",
+        "credo --strict"
+      ],
       profile: ["run bench/profile.exs"],
       benchmark: [
         "run bench/self.exs",
