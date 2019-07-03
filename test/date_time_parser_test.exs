@@ -52,6 +52,7 @@ defmodule DateTimeParserTest do
     test_datetime_parsing("1/2/2018 18:06:26", "2018-01-02T18:06:26")
     test_datetime_parsing("1/3/2019 12:00:00 AM", "2019-01-03T12:00:00")
     test_datetime_parsing("1/31/2018 0:00:00 UTC", "2018-01-31T00:00:00Z")
+    test_datetime_parsing("5/12/2019 12:21:58 PM", "2019-05-12T12:21:58")
     test_datetime_parsing("2011-01-01 04:19:20 -0:00", "2011-01-01T04:19:20Z")
     test_datetime_parsing("2012-11-23T22:42:25-05:00", "2012-11-24T03:42:25Z")
     test_datetime_parsing("2013-12-31T22:18:50+00:00", "2013-12-31T22:18:50Z")

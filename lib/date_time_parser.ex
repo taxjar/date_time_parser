@@ -220,7 +220,7 @@ defmodule DateTimeParser do
   defp format_token(tokens, :hour) do
     case tokens |> find_token(:hour) do
       {:hour, hour} ->
-        if tokens |> find_token(:am_pm) |> format == "PM" && hour <= 12 do
+        if tokens |> find_token(:am_pm) |> format == "PM" && hour < 12 do
           hour + 12
         else
           hour
