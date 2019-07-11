@@ -175,6 +175,7 @@ defmodule DateTimeParserTest do
     test_datetime_parsing("34-1-13", ~N[2034-01-13 00:00:00])
     test_datetime_parsing("2034-1-9", ~N[2034-01-09 00:00:00])
     test_datetime_parsing("2034-01-13", ~N[2034-01-13 00:00:00])
+    test_datetime_parsing("2016-02-29 00:00:00 UTC", "2016-02-29T00:00:00Z")
 
     test_datetime_parsing(
       "2017-11-04 15:20:47 UTC",
@@ -224,6 +225,7 @@ defmodule DateTimeParserTest do
     test_date_parsing("2017-11-04 15:20:47+0500", ~D[2017-11-04])
     test_date_parsing("2017-11-04 15:20:47+0000", ~D[2017-11-04])
     test_date_parsing("2019-05-20 10:00:00PST", ~D[2019-05-20])
+    test_date_parsing("2016-02-29", ~D[2016-02-29])
   end
 
   describe "parse_datetime/2 - options" do
@@ -337,6 +339,20 @@ defmodule DateTimeParserTest do
       assert DateTimeParser.parse_datetime(nil) == {:error, "Could not parse nil"}
       assert DateTimeParser.parse_date(nil) == {:error, "Could not parse nil"}
       assert DateTimeParser.parse_time(nil) == {:error, "Could not parse nil"}
+    end
+
+    test "errors on invalid days of month" do
+      assert DateTimeParser.parse_datetime("2017-02-29 00:00:00 UTC") ==
+        {:error, "Could not parse 2017-02-29 00:00:00 UTC"}
+      assert DateTimeParser.parse_date("2017-02-29") ==
+        {:error, "Could not parse 2017-02-29"}
+
+      for month <- ["04", "06", "09", "11"] do
+        assert DateTimeParser.parse_datetime("2017-#{month}-31 00:00:00 UTC") ==
+          {:error, "Could not parse 2017-#{month}-31 00:00:00 UTC"}
+        assert DateTimeParser.parse_date("2017-#{month}-31") ==
+          {:error, "Could not parse 2017-#{month}-31"}
+      end
     end
   end
 end

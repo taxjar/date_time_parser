@@ -76,14 +76,13 @@ defmodule DateTimeParser do
         &DateTimeParser.DateTime.parse/1
       end
 
-    case string |> clean() |> parser.() do
-      {:ok, tokens, _, _, _, _} ->
-        {:ok,
-         tokens
-         |> to_naive_datetime()
-         |> to_datetime(tokens)
-         |> maybe_convert_to_utc(opts)}
-
+    with {:ok, tokens, _, _, _, _} <- string |> clean() |> parser.(),
+         naive_datetime <- to_naive_datetime(tokens),
+         datetime <- to_datetime(naive_datetime, tokens),
+         {:ok, datetime} <- validate_day(datetime),
+         datetime <- maybe_convert_to_utc(datetime, opts) do
+      {:ok, datetime}
+    else
       _ ->
         {:error, "Could not parse #{string}"}
     end
@@ -120,10 +119,11 @@ defmodule DateTimeParser do
       &DateTimeParser.Date.parse/1
     end
 
-    case string |> clean |> parser.() do
-      {:ok, tokens, _, _, _, _} ->
-        to_date(tokens)
-
+    with {:ok, tokens, _, _, _, _} <- string |> clean |> parser.(),
+         {:ok, date} <- to_date(tokens),
+         {:ok, _} <- validate_day(date) do
+      {:ok, date}
+    else
       _ ->
         {:error, "Could not parse #{string}"}
     end
@@ -181,6 +181,19 @@ defmodule DateTimeParser do
       _ -> naive_datetime
     end
   end
+
+  defp validate_day(%{day: day, month: month} = date)
+    when month in [1, 3, 5, 7, 8, 10, 12] and day in 1..31, do: {:ok, date}
+  defp validate_day(%{day: day, month: month} = date)
+    when month in [4, 6, 9, 11] and day in 1..30, do: {:ok, date}
+  defp validate_day(%{day: day, month: 2} = date)
+    when day in 1..28, do: {:ok, date}
+  defp validate_day(%{day: 29, month: 2, year: year} = date) do
+    if Timex.is_leap?(year),
+      do: {:ok, date},
+      else: :error
+  end
+  defp validate_day(_), do: :error
 
   defp maybe_convert_to_utc(%NaiveDateTime{} = naive_datetime, opts) do
     if Keyword.get(opts, :assume_utc, false) do
