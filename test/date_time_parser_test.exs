@@ -343,15 +343,17 @@ defmodule DateTimeParserTest do
 
     test "errors on invalid days of month" do
       assert DateTimeParser.parse_datetime("2017-02-29 00:00:00 UTC") ==
-        {:error, "Could not parse 2017-02-29 00:00:00 UTC"}
+               {:error, "Could not parse 2017-02-29 00:00:00 UTC"}
+
       assert DateTimeParser.parse_date("2017-02-29") ==
-        {:error, "Could not parse 2017-02-29"}
+               {:error, "Could not parse 2017-02-29"}
 
       for month <- ["04", "06", "09", "11"] do
         assert DateTimeParser.parse_datetime("2017-#{month}-31 00:00:00 UTC") ==
-          {:error, "Could not parse 2017-#{month}-31 00:00:00 UTC"}
+                 {:error, "Could not parse 2017-#{month}-31 00:00:00 UTC"}
+
         assert DateTimeParser.parse_date("2017-#{month}-31") ==
-          {:error, "Could not parse 2017-#{month}-31"}
+                 {:error, "Could not parse 2017-#{month}-31"}
       end
     end
   end
