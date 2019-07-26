@@ -1,4 +1,5 @@
 #!/bin/sh
+# Usage: ./bin/release {old_version} {new_version}
 set -e
 
 previous_version="${1}"

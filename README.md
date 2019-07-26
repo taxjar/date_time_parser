@@ -1,5 +1,8 @@
 # DateTimeParser
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE.md)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v1.4%20adopted-ff69b4.svg)](./CODE_OF_CONDUCT.md)
+
 DateTimeParser is a tokenizer for strings that attempts to parse into a
 DateTime, NaiveDateTime if timezone is not determined, Date, or Time.
 
@@ -71,18 +74,12 @@ end
 
 ## Changelog
 
-[View changelog](./CHANGELOG.md)
+[View Changelog](./CHANGELOG.md)
 
 ## Contributing
 
-To run tests:
-```shell
-$ # This will run tests, regenerate EXAMPLES.md, and run Credo in strict mode
-$ mix tests
-```
+[How to contribute](./CONTRIBUTING.md)
 
-To build a release:
-```shell
-$ # bin/release {old_version} {new_version}
-$ bin/release 0.0.1 0.0.2
-```
+## Special Thanks
+
+[<img src="https://www.taxjar.com/img/lander/logo.svg" height=75 />](https://www.taxjar.com)

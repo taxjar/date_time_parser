@@ -1,7 +1,7 @@
 defmodule DateTimeParser do
   @moduledoc """
   DateTimeParser is a tokenizer for strings that attempts to parse into a
-  DateTime, NaiveDateTime if timezone is not determined, Date, or Time.
+  `DateTime`, `NaiveDateTime` if timezone is not determined, `Date`, or `Time`.
 
   The biggest ambiguity between datetime formats is whether it's `ymd` (year month
   day), `mdy` (month day year), or `dmy` (day month year); this is resolved by
@@ -30,7 +30,7 @@ defmodule DateTimeParser do
 
     iex> DateTimeParser.parse_datetime("1/1/18 3:24 PM", assume_utc: true)
     {:ok, DateTime.from_naive!(~N[2018-01-01T15:24:00Z], "Etc/UTC")}
-    # or ~U[2018-01-01T15:24:00Z] in 1.9.0+
+    # or ~U[2018-01-01T15:24:00Z] in Elixir 1.9.0+
 
     iex> DateTimeParser.parse_datetime(~s|"Dec 1, 2018 7:39:53 AM PST"|)
     {:ok, DateTime.from_naive!(~N[2018-12-01T14:39:53Z], "Etc/UTC")}
@@ -113,11 +113,12 @@ defmodule DateTimeParser do
   """
   @spec parse_date(String.t() | nil) :: {:ok, Date.t()} | {:error, String.t()}
   def parse_date(string) when is_binary(string) do
-    parser = if String.contains?(string, "/") do
-      &DateTimeParser.Date.parse_us/1
-    else
-      &DateTimeParser.Date.parse/1
-    end
+    parser =
+      if String.contains?(string, "/") do
+        &DateTimeParser.Date.parse_us/1
+      else
+        &DateTimeParser.Date.parse/1
+      end
 
     with {:ok, tokens, _, _, _, _} <- string |> clean |> parser.(),
          {:ok, date} <- to_date(tokens),
@@ -183,16 +184,23 @@ defmodule DateTimeParser do
   end
 
   defp validate_day(%{day: day, month: month} = date)
-    when month in [1, 3, 5, 7, 8, 10, 12] and day in 1..31, do: {:ok, date}
+       when month in [1, 3, 5, 7, 8, 10, 12] and day in 1..31,
+       do: {:ok, date}
+
   defp validate_day(%{day: day, month: month} = date)
-    when month in [4, 6, 9, 11] and day in 1..30, do: {:ok, date}
+       when month in [4, 6, 9, 11] and day in 1..30,
+       do: {:ok, date}
+
   defp validate_day(%{day: day, month: 2} = date)
-    when day in 1..28, do: {:ok, date}
+       when day in 1..28,
+       do: {:ok, date}
+
   defp validate_day(%{day: 29, month: 2, year: year} = date) do
     if Timex.is_leap?(year),
       do: {:ok, date},
       else: :error
   end
+
   defp validate_day(_), do: :error
 
   defp maybe_convert_to_utc(%NaiveDateTime{} = naive_datetime, opts) do

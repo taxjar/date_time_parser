@@ -7,8 +7,8 @@ defmodule DateTimeParser.MixProject do
       app: :date_time_parser,
       name: "DateTimeParser",
       version: @version,
+      homepage_url: "https://hexdocs.pm/date_time_parser",
       source_url: "https://github.com/taxjar/date_time_parser",
-      homepage_url: "https://github.com/taxjar/date_time_parser",
       elixir: ">= 1.3.0",
       elixirc_paths: elixirc_paths(Mix.env()),
       aliases: aliases(),
@@ -21,7 +21,7 @@ defmodule DateTimeParser.MixProject do
         profile: :bench
       ],
       deps: deps(),
-      description: "Parse a string into %DateTime{}, %NaiveDateTime{}, %Time{}, or %Date{}"
+      description: "Parse a string into `%DateTime{}`, `%NaiveDateTime{}`, `%Time{}`, or `%Date{}`"
     ]
   end
 
@@ -36,13 +36,22 @@ defmodule DateTimeParser.MixProject do
 
   defp package do
     [
-      files: ["lib", "mix.exs", "CHANGELOG*", "README*", "LICENSE*", "EXAMPLES*"],
+      files: [
+        "lib",
+        "mix.exs",
+        "CODE_OF_CONDUCT*",
+        "CHANGELOG*",
+        "README*",
+        "LICENSE*",
+        "EXAMPLES*"
+      ],
+      organization: "taxjar",
       maintainers: ["David Bernheisel"],
-      licenses: [],
+      licenses: ["MIT"],
       links: %{
         "GitHub" => "https://github.com/taxjar/date_time_parser",
-        "readme" => "https://github.com/taxjar/date_time_parser/blob/#{@version}/README.md",
-        "changelog" => "https://github.com/taxjar/date_time_parser/blob/#{@version}/CHANGELOG.md"
+        "Readme" => "https://github.com/taxjar/date_time_parser/blob/#{@version}/README.md",
+        "Changelog" => "https://github.com/taxjar/date_time_parser/blob/#{@version}/CHANGELOG.md"
       }
     ]
   end
@@ -70,7 +79,7 @@ defmodule DateTimeParser.MixProject do
 
   defp docs() do
     [
-      main: "readme",
+      main: "DateTimeParser",
       source_ref: @version,
       extras: [
         "README.md",
