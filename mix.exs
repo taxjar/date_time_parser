@@ -45,7 +45,6 @@ defmodule DateTimeParser.MixProject do
         "LICENSE*",
         "EXAMPLES*"
       ],
-      organization: "taxjar",
       maintainers: ["David Bernheisel"],
       licenses: ["MIT"],
       links: %{
