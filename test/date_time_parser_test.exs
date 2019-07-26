@@ -63,8 +63,8 @@ defmodule DateTimeParserTest do
     test_datetime_parsing("19-Dec-19", "2019-12-19T00:00:00")
     test_datetime_parsing("2012-10-30 09:52:00", "2012-10-30T09:52:00")
     test_datetime_parsing("2013-04-26 11:25:03 UTC", "2013-04-26T11:25:03Z")
-    test_datetime_parsing "2013-09-10 22:14:56.717", "2013-09-10T22:14:56.717"
-    test_datetime_parsing "2016-11-17 10:36:34.81", "2016-11-17T10:36:34.81"
+    test_datetime_parsing("2013-09-10 22:14:56.717", "2013-09-10T22:14:56.717")
+    test_datetime_parsing("2016-11-17 10:36:34.81", "2016-11-17T10:36:34.81")
     test_datetime_parsing("2015-09-28 10:57:11 -0700", "2015-09-28T17:57:11Z")
     test_datetime_parsing("2015/12/1 1:16", "2015-12-01T01:16:00")
     test_datetime_parsing("2016-04-30", "2016-04-30T00:00:00")
@@ -126,9 +126,22 @@ defmodule DateTimeParserTest do
   describe "parse_datetime/1 - epoch" do
     test_datetime_parsing("99999999999", DateTime.from_naive!(~N[5138-11-16T09:46:39], "Etc/UTC"))
     test_datetime_parsing("9999999999", DateTime.from_naive!(~N[2286-11-20T17:46:39], "Etc/UTC"))
-    test_datetime_parsing("9999999999.999", DateTime.from_naive!(~N[2286-11-20T17:46:39.999], "Etc/UTC"))
-    test_datetime_parsing("9999999999.999999", DateTime.from_naive!(~N[2286-11-20T17:46:39.999999], "Etc/UTC"))
-    test_datetime_parsing("9999999999.9999999999", DateTime.from_naive!(~N[2286-11-20T17:46:39.999999], "Etc/UTC"))
+
+    test_datetime_parsing(
+      "9999999999.999",
+      DateTime.from_naive!(~N[2286-11-20T17:46:39.999], "Etc/UTC")
+    )
+
+    test_datetime_parsing(
+      "9999999999.999999",
+      DateTime.from_naive!(~N[2286-11-20T17:46:39.999999], "Etc/UTC")
+    )
+
+    test_datetime_parsing(
+      "9999999999.9999999999",
+      DateTime.from_naive!(~N[2286-11-20T17:46:39.999999], "Etc/UTC")
+    )
+
     test_datetime_parsing("0000000000", DateTime.from_naive!(~N[1970-01-01T00:00:00], "Etc/UTC"))
   end
 
@@ -333,11 +346,29 @@ defmodule DateTimeParserTest do
     test_date_parsing("11 July 2017 1:43:46 PM", ~D[2017-07-11])
   end
 
+  describe "parse_date/1 - epoch" do
+    test_date_parsing("99999999999", ~D[5138-11-16])
+    test_date_parsing("9999999999", ~D[2286-11-20])
+    test_date_parsing("9999999999.999", ~D[2286-11-20])
+    test_date_parsing("9999999999.999999", ~D[2286-11-20])
+    test_date_parsing("9999999999.9999999999", ~D[2286-11-20])
+    test_date_parsing("0000000000", ~D[1970-01-01])
+  end
+
   describe "parse_time/1" do
     test_time_parsing("00:00.0", ~T[00:00:00])
     test_time_parsing("07:09.3", ~T[07:09:00])
     test_time_parsing("08:53.0", ~T[08:53:00])
     test_time_parsing("10:13.7", ~T[10:13:00])
+  end
+
+  describe "parse_time/1 - epoch" do
+    test_time_parsing("99999999999", ~T[09:46:39])
+    test_time_parsing("9999999999", ~T[17:46:39])
+    test_time_parsing("9999999999.999", ~T[17:46:39.999])
+    test_time_parsing("9999999999.999999", ~T[17:46:39.999999])
+    test_time_parsing("9999999999.9999999999", ~T[17:46:39.999999])
+    test_time_parsing("0000000000", ~T[00:00:00])
   end
 
   describe "errors" do

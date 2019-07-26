@@ -10,6 +10,8 @@ defmodule DateTimeParser do
   the conditions are right, it can even parse `dmy` with dashes if the month is a
   vocal month (eg, `"Jan"`).
 
+  If the string starts with 10 digits, then we'll try to parse it as a Unix epoch timestamp.
+
   ## Examples
 
     ```elixir
@@ -76,7 +78,7 @@ defmodule DateTimeParser do
     parser =
       cond do
         String.contains?(string, "/") -> &DateTimeParser.DateTime.parse_us/1
-        Regex.match?(@epoch_regex, string) -> &DateTimeParser.DateTime.parse_epoch/1
+        Regex.match?(@epoch_regex, string) -> &DateTimeParser.Epoch.parse/1
         true -> &DateTimeParser.DateTime.parse/1
       end
 
@@ -87,9 +89,6 @@ defmodule DateTimeParser do
          datetime <- maybe_convert_to_utc(datetime, opts) do
       {:ok, datetime}
     else
-      {:ok, %DateTime{} = datetime} ->
-        {:ok, datetime}
-
       _ ->
         {:error, "Could not parse #{string}"}
     end
@@ -103,7 +102,14 @@ defmodule DateTimeParser do
   """
   @spec parse_time(String.t() | nil) :: {:ok, Time.t()} | {:error, String.t()}
   def parse_time(string) when is_binary(string) do
-    case string |> clean |> DateTimeParser.Time.parse() do
+    parser =
+      if Regex.match?(@epoch_regex, string) do
+        &DateTimeParser.Epoch.parse/1
+      else
+        &DateTimeParser.Time.parse/1
+      end
+
+    case string |> clean |> parser.() do
       {:ok, tokens, _, _, _, _} ->
         to_time(tokens)
 
@@ -121,10 +127,10 @@ defmodule DateTimeParser do
   @spec parse_date(String.t() | nil) :: {:ok, Date.t()} | {:error, String.t()}
   def parse_date(string) when is_binary(string) do
     parser =
-      if String.contains?(string, "/") do
-        &DateTimeParser.Date.parse_us/1
-      else
-        &DateTimeParser.Date.parse/1
+      cond do
+        String.contains?(string, "/") -> &DateTimeParser.Date.parse_us/1
+        Regex.match?(@epoch_regex, string) -> &DateTimeParser.Epoch.parse/1
+        true -> &DateTimeParser.Date.parse/1
       end
 
     with {:ok, tokens, _, _, _, _} <- string |> clean |> parser.(),
@@ -140,37 +146,73 @@ defmodule DateTimeParser do
   def parse_date(nil), do: {:error, "Could not parse nil"}
   def parse_date(value), do: {:error, "Could not parse #{value}"}
 
+  defp from_epoch(tokens) do
+    with {:ok, datetime} <- DateTime.from_unix(tokens[:unix_epoch]) do
+      case tokens[:unix_epoch_subsecond] do
+        nil ->
+          datetime
+
+        subsecond ->
+          truncated_subsecond =
+            subsecond
+            |> Integer.digits()
+            |> Enum.take(6)
+            |> Integer.undigits()
+
+          %{datetime | microsecond: format({:microsecond, truncated_subsecond})}
+      end
+    end
+  end
+
   defp to_time(tokens) do
-    Time.new(
-      format_token(tokens, :hour) || 0,
-      format_token(tokens, :minute) || 0,
-      format_token(tokens, :second) || 0,
-      format_token(tokens, :microsecond) || {0, 0}
-    )
+    if tokens[:unix_epoch] do
+      with %Time{} = time <- tokens |> from_epoch() |> DateTime.to_time() do
+        {:ok, time}
+      end
+    else
+      Time.new(
+        format_token(tokens, :hour) || 0,
+        format_token(tokens, :minute) || 0,
+        format_token(tokens, :second) || 0,
+        format_token(tokens, :microsecond) || {0, 0}
+      )
+    end
   end
 
   defp to_date(tokens) do
-    Date.new(
-      format_token(tokens, :year) || 0,
-      format_token(tokens, :month) || 0,
-      format_token(tokens, :day) || 0
-    )
+    if tokens[:unix_epoch] do
+      with %Date{} = date <- tokens |> from_epoch() |> DateTime.to_date() do
+        {:ok, date}
+      end
+    else
+      Date.new(
+        format_token(tokens, :year) || 0,
+        format_token(tokens, :month) || 0,
+        format_token(tokens, :day) || 0
+      )
+    end
   end
 
   defp to_naive_datetime(tokens) do
-    Map.merge(
-      NaiveDateTime.utc_now(),
-      clean(%{
-        year: format_token(tokens, :year),
-        month: format_token(tokens, :month),
-        day: format_token(tokens, :day),
-        hour: format_token(tokens, :hour) || 0,
-        minute: format_token(tokens, :minute) || 0,
-        second: format_token(tokens, :second) || 0,
-        microsecond: format_token(tokens, :microsecond) || {0, 0}
-      })
-    )
+    if tokens[:unix_epoch] do
+      from_epoch(tokens)
+    else
+      Map.merge(
+        NaiveDateTime.utc_now(),
+        clean(%{
+          year: format_token(tokens, :year),
+          month: format_token(tokens, :month),
+          day: format_token(tokens, :day),
+          hour: format_token(tokens, :hour) || 0,
+          minute: format_token(tokens, :minute) || 0,
+          second: format_token(tokens, :second) || 0,
+          microsecond: format_token(tokens, :microsecond) || {0, 0}
+        })
+      )
+    end
   end
+
+  defp to_datetime(%DateTime{} = datetime, _tokens), do: datetime
 
   defp to_datetime(naive_datetime, tokens) do
     with zone <- format_token(tokens, :zone_abbr),
@@ -340,7 +382,7 @@ defmodule DateTimeParser do
   defp format({:microsecond, value}) do
     {
       value |> to_string |> String.pad_trailing(6, "0") |> String.to_integer(),
-      value |> to_string |> :erlang.size()
+      value |> to_string |> byte_size()
     }
   end
 
