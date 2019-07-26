@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.3
+
+- Support parsing Unix epoch times from strings
+- Fix microsecond parsing
+
 ## 0.1.2
 
 - Validate days of month. Previously it would allow invalid days such as Feb 30.
