@@ -25,6 +25,9 @@ defmodule DateTimeParser do
     iex> DateTimeParser.parse_date("01/01/2017")
     {:ok, ~D[2017-01-01]}
 
+    iex> DateTimeParser.parse_datetime("1564154204")
+    {:ok, DateTime.from_naive!(~N[2019-07-26T15:16:44Z], "Etc/UTC")}
+
     iex> DateTimeParser.parse_datetime("1/1/18 3:24 PM")
     {:ok, ~N[2018-01-01T15:24:00]}
 
@@ -64,16 +67,17 @@ defmodule DateTimeParser do
     If there's a timezone detected in the string, then attempt to convert to UTC timezone. This is
     helpful for storing in databases with Ecto.
   """
+  @epoch_regex ~r|(?<!\d)\d{10}\.?\d{0,10}|
   @spec parse_datetime(String.t() | nil, Keyword.t()) ::
           {:ok, DateTime.t() | NaiveDateTime.t()} | {:error, String.t()}
   def parse_datetime(string, opts \\ [])
 
   def parse_datetime(string, opts) when is_binary(string) do
     parser =
-      if String.contains?(string, "/") do
-        &DateTimeParser.DateTime.parse_us/1
-      else
-        &DateTimeParser.DateTime.parse/1
+      cond do
+        String.contains?(string, "/") -> &DateTimeParser.DateTime.parse_us/1
+        Regex.match?(@epoch_regex, string) -> &DateTimeParser.DateTime.parse_epoch/1
+        true -> &DateTimeParser.DateTime.parse/1
       end
 
     with {:ok, tokens, _, _, _, _} <- string |> clean() |> parser.(),
@@ -83,6 +87,9 @@ defmodule DateTimeParser do
          datetime <- maybe_convert_to_utc(datetime, opts) do
       {:ok, datetime}
     else
+      {:ok, %DateTime{} = datetime} ->
+        {:ok, datetime}
+
       _ ->
         {:error, "Could not parse #{string}"}
     end
@@ -332,8 +339,8 @@ defmodule DateTimeParser do
 
   defp format({:microsecond, value}) do
     {
-      value |> to_string |> String.to_integer(),
-      value |> to_string |> String.graphemes() |> length()
+      value |> to_string |> String.pad_trailing(6, "0") |> String.to_integer(),
+      value |> to_string |> :erlang.size()
     }
   end
 
