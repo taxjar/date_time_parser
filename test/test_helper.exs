@@ -1,13 +1,5 @@
 alias DateTimeParserTest.Recorder
 
-if System.get_env("CI") == "true" do
-  "test-results/exunit"
-  |> Path.relative()
-  |> File.mkdir_p!()
-
-  ExUnit.configure(formatters: [JUnitFormatter, ExUnit.CLIFormatter])
-end
-
 {:ok, _recorder_pid} = Recorder.start_link()
 
 write_examples = fn
