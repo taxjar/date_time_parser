@@ -15,6 +15,9 @@ first. All other cases will use the international format `ymd`. Sometimes, if
 the conditions are right, it can even parse `dmy` with dashes if the month is a
 vocal month (eg, `"Jan"`).
 
+If the string is 10-11 digits with optional precision, then we'll try to parse
+it as a Unix epoch timestamp.
+
 ## Documentation
 
 [Online Documentation](https://hexdocs.pm/date_time_parser)

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.4
+
+- Refactor
+- Support subsecond parsing to 24 digits (yoctoseconds) [thanks @myfreeweb]
+
 ## 0.1.3
 
 - Support parsing Unix epoch times from strings
