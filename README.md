@@ -13,6 +13,14 @@ first. All other cases will use the international format `ymd`. Sometimes, if
 the conditions are right, it can even parse `dmy` with dashes if the month is a
 vocal month (eg, `"Jan"`).
 
+If the string is 10-11 digits with optional precision, then we'll try to parse
+it as a Unix epoch timestamp.
+
+If the string is 1-5 digits with optional precision, then we'll try to parse it
+as a serial timestamp (spreadsheet time) treating 1899-12-31 as 1. This will
+cause Excel-produced dates from 1900-01-01 until 1900-03-01 to be incorrect, as
+they really are.
+
 ## Documentation
 
 [Online Documentation](https://hexdocs.pm/date_time_parser)

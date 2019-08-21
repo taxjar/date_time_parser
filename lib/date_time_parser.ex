@@ -1,16 +1,20 @@
 defmodule DateTimeParser do
   @moduledoc """
-  DateTimeParser is a tokenizer for strings that attempts to parse into a
-  `DateTime`, `NaiveDateTime` if timezone is not determined, `Date`, or `Time`.
+  DateTimeParser is a tokenizer for strings that attempts to parse into a `DateTime`,
+  `NaiveDateTime` if timezone is not determined, `Date`, or `Time`.
 
-  The biggest ambiguity between datetime formats is whether it's `ymd` (year month
-  day), `mdy` (month day year), or `dmy` (day month year); this is resolved by
-  checking if there are slashes or dashes. If slashes, then it will try `dmy`
-  first. All other cases will use the international format `ymd`. Sometimes, if
-  the conditions are right, it can even parse `dmy` with dashes if the month is a
-  vocal month (eg, `"Jan"`).
+  The biggest ambiguity between datetime formats is whether it's `ymd` (year month day), `mdy`
+  (month day year), or `dmy` (day month year); this is resolved by checking if there are slashes or
+  dashes. If slashes, then it will try `dmy` first. All other cases will use the international
+  format `ymd`. Sometimes, if the conditions are right, it can even parse `dmy` with dashes if the
+  month is a vocal month (eg, `"Jan"`).
 
-  If the string starts with 10 digits, then we'll try to parse it as a Unix epoch timestamp.
+  If the string is 10-11 digits with optional precision, then we'll try to parse it as a Unix epoch
+  timestamp.
+
+  If the string is 1-5 digits with optional precision, then we'll try to parse it as a serial
+  timestamp (spreadsheet time) treating 1899-12-31 as 1. This will cause Excel-produced dates from
+  1900-01-01 until 1900-03-01 to be incorrect, as they really are.
 
   ## Examples
 
@@ -29,6 +33,13 @@ defmodule DateTimeParser do
 
     iex> DateTimeParser.parse_datetime("1564154204")
     {:ok, DateTime.from_naive!(~N[2019-07-26T15:16:44Z], "Etc/UTC")}
+
+    iex> DateTimeParser.parse_datetime("41261.6013888889")
+    {:ok, ~N[2012-12-18T14:26:00]}
+
+    iex> DateTimeParser.parse_date("44262")
+    {:ok, ~D[2021-03-07]}
+    # This is a serial number date, commonly found in spreadsheets, eg: `=VALUE("03/07/2021")`
 
     iex> DateTimeParser.parse_datetime("1/1/18 3:24 PM")
     {:ok, ~N[2018-01-01T15:24:00]}
@@ -69,20 +80,19 @@ defmodule DateTimeParser do
     If there's a timezone detected in the string, then attempt to convert to UTC timezone. This is
     helpful for storing in databases with Ecto.
   """
-  @epoch_regex ~r|(?<!\d)\d{10}\.?\d{0,10}|
+
+  import DateTimeParser.Formatters
+  alias DateTimeParser.{Epoch, Serial}
+
+  @epoch_regex ~r|\A\d{10,11}(?:\.\d{1,10})?\z|
+  @serial_regex ~r|\A-?\d{1,5}(?:\.\d{1,10})?\z|
   @spec parse_datetime(String.t() | nil, Keyword.t()) ::
           {:ok, DateTime.t() | NaiveDateTime.t()} | {:error, String.t()}
   def parse_datetime(string, opts \\ [])
 
   def parse_datetime(string, opts) when is_binary(string) do
-    parser =
-      cond do
-        String.contains?(string, "/") -> &DateTimeParser.DateTime.parse_us/1
-        Regex.match?(@epoch_regex, string) -> &DateTimeParser.Epoch.parse/1
-        true -> &DateTimeParser.DateTime.parse/1
-      end
-
-    with {:ok, tokens, _, _, _, _} <- string |> clean() |> parser.(),
+    with string <- clean(string),
+         {:ok, tokens, _, _, _, _} <- do_datetime_parse(string),
          naive_datetime <- to_naive_datetime(tokens),
          datetime <- to_datetime(naive_datetime, tokens),
          {:ok, datetime} <- validate_day(datetime),
@@ -97,19 +107,21 @@ defmodule DateTimeParser do
   def parse_datetime(nil, _opts), do: {:error, "Could not parse nil"}
   def parse_datetime(value, _opts), do: {:error, "Could not parse #{value}"}
 
+  def do_datetime_parse(string) do
+    cond do
+      String.contains?(string, "/") -> DateTimeParser.DateTime.parse_us(string)
+      Regex.match?(@epoch_regex, string) -> Epoch.parse(string)
+      Regex.match?(@serial_regex, string) -> Serial.parse(string)
+      true -> DateTimeParser.DateTime.parse(string)
+    end
+  end
+
   @doc """
   Parse `%Time{}` from a string.
   """
   @spec parse_time(String.t() | nil) :: {:ok, Time.t()} | {:error, String.t()}
   def parse_time(string) when is_binary(string) do
-    parser =
-      if Regex.match?(@epoch_regex, string) do
-        &DateTimeParser.Epoch.parse/1
-      else
-        &DateTimeParser.Time.parse/1
-      end
-
-    case string |> clean |> parser.() do
+    case string |> clean() |> do_time_parse() do
       {:ok, tokens, _, _, _, _} ->
         to_time(tokens)
 
@@ -121,19 +133,21 @@ defmodule DateTimeParser do
   def parse_time(nil), do: {:error, "Could not parse nil"}
   def parse_time(value), do: {:error, "Could not parse #{value}"}
 
+  def do_time_parse(string) do
+    cond do
+      Regex.match?(@epoch_regex, string) -> Epoch.parse(string)
+      Regex.match?(@serial_regex, string) -> Serial.parse(string)
+      true -> DateTimeParser.Time.parse(string)
+    end
+  end
+
   @doc """
   Parse `%Date{}` from a string.
   """
   @spec parse_date(String.t() | nil) :: {:ok, Date.t()} | {:error, String.t()}
   def parse_date(string) when is_binary(string) do
-    parser =
-      cond do
-        String.contains?(string, "/") -> &DateTimeParser.Date.parse_us/1
-        Regex.match?(@epoch_regex, string) -> &DateTimeParser.Epoch.parse/1
-        true -> &DateTimeParser.Date.parse/1
-      end
-
-    with {:ok, tokens, _, _, _, _} <- string |> clean |> parser.(),
+    with string <- clean(string),
+         {:ok, tokens, _, _, _, _} <- do_parse_date(string),
          {:ok, date} <- to_date(tokens),
          {:ok, _} <- validate_day(date) do
       {:ok, date}
@@ -146,89 +160,71 @@ defmodule DateTimeParser do
   def parse_date(nil), do: {:error, "Could not parse nil"}
   def parse_date(value), do: {:error, "Could not parse #{value}"}
 
-  defp from_epoch(tokens) do
-    with {:ok, datetime} <- DateTime.from_unix(tokens[:unix_epoch]) do
-      case tokens[:unix_epoch_subsecond] do
-        nil ->
-          datetime
-
-        subsecond ->
-          truncated_subsecond =
-            subsecond
-            |> Integer.digits()
-            |> Enum.take(6)
-            |> Integer.undigits()
-
-          %{datetime | microsecond: format({:microsecond, truncated_subsecond})}
-      end
+  defp do_parse_date(string) do
+    cond do
+      String.contains?(string, "/") -> DateTimeParser.Date.parse_us(string)
+      Regex.match?(@epoch_regex, string) -> Epoch.parse(string)
+      Regex.match?(@serial_regex, string) -> Serial.parse(string)
+      true -> DateTimeParser.Date.parse(string)
     end
   end
 
   defp to_time(tokens) do
-    if tokens[:unix_epoch] do
-      with %Time{} = time <- tokens |> from_epoch() |> DateTime.to_time() do
-        {:ok, time}
-      end
-    else
-      Time.new(
-        format_token(tokens, :hour) || 0,
-        format_token(tokens, :minute) || 0,
-        format_token(tokens, :second) || 0,
-        format_token(tokens, :microsecond) || {0, 0}
-      )
+    cond do
+      tokens[:unix_epoch] ->
+        with %Time{} = time <- tokens |> Epoch.from_tokens() |> DateTime.to_time() do
+          {:ok, time}
+        end
+
+      tokens[:serial] ->
+        with %Time{} = time <- tokens |> Serial.from_tokens() |> NaiveDateTime.to_time() do
+          {:ok, time}
+        end
+
+      true ->
+        DateTimeParser.Time.from_tokens(tokens)
     end
   end
 
   defp to_date(tokens) do
-    if tokens[:unix_epoch] do
-      with %Date{} = date <- tokens |> from_epoch() |> DateTime.to_date() do
-        {:ok, date}
-      end
-    else
-      Date.new(
-        format_token(tokens, :year) || 0,
-        format_token(tokens, :month) || 0,
-        format_token(tokens, :day) || 0
-      )
+    cond do
+      tokens[:serial] ->
+        with %Date{} = date <- tokens |> Serial.from_tokens() |> NaiveDateTime.to_date() do
+          {:ok, date}
+        end
+
+      tokens[:unix_epoch] ->
+        with %Date{} = date <- tokens |> Epoch.from_tokens() |> DateTime.to_date() do
+          {:ok, date}
+        end
+
+      true ->
+        DateTimeParser.Date.from_tokens(tokens)
     end
   end
 
   defp to_naive_datetime(tokens) do
-    if tokens[:unix_epoch] do
-      from_epoch(tokens)
-    else
-      Map.merge(
-        NaiveDateTime.utc_now(),
-        clean(%{
-          year: format_token(tokens, :year),
-          month: format_token(tokens, :month),
-          day: format_token(tokens, :day),
-          hour: format_token(tokens, :hour) || 0,
-          minute: format_token(tokens, :minute) || 0,
-          second: format_token(tokens, :second) || 0,
-          microsecond: format_token(tokens, :microsecond) || {0, 0}
-        })
-      )
+    cond do
+      tokens[:serial] ->
+        Serial.from_tokens(tokens)
+
+      tokens[:unix_epoch] ->
+        Epoch.from_tokens(tokens)
+
+      true ->
+        DateTimeParser.DateTime.from_tokens(tokens)
     end
   end
 
   defp to_datetime(%DateTime{} = datetime, _tokens), do: datetime
 
-  defp to_datetime(naive_datetime, tokens) do
-    with zone <- format_token(tokens, :zone_abbr),
-         offset <- format_token(tokens, :utc_offset),
-         true <- Enum.any?([zone, offset]),
-         %{} = timezone_info <- Timex.Timezone.get(offset || zone) do
-      naive_datetime
-      |> DateTime.from_naive!("Etc/UTC")
-      |> Map.merge(%{
-        std_offset: timezone_info.offset_std,
-        utc_offset: timezone_info.offset_utc,
-        zone_abbr: timezone_info.abbreviation,
-        time_zone: timezone_info.full_name
-      })
-    else
-      _ -> naive_datetime
+  defp to_datetime(%NaiveDateTime{} = naive_datetime, tokens) do
+    case DateTimeParser.DateTime.timezone_from_tokens(tokens) do
+      %{} = timezone_info ->
+        DateTimeParser.DateTime.from_naive_datetime_and_timezone(naive_datetime, timezone_info)
+
+      _ ->
+        naive_datetime
     end
   end
 
@@ -269,128 +265,4 @@ defmodule DateTimeParser do
       datetime
     end
   end
-
-  defp clean(string) when is_binary(string) do
-    string
-    |> String.trim()
-    |> String.replace(" @ ", "T")
-    |> String.replace(~r{[[:space:]]+}, " ")
-    |> String.replace(" - ", "-")
-    |> String.replace("//", "/")
-    |> String.replace(~r{=|"|'|,|\\}, "")
-    |> String.downcase()
-  end
-
-  defp clean(%{} = map) do
-    map
-    |> Enum.reject(fn {_k, v} -> is_nil(v) end)
-    |> Enum.into(%{})
-  end
-
-  defp format_token(tokens, :hour) do
-    case tokens |> find_token(:hour) do
-      {:hour, hour} ->
-        if tokens |> find_token(:am_pm) |> format == "PM" && hour < 12 do
-          hour + 12
-        else
-          hour
-        end
-
-      _ ->
-        nil
-    end
-  end
-
-  defp format_token(tokens, :year) do
-    case tokens |> find_token(:year) |> format() do
-      nil ->
-        nil
-
-      year ->
-        year |> to_4_year() |> String.to_integer()
-    end
-  end
-
-  defp format_token(tokens, token) do
-    tokens |> find_token(token) |> format()
-  end
-
-  defp find_token(tokens, find_me) do
-    Enum.find(tokens, fn
-      {token, _} -> token == find_me
-      _ -> false
-    end)
-  end
-
-  # If the parsed two-digit year is 00 to 49, then
-  #  - If the last two digits of the current year are 00 to 49, then the returned year has the same
-  #    first two digits as the current year.
-  #  - If the last two digits of the current year are 50 to 99, then the first 2 digits of the
-  #    returned year are 1 greater than the first 2 digits of the current year.
-  # If the parsed two-digit year is 50 to 99, then
-  #  - If the last two digits of the current year are 00 to 49, then the first 2 digits of the
-  #    returned year are 1 less than the first 2 digits of the current year.
-  #  - If the last two digits of the current year are 50 to 99, then the returned year has the same
-  #    first two digits as the current year.
-  defp to_4_year(parsed_3yr) when byte_size(parsed_3yr) == 3 do
-    [current_millenia | _rest] =
-      DateTime.utc_now()
-      |> Map.get(:year)
-      |> Integer.digits()
-
-    "#{current_millenia}#{parsed_3yr}"
-  end
-
-  defp to_4_year(parsed_2yr) when byte_size(parsed_2yr) == 2 do
-    [current_millenia, current_century, current_decade, current_year] =
-      DateTime.utc_now()
-      |> Map.get(:year)
-      |> Integer.digits()
-
-    parsed_2yr = String.to_integer(parsed_2yr)
-    current_2yr = String.to_integer("#{current_decade}#{current_year}")
-
-    cond do
-      parsed_2yr < 50 && current_2yr < 50 ->
-        "#{current_millenia}#{current_century}#{parsed_2yr}"
-
-      parsed_2yr < 50 && current_2yr >= 50 ->
-        [_parsed_millenia, parsed_century] =
-          [current_millenia, current_century]
-          |> Integer.undigits()
-          |> Kernel.+(1)
-          |> Integer.digits()
-
-        "#{current_millenia}#{parsed_century}#{parsed_2yr}"
-
-      parsed_2yr >= 50 && current_2yr < 50 ->
-        [parsed_millenia, parsed_century] =
-          [current_millenia, current_century]
-          |> Integer.undigits()
-          |> Kernel.-(1)
-          |> Integer.digits()
-
-        "#{parsed_millenia}#{parsed_century}#{parsed_2yr}"
-
-      parsed_2yr >= 50 && current_2yr >= 50 ->
-        "#{current_millenia}#{current_century}#{parsed_2yr}"
-    end
-  end
-
-  defp to_4_year(parsed_year), do: parsed_year
-
-  defp format({:microsecond, value}) do
-    {
-      value |> to_string |> String.pad_trailing(6, "0") |> String.to_integer(),
-      value |> to_string |> byte_size()
-    }
-  end
-
-  defp format({:zone_abbr, value}), do: String.upcase(value)
-  defp format({:utc_offset, offset}), do: to_string(offset)
-  defp format({:year, value}), do: to_string(value)
-  defp format({:am_pm, value}), do: String.upcase(value)
-  defp format({_, value}) when is_integer(value), do: value
-  defp format({_, value}), do: String.to_integer(value)
-  defp format(_), do: nil
 end
