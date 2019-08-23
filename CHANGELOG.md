@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.0
+
+- Support parsing Serial timestamps, commonly found in spreadsheets.
+
 ## 0.1.3
 
 - Support parsing Unix epoch times from strings
