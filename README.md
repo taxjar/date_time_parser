@@ -1,5 +1,7 @@
 # DateTimeParser
 
+[![Hex.pm Version](http://img.shields.io/hexpm/v/date_time_parser.svg)](https://hex.pm/packages/date_time_parser)
+[![Hex docs](http://img.shields.io/badge/hex.pm-docs-blue.svg?style=flat)](https://hexdocs.pm/date_time_parser)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE.md)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v1.4%20adopted-ff69b4.svg)](./CODE_OF_CONDUCT.md)
 
