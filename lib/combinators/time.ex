@@ -23,9 +23,9 @@ defmodule DateTimeParser.Combinators.Time do
   def microsecond do
     [?0..?9]
     |> ascii_char()
-    |> times(min: 1, max: 6)
+    |> times(min: 1, max: 24)
     |> tag(:microsecond)
-    |> label("numeric microsecond up to 6 digits")
+    |> label("numeric microsecond up to 24 digits")
   end
 
   def second_or_minute do
