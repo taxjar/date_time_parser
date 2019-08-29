@@ -51,6 +51,9 @@ defmodule DateTimeParser do
     iex> DateTimeParser.parse_time("10:13:34")
     {:ok, ~T[10:13:34]}
 
+    iex> DateTimeParser.parse_time("18:14:21.145851000000Z")
+    {:ok, ~T[18:14:21.145851]}
+
     iex> DateTimeParser.parse_datetime(nil)
     {:error, "Could not parse nil"}
     ```
@@ -69,7 +72,7 @@ defmodule DateTimeParser do
     If there's a timezone detected in the string, then attempt to convert to UTC timezone. This is
     helpful for storing in databases with Ecto.
   """
-  @epoch_regex ~r|(?<!\d)\d{10}\.?\d{0,10}|
+  @epoch_regex ~r|\A(?<!\d)\d{10}\.?\d{0,10}\z|
   @spec parse_datetime(String.t() | nil, Keyword.t()) ::
           {:ok, DateTime.t() | NaiveDateTime.t()} | {:error, String.t()}
   def parse_datetime(string, opts \\ [])
@@ -380,9 +383,10 @@ defmodule DateTimeParser do
   defp to_4_year(parsed_year), do: parsed_year
 
   defp format({:microsecond, value}) do
+    val = value |> to_string |> String.slice(0, 6)
     {
-      value |> to_string |> String.pad_trailing(6, "0") |> String.to_integer(),
-      value |> to_string |> byte_size()
+      val |> String.pad_trailing(6, "0") |> String.to_integer(),
+      val |> byte_size()
     }
   end
 
