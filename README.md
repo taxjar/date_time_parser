@@ -18,12 +18,41 @@ vocal month (eg, `"Jan"`).
 If the string is 10-11 digits with optional precision, then we'll try to parse
 it as a Unix epoch timestamp.
 
+## Planned Breaking Changes
+
+* `parse_datetime` currently assumes `00:00:00` time if it cannot be determined.
+    This will likely change in a future version because it's better to have no
+    information than have wrong information. If you want to assume `00:00:00`,
+    that's fine, but this library shouldn't assume it for you, or at least make
+    it an option.
+* `parse_datetime` currently defaults to converting to UTC when the timezone is
+    known. This default may change to keep the original timezone information.
+    This will help for future timestamps since timezone rules change; converting
+    to UTC too early may use rules that become outdated by the time the
+    timestamp arrives. The option to convert to UTC will remain, but may not be
+    default.
+* Introduce `parse` to parse as much as it can, but return any of the structs,
+    `%DateTime{}` `%NaiveDateTime{}` `%Date{}` or `%Time{}`. It would be up to
+    you to match on what the result is and do what you will. If you know you
+    want the one specific struct, then you can continue to use the more-specific
+    functions like `parse_date`.
+
+## Required reading
+
+* [Elixir DateTime docs](https://hexdocs.pm/elixir/DateTime.html)
+* [Elixir NaiveDateTime docs](https://hexdocs.pm/elixir/NaiveDateTime.html)
+* [Elixir Date docs](https://hexdocs.pm/elixir/Date.html)
+* [Elixir Time docs](https://hexdocs.pm/elixir/Time.html)
+* [Elixir Calendar docs](https://hexdocs.pm/elixir/Calendar.html)
+* [How to save datetimes for future events (when UTC is not the right answer)](http://www.creativedeletion.com/2015/03/19/persisting_future_datetimes.html)
+  * tldr: rules change, so don't convert to UTC too early. The future might
+      change the timezone conversion rules.
+
 ## Documentation
 
 [Online Documentation](https://hexdocs.pm/date_time_parser)
 
 ## Examples
-
 
 ```elixir
 iex> DateTimeParser.parse_datetime("19 September 2018 08:15:22 AM")
