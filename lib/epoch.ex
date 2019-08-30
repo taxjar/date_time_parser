@@ -11,7 +11,7 @@ defmodule DateTimeParser.Epoch do
     with {:ok, datetime} <- DateTime.from_unix(tokens[:unix_epoch]) do
       case tokens[:unix_epoch_subsecond] do
         nil ->
-          datetime
+          {:ok, datetime}
 
         subsecond ->
           truncated_subsecond =
@@ -20,7 +20,7 @@ defmodule DateTimeParser.Epoch do
             |> Enum.take(6)
             |> Integer.undigits()
 
-          %{datetime | microsecond: format({:microsecond, truncated_subsecond})}
+          {:ok, %{datetime | microsecond: format({:microsecond, truncated_subsecond})}}
       end
     end
   end
