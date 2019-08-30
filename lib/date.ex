@@ -21,9 +21,9 @@ defmodule DateTimeParser.Date do
 
   def from_tokens(tokens) do
     Date.new(
-      format_token(tokens, :year) || 0,
-      format_token(tokens, :month) || 0,
-      format_token(tokens, :day) || 0
+      format_token(tokens, :year),
+      format_token(tokens, :month),
+      format_token(tokens, :day)
     )
   end
 end
