@@ -9,9 +9,9 @@ defmodule DateTimeParserTest.Recorder do
     Agent.start_link(fn -> initial_value end, name: @name)
   end
 
-  def add(input, output, method) do
+  def add(input, output, method, opts) do
     Agent.update(@name, fn state ->
-      [{input, output, method} | state]
+      [{input, output, method, opts} | state]
     end)
   end
 
@@ -34,16 +34,16 @@ defmodule DateTimeParserTest.Recorder do
       """
       # Examples
 
-      |**Input**|**Output (ISO 8601)**|**Method**|
-      |:--------:|:-------:|:--------:|
+      |**Input**|**Output (ISO 8601)**|**Method**|**Options**|
+      |:-------:|:-------------------:|:--------:|:---------:|
       """
     )
   end
 
-  defp write_result({input, output, method}) do
+  defp write_result({input, output, method, opts}) do
     File.write(
       @example_file,
-      "|`#{input}`|`#{DateTimeParserTestMacros.to_iso(output)}`|#{method}|\n",
+      "|`#{input}`|`#{DateTimeParserTestMacros.to_iso(output)}`|#{method}|#{if opts == [], do: "", else: inspect opts}|\n",
       [:append]
     )
   end

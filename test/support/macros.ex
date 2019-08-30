@@ -9,6 +9,32 @@ defmodule DateTimeParserTestMacros do
   def to_iso(%Time{} = time), do: Time.to_iso8601(time)
   def to_iso(string) when is_binary(string), do: string
 
+  defmacro test_parsing(string_timestamp, expected_result, opts \\ []) do
+    quote do
+      test_name =
+        if unquote(opts) == [] do
+          "parses timestamp #{unquote(string_timestamp)}"
+        else
+          "parses timestamp #{unquote(string_timestamp)} with opts #{inspect(unquote(opts))}"
+        end
+
+      test test_name do
+        assert {:ok, result} =
+                 DateTimeParser.parse(unquote(string_timestamp), unquote(opts))
+
+        case unquote(expected_result) do
+          %{} = expected ->
+            assert result == expected
+
+          expected when is_binary(expected) ->
+            assert to_iso(result) == expected
+        end
+
+        Recorder.add(unquote(string_timestamp), unquote(expected_result), "parse", unquote(opts))
+      end
+    end
+  end
+
   defmacro test_datetime_parsing(string_datetime, expected_result, opts \\ []) do
     quote do
       test_name =
@@ -30,7 +56,7 @@ defmodule DateTimeParserTestMacros do
             assert to_iso(datetime) == expected
         end
 
-        Recorder.add(unquote(string_datetime), unquote(expected_result), "parse_datetime")
+        Recorder.add(unquote(string_datetime), unquote(expected_result), "parse_datetime", unquote(opts))
       end
     end
   end
@@ -40,17 +66,43 @@ defmodule DateTimeParserTestMacros do
       test "parses time #{unquote(string_time)}" do
         assert {:ok, time} = DateTimeParser.parse_time(unquote(string_time))
         assert time == unquote(expected_result)
-        Recorder.add(unquote(string_time), unquote(expected_result), "parse_time")
+        Recorder.add(unquote(string_time), unquote(expected_result), "parse_time", [])
       end
     end
   end
 
-  defmacro test_date_parsing(string_date, expected_result) do
+  defmacro test_date_parsing(string_date, expected_result, opts \\ []) do
     quote do
-      test "parses date #{unquote(string_date)}" do
-        assert {:ok, date} = DateTimeParser.parse_date(unquote(string_date))
+      test_name =
+        if unquote(opts) == [] do
+          "parses date #{unquote(string_date)}"
+        else
+          "parses date #{unquote(string_date)} with opts #{inspect(unquote(opts))}"
+        end
+
+      test test_name do
+        assert {:ok, date} = DateTimeParser.parse_date(unquote(string_date), unquote(opts))
         assert date == unquote(expected_result)
-        Recorder.add(unquote(string_date), unquote(expected_result), "parse_date")
+        Recorder.add(unquote(string_date), unquote(expected_result), "parse_date", unquote(opts))
+      end
+    end
+  end
+
+  defmacro test_error(string_timestamp, expected_message \\ nil, opts \\ []) do
+    quote do
+      test_name =
+        if unquote(opts) == [] do
+          "does not parse timestamp #{unquote(string_timestamp)}"
+        else
+          "does not parse timestamp #{unquote(string_timestamp)} with opts #{inspect(unquote(opts))}"
+        end
+
+      test test_name do
+        assert {:error, message} = DateTimeParser.parse(unquote(string_timestamp), unquote(opts))
+        if unquote(expected_message) do
+          assert message == unquote(expected_message)
+        end
+        Recorder.add(unquote(string_timestamp), message, "parse", unquote(opts))
       end
     end
   end
