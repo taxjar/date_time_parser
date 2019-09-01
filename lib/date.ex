@@ -20,11 +20,12 @@ defmodule DateTimeParser.Date do
   )
 
   def from_tokens(tokens, opts) do
-    parsed_values = clean(%{
-      year: format_token(tokens, :year),
-      month: format_token(tokens, :month),
-      day: format_token(tokens, :day)
-    })
+    parsed_values =
+      clean(%{
+        year: format_token(tokens, :year),
+        month: format_token(tokens, :month),
+        day: format_token(tokens, :day)
+      })
 
     case Keyword.get(opts, :assume_date, false) do
       %Date{} = date ->

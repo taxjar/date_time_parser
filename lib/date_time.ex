@@ -29,15 +29,16 @@ defmodule DateTimeParser.DateTime do
   )
 
   def from_tokens(tokens, opts) do
-    parsed_values = clean(%{
-      year: format_token(tokens, :year),
-      month: format_token(tokens, :month),
-      day: format_token(tokens, :day),
-      hour: format_token(tokens, :hour),
-      minute: format_token(tokens, :minute),
-      second: format_token(tokens, :second),
-      microsecond: format_token(tokens, :microsecond)
-    })
+    parsed_values =
+      clean(%{
+        year: format_token(tokens, :year),
+        month: format_token(tokens, :month),
+        day: format_token(tokens, :day),
+        hour: format_token(tokens, :hour),
+        minute: format_token(tokens, :minute),
+        second: format_token(tokens, :second),
+        microsecond: format_token(tokens, :microsecond)
+      })
 
     case Keyword.get(opts, :assume_time, false) do
       false ->
