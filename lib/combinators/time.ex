@@ -1,7 +1,7 @@
 defmodule DateTimeParser.Combinators.Time do
   @moduledoc false
 
-  import DateTimeParser.Combinators.TimeZone
+  import DateTimeParser.Combinators.TimeZone, only: [second_letter_of_timezone_abbreviation: 0]
   import NimbleParsec
 
   @hour_num ~w(00 01 02 03 04 05 06 07 08 09) ++ Enum.map(23..0, &to_string/1)
@@ -15,6 +15,7 @@ defmodule DateTimeParser.Combinators.Time do
     @hour_num
     |> Enum.map(&string/1)
     |> choice()
+    |> lookahead_not(invalid_first_digit())
     |> map(:to_integer)
     |> unwrap_and_tag(:hour)
     |> label("numeric hour from 00-23")
@@ -32,6 +33,7 @@ defmodule DateTimeParser.Combinators.Time do
     @second_minute_num
     |> Enum.map(&string/1)
     |> choice()
+    |> lookahead_not(invalid_first_digit())
     |> map(:to_integer)
   end
 
@@ -80,6 +82,8 @@ defmodule DateTimeParser.Combinators.Time do
   end
 
   defp space_separator, do: string(" ")
+
+  defp invalid_first_digit, do: ascii_char([?6..?9])
 
   defp time_separator, do: string(@time_separator)
 end

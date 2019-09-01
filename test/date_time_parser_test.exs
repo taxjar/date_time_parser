@@ -105,7 +105,11 @@ defmodule DateTimeParserTest do
     test_parsing(~s|"Jan 1, 2014 6:44:47 AM PST"|, "2014-01-01T13:44:47Z", to_utc: true)
     test_parsing("Jan-01-19", "2019-01-01")
     test_parsing("Jan-01-19", "2019-01-01T00:00:00", assume_time: true)
-    test_parsing("Jan-01-19", "2019-01-01T10:13:15", assume_time: %Time{hour: 10, minute: 13, second: 15})
+
+    test_parsing("Jan-01-19", "2019-01-01T10:13:15",
+      assume_time: %Time{hour: 10, minute: 13, second: 15}
+    )
+
     test_parsing("Jan-01-2018", "2018-01-01")
     test_parsing("Monday 01 October 2018 06:34:19 AM", "2018-10-01T06:34:19")
     test_parsing("Monday 02 October 2017 9:04:49 AM", "2017-10-02T09:04:49")

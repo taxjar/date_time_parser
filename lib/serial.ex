@@ -34,6 +34,7 @@ defmodule DateTimeParser.Serial do
   end
 
   defp assume_time(datetime, true), do: assume_time(datetime, ~T[00:00:00])
+
   defp assume_time(%Date{} = date, %Time{} = time) do
     NaiveDateTime.new(
       date.year,
@@ -45,6 +46,7 @@ defmodule DateTimeParser.Serial do
       time.microsecond
     )
   end
+
   defp assume_time(datetime, _), do: {:ok, datetime}
 
   def time_from_serial(0.0), do: {0, 0, 0}

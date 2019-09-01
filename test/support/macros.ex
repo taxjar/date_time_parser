@@ -19,8 +19,7 @@ defmodule DateTimeParserTestMacros do
         end
 
       test test_name do
-        assert {:ok, result} =
-                 DateTimeParser.parse(unquote(string_timestamp), unquote(opts))
+        assert {:ok, result} = DateTimeParser.parse(unquote(string_timestamp), unquote(opts))
 
         case unquote(expected_result) do
           %{} = expected ->
@@ -56,7 +55,12 @@ defmodule DateTimeParserTestMacros do
             assert to_iso(datetime) == expected
         end
 
-        Recorder.add(unquote(string_datetime), unquote(expected_result), "parse_datetime", unquote(opts))
+        Recorder.add(
+          unquote(string_datetime),
+          unquote(expected_result),
+          "parse_datetime",
+          unquote(opts)
+        )
       end
     end
   end
@@ -94,14 +98,18 @@ defmodule DateTimeParserTestMacros do
         if unquote(opts) == [] do
           "does not parse timestamp #{unquote(string_timestamp)}"
         else
-          "does not parse timestamp #{unquote(string_timestamp)} with opts #{inspect(unquote(opts))}"
+          "does not parse timestamp #{unquote(string_timestamp)} with opts #{
+            inspect(unquote(opts))
+          }"
         end
 
       test test_name do
         assert {:error, message} = DateTimeParser.parse(unquote(string_timestamp), unquote(opts))
+
         if unquote(expected_message) do
           assert message == unquote(expected_message)
         end
+
         Recorder.add(unquote(string_timestamp), message, "parse", unquote(opts))
       end
     end

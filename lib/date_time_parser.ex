@@ -21,11 +21,29 @@ defmodule DateTimeParser do
   ## Examples
 
     ```elixir
+    iex> DateTimeParser.parse("19 September 2018 08:15:22 AM")
+    {:ok, ~N[2018-09-19 08:15:22]}
+
     iex> DateTimeParser.parse_datetime("19 September 2018 08:15:22 AM")
     {:ok, ~N[2018-09-19 08:15:22]}
 
     iex> DateTimeParser.parse_datetime("2034-01-13", assume_time: true)
     {:ok, ~N[2034-01-13 00:00:00]}
+
+    iex> DateTimeParser.parse_datetime("2034-01-13", assume_time: ~T[06:00:00])
+    {:ok, ~N[2034-01-13 06:00:00]}
+
+    iex> DateTimeParser.parse("invalid date 10:30pm")
+    {:ok, ~T[22:30:00]}
+
+    iex> DateTimeParser.parse("2019-03-11T99:99:99")
+    {:ok, ~D[2019-03-11]}
+
+    iex> DateTimeParser.parse("2019-03-11T10:30:00pm UNK")
+    {:ok, ~N[2019-03-11T22:30:00]}
+
+    iex> DateTimeParser.parse("2019-03-11T22:30:00.234+00:00")
+    {:ok, DateTime.from_naive!(~N[2019-03-11T22:30:00.234Z], "Etc/UTC")}
 
     iex> DateTimeParser.parse_date("2034-01-13")
     {:ok, ~D[2034-01-13]}
@@ -71,37 +89,47 @@ defmodule DateTimeParser do
     ```
   """
 
-  @doc """
-  Parse a `%DateTime{}` or `%NaiveDateTime{}` from a string.
-
-  Options:
-    * `:assume_utc` Default `false`.
-    Only applicable for strings where parsing could not determine a timezone. Instead of returning a
-    NaiveDateTime, this option will assume them to be in UTC timezone, and therefore return a
-    DateTime. If the timezone is determined, then it will continue to be returned in the original
-    timezone. See `to_utc` option to also convert it to UTC.
-
-    * `:to_utc` Default `false`.
-    If there's a timezone detected in the string, then attempt to convert to UTC timezone. If you
-    know that your timestamps are in the future and are going to store it for later use, it may be
-    better to _not_ convert to UTC since government organizations may change timezone rules before
-    the timestamp elapses, therefore making the UTC timestamp wrong or invalid.
-  """
-
   import DateTimeParser.Formatters
   alias DateTimeParser.{Epoch, Serial}
 
   @epoch_regex ~r|\A\d{10,11}(?:\.\d{1,10})?\z|
   @serial_regex ~r|\A-?\d{1,5}(?:\.\d{1,10})?\z|
+  @time_regex ~r|(?<time>\d{1,2}:\d{2}(?::\d{2})?(?:.*)?)|
 
   @type assume_date :: {:assume_date, bool() | Date.t()}
   @type assume_time :: {:assume_time, bool() | Time.t()}
   @type assume_utc :: {:assume_utc, bool()}
   @type to_utc :: {:to_utc, bool()}
+  @typedoc """
+  * `:assume_utc` Default `false`.
+  Only applicable for strings where parsing could not determine a timezone. Instead of returning a
+  NaiveDateTime, this option will assume them to be in UTC timezone, and therefore return a
+  DateTime. If the timezone is determined, then it will continue to be returned in the original
+  timezone. See `to_utc` option to also convert it to UTC.
+
+  * `:to_utc` Default `false`.
+  If there's a timezone detected in the string, then attempt to convert to UTC timezone. If you
+  know that your timestamps are in the future and are going to store it for later use, it may be
+  better to _not_ convert to UTC since government organizations may change timezone rules before
+  the timestamp elapses, therefore making the UTC timestamp wrong or invalid.
+  """
   @type parse_datetime_options :: [assume_utc() | to_utc() | assume_time()]
+  @typedoc """
+  * `:assume_date` Default `false`.
+    Only applicable for strings where parsing could not determine all components. If assume_date
+    is provided as true, the parsed tokens will be merged with `Date.utc_today()`. If assume_date
+    is provided a %Date{}, then the parsed tokens will be merged with it. Otherwise, missing
+    information will not be assumed.
+  """
   @type parse_date_options :: [assume_date()]
+  @typedoc "Combination of t:parse_date_options and t:parse_datetime_options"
   @type parse_options :: parse_datetime_options() | parse_date_options()
 
+  @doc """
+  Parse a `%DateTime{}`, `%NaiveDateTime{}`, `%Date{}`, or `%Time{}` from a string.
+
+  Accepts `t:parse_options`
+  """
   @spec parse(String.t() | nil, parse_options()) ::
           {:ok, DateTime.t() | NaiveDateTime.t(), Date.t(), Time.t()} | {:error, String.t()}
   def parse(string, opts \\ []) do
@@ -111,6 +139,10 @@ defmodule DateTimeParser do
     end
   end
 
+  @doc """
+  Parse a `%DateTime{}` or `%NaiveDateTime{}` from a string. Accepts options
+  `t:parse_datetime_options`
+  """
   @spec parse_datetime(String.t() | nil, parse_datetime_options()) ::
           {:ok, DateTime.t() | NaiveDateTime.t()} | {:error, String.t()}
   def parse_datetime(string, opts \\ [])
@@ -160,24 +192,27 @@ defmodule DateTimeParser do
 
   defp do_time_parse(string) do
     cond do
-      Regex.match?(@epoch_regex, string) -> Epoch.parse(string)
-      Regex.match?(@serial_regex, string) -> Serial.parse(string)
-      true -> DateTimeParser.Time.parse(string)
+      Regex.match?(@epoch_regex, string) ->
+        Epoch.parse(string)
+
+      Regex.match?(@serial_regex, string) ->
+        Serial.parse(string)
+
+      true ->
+        case Regex.named_captures(@time_regex, string) do
+          %{"time" => time} -> DateTimeParser.Time.parse(time)
+          _ -> DateTimeParser.Time.parse(string)
+        end
     end
   end
 
   @doc """
   Parse `%Date{}` from a string.
-
-  Options:
-    * `:assume_date` Default `false`.
-      Only applicable for strings where parsing could not determine all components. If assume_date
-      is provided as true, the parsed tokens will be merged with `Date.utc_today()`. If assume_date
-      is provided a %Date{}, then the parsed tokens will be merged with it. Otherwise, missing
-      information will not be assumed.
   """
-  @spec parse_date(String.t() | nil, parse_date_options()) :: {:ok, Date.t()} | {:error, String.t()}
+  @spec parse_date(String.t() | nil, parse_date_options()) ::
+          {:ok, Date.t()} | {:error, String.t()}
   def parse_date(string, opts \\ [])
+
   def parse_date(string, opts) when is_binary(string) do
     with cleaned_string <- clean(string),
          {:ok, tokens, _, _, _, _} <- do_parse_date(cleaned_string),
@@ -213,6 +248,7 @@ defmodule DateTimeParser do
         case Serial.from_tokens(tokens, []) do
           {:ok, %NaiveDateTime{} = datetime} ->
             {:ok, NaiveDateTime.to_time(datetime)}
+
           true ->
             :error
         end
@@ -228,8 +264,10 @@ defmodule DateTimeParser do
         case Serial.from_tokens(tokens, opts) do
           {:ok, %NaiveDateTime{} = naive_datetime} ->
             {:ok, NaiveDateTime.to_date(naive_datetime)}
+
           {:ok, %Date{} = date} ->
             {:ok, date}
+
           true ->
             :error
         end
@@ -251,6 +289,7 @@ defmodule DateTimeParser do
         case Serial.from_tokens(tokens, opts) do
           {:ok, %NaiveDateTime{} = naive_datetime} ->
             {:ok, naive_datetime}
+
           true ->
             :error
         end
@@ -302,6 +341,7 @@ defmodule DateTimeParser do
   end
 
   defp maybe_convert_to_utc(%DateTime{zone_abbr: "Etc/UTC"} = datetime, _opts), do: datetime
+
   defp maybe_convert_to_utc(%DateTime{} = datetime, opts) do
     if Keyword.get(opts, :to_utc, false) do
       Timex.Timezone.convert(datetime, "Etc/UTC")
