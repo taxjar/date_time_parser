@@ -126,9 +126,9 @@ defmodule DateTimeParserTest do
   describe "parse_datetime/1 - serial" do
     test_datetime_parsing("41261.6013888889", ~N[2012-12-18T14:26:00])
     test_datetime_parsing("-45103.1454398148", ~N[1776-07-04T20:30:34])
-    test_datetime_parsing("-363", ~N[1899-01-01T00:00:00])
-    test_datetime_parsing("2", ~N[1900-01-01T00:00:00])
-    test_datetime_parsing("62", ~N[1900-03-02T00:00:00])
+    test_datetime_parsing("-363.0", ~N[1899-01-01T00:00:00])
+    test_datetime_parsing("2.0", ~N[1900-01-01T00:00:00])
+    test_datetime_parsing("62.0", ~N[1900-03-02T00:00:00])
   end
 
   describe "parse_datetime/1 - epoch" do

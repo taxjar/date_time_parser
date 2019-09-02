@@ -14,7 +14,9 @@ defmodule DateTimeParser do
 
   If the string starts with 1-5 digits with optional precision, then we'll try to parse it as a
   serial timestamp (spreadsheet time) treating 1899-12-31 as 1. This will cause Excel-produced dates
-  from 1900-01-01 until 1900-03-01 to be incorrect, as they really are.
+  from 1900-01-01 until 1900-03-01 to be incorrect, as they really are. If the string represents an
+  integer, then we will parse a date from it. If it is a flaot, then we'll parse a NaiveDateTime
+  from it.
 
   ## Examples
 
@@ -181,8 +183,9 @@ defmodule DateTimeParser do
         end
 
       tokens[:serial] ->
-        with %Time{} = time <- tokens |> Serial.from_tokens() |> NaiveDateTime.to_time() do
-          {:ok, time}
+        case Serial.from_tokens(tokens) do
+          %NaiveDateTime{} = datetime -> {:ok, NaiveDateTime.to_time(datetime)}
+          true -> :error
         end
 
       true ->
@@ -193,8 +196,9 @@ defmodule DateTimeParser do
   defp to_date(tokens) do
     cond do
       tokens[:serial] ->
-        with %Date{} = date <- tokens |> Serial.from_tokens() |> NaiveDateTime.to_date() do
-          {:ok, date}
+        case Serial.from_tokens(tokens) do
+          %NaiveDateTime{} = naive_datetime -> {:ok, NaiveDateTime.to_date(naive_datetime)}
+          %Date{} = date -> {:ok, date}
         end
 
       tokens[:unix_epoch] ->
@@ -231,6 +235,7 @@ defmodule DateTimeParser do
         naive_datetime
     end
   end
+  defp to_datetime(%Date{}, _tokens), do: :error
 
   defp validate_day(%{day: day, month: month} = date)
        when month in [1, 3, 5, 7, 8, 10, 12] and day in 1..31,
