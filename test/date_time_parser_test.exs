@@ -15,8 +15,7 @@ defmodule DateTimeParserTest do
     test_parsing(" 24 Sep 2013", "2013-09-24")
     test_parsing("01-01-2018", "2018-01-01")
     test_parsing("01-Feb-18", "2018-02-01")
-    test_parsing("01-Jul", "2019-07-01", assume_date: %Date{year: 2019, month: 1, day: 5})
-    test_error("01-Jul", "Could not parse 01-Jul")
+    test_parsing("01-Jul", "2019-07-01", assume_date: ~D[2019-01-05])
     test_parsing("01-Jul-18", "2018-07-01")
     test_parsing("01.09.2018", "2018-09-01")
     test_parsing("01.11.2018", "2018-11-01")
@@ -39,7 +38,7 @@ defmodule DateTimeParserTest do
     test_parsing("05/01/2018 0:00", "2018-05-01T00:00:00")
     test_parsing("06/14/2018 09:42:08 PM-0500", "2018-06-15T02:42:08Z", to_utc: true)
     test_parsing("06/28/18 1:25", "2018-06-28T01:25:00")
-    test_parsing("1-Apr", "2019-04-01", assume_date: %Date{year: 2019, month: 1, day: 13})
+    test_parsing("1-Apr", "2019-04-01", assume_date: ~D[2019-01-13])
     test_error("1-Apr")
     # Ruby parses this next one incorrectly
     test_parsing("1//1/17", "2017-01-01")
@@ -105,11 +104,7 @@ defmodule DateTimeParserTest do
     test_parsing(~s|"Jan 1, 2014 6:44:47 AM PST"|, "2014-01-01T13:44:47Z", to_utc: true)
     test_parsing("Jan-01-19", "2019-01-01")
     test_parsing("Jan-01-19", "2019-01-01T00:00:00", assume_time: true)
-
-    test_parsing("Jan-01-19", "2019-01-01T10:13:15",
-      assume_time: %Time{hour: 10, minute: 13, second: 15}
-    )
-
+    test_parsing("Jan-01-19", "2019-01-01T10:13:15", assume_time: ~T[10:13:15])
     test_parsing("Jan-01-2018", "2018-01-01")
     test_parsing("Monday 01 October 2018 06:34:19 AM", "2018-10-01T06:34:19")
     test_parsing("Monday 02 October 2017 9:04:49 AM", "2017-10-02T09:04:49")
@@ -421,20 +416,16 @@ defmodule DateTimeParserTest do
       assert DateTimeParser.parse_time(nil) == {:error, "Could not parse nil"}
     end
 
-    test "errors on invalid days of month" do
-      assert DateTimeParser.parse_datetime("2017-02-29 00:00:00 UTC") ==
-               {:error, "Could not parse 2017-02-29 00:00:00 UTC"}
+    test_error("01-Jul", "Could not parse 01-Jul")
+    test_datetime_error("01-Jul")
+    test_datetime_error("2017-02-29 00:00:00 UTC")
+    test_date_error("2017-02-29")
 
-      assert DateTimeParser.parse_date("2017-02-29") ==
-               {:error, "Could not parse 2017-02-29"}
+    for month <- ~w[04 06 09 11] do
+      @month month
 
-      for month <- ["04", "06", "09", "11"] do
-        assert DateTimeParser.parse_datetime("2017-#{month}-31 00:00:00 UTC") ==
-                 {:error, "Could not parse 2017-#{month}-31 00:00:00 UTC"}
-
-        assert DateTimeParser.parse_date("2017-#{month}-31") ==
-                 {:error, "Could not parse 2017-#{month}-31"}
-      end
+      test_datetime_error("2017-#{@month}-31 00:00:00 UTC", "Could not parse 2017-#{@month}-31 00:00:00 UTC")
+      test_date_error("2017-#{@month}-31", "Could not parse 2017-#{@month}-31")
     end
   end
 end

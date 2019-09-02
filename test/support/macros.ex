@@ -114,4 +114,54 @@ defmodule DateTimeParserTestMacros do
       end
     end
   end
+
+  defmacro test_datetime_error(string_timestamp, expected_message \\ nil, opts \\ []) do
+    quote do
+      test_name =
+        if unquote(opts) == [] do
+          "does not parse datetime #{unquote(string_timestamp)}"
+        else
+          "does not parse datetime #{unquote(string_timestamp)} with opts #{inspect(unquote(opts))}"
+        end
+
+      test test_name do
+        assert {:error, message} = DateTimeParser.parse_datetime(unquote(string_timestamp), unquote(opts))
+        if unquote(expected_message) do
+          assert message == unquote(expected_message)
+        end
+        Recorder.add(unquote(string_timestamp), message, "parse_datetime", unquote(opts))
+      end
+    end
+  end
+
+  defmacro test_date_error(string_timestamp, expected_message \\ nil, opts \\ []) do
+    quote do
+      test_name =
+        if unquote(opts) == [] do
+          "does not parse date #{unquote(string_timestamp)}"
+        else
+          "does not parse date #{unquote(string_timestamp)} with opts #{inspect(unquote(opts))}"
+        end
+
+      test test_name do
+        assert {:error, message} = DateTimeParser.parse_date(unquote(string_timestamp), unquote(opts))
+        if unquote(expected_message) do
+          assert message == unquote(expected_message)
+        end
+        Recorder.add(unquote(string_timestamp), message, "parse_date", unquote(opts))
+      end
+    end
+  end
+
+  defmacro test_time_error(string_time, expected_message) do
+    quote do
+      test "does not parse time #{unquote(string_time)}" do
+        assert {:error, expected_message} = DateTimeParser.parse_time(unquote(string_time))
+        if unquote(expected_message) do
+          assert message == unquote(expected_message)
+        end
+        Recorder.add(unquote(string_time), unquote(expected_message), "parse_time", [])
+      end
+    end
+  end
 end

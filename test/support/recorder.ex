@@ -43,10 +43,11 @@ defmodule DateTimeParserTest.Recorder do
   defp write_result({input, output, method, opts}) do
     File.write(
       @example_file,
-      "|`#{input}`|`#{DateTimeParserTestMacros.to_iso(output)}`|#{method}|#{
-        if opts == [], do: "", else: inspect(opts)
-      }|\n",
+      "|`#{input}`|`#{DateTimeParserTestMacros.to_iso(output)}`|#{method}|#{format_options(opts)}|\n",
       [:append]
     )
   end
+
+  defp format_options([]), do: ""
+  defp format_options(options), do: "`#{inspect options}`"
 end
