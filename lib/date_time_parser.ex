@@ -98,7 +98,7 @@ defmodule DateTimeParser do
   def parse_datetime(nil, _opts), do: {:error, "Could not parse nil"}
   def parse_datetime(value, _opts), do: {:error, "Could not parse #{value}"}
 
-  def do_datetime_parse(string) do
+  defp do_datetime_parse(string) do
     cond do
       String.contains?(string, "/") -> DateTimeParser.DateTime.parse_us(string)
       Regex.match?(@epoch_regex, string) -> Epoch.parse(string)
@@ -123,7 +123,7 @@ defmodule DateTimeParser do
   def parse_time(nil), do: {:error, "Could not parse nil"}
   def parse_time(value), do: {:error, "Could not parse #{value}"}
 
-  def do_time_parse(string) do
+  defp do_time_parse(string) do
     if Regex.match?(@epoch_regex, string) do
       Epoch.parse(string)
     else
