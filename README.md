@@ -8,6 +8,9 @@
 DateTimeParser is a tokenizer for strings that attempts to parse into a
 DateTime, NaiveDateTime if timezone is not determined, Date, or Time.
 
+You're currently looking at the master branch. [Check out the docs for the latest
+published version.](https://hexdocs.pm/date_time_parser)
+
 The biggest ambiguity between datetime formats is whether it's `ymd` (year month
 day), `mdy` (month day year), or `dmy` (day month year); this is resolved by
 checking if there are slashes or dashes. If slashes, then it will try `dmy`
@@ -36,25 +39,6 @@ they really are.
 [Epoch]: https://en.wikipedia.org/wiki/Unix_time
 [Serial]: https://support.office.com/en-us/article/date-systems-in-excel-e7fe7167-48a9-4b96-bb53-5612a800b487
 
-## Planned Breaking Changes
-
-* `parse_datetime` currently assumes `00:00:00` time if it cannot be determined.
-    This will likely change in a future version because it's better to have no
-    information than have wrong information. If you want to assume `00:00:00`,
-    that's fine, but this library shouldn't assume it for you, or at least make
-    it an option.
-* `parse_datetime` currently defaults to converting to UTC when the timezone is
-    known. This default may change to keep the original timezone information.
-    This will help for future timestamps since timezone rules change; converting
-    to UTC too early may use rules that become outdated by the time the
-    timestamp arrives. The option to convert to UTC will remain, but may not be
-    default.
-* Introduce `parse` to parse as much as it can, but return any of the structs,
-    `%DateTime{}` `%NaiveDateTime{}` `%Date{}` or `%Time{}`. It would be up to
-    you to match on what the result is and do what you will. If you know you
-    want the one specific struct, then you can continue to use the more-specific
-    functions like `parse_date`.
-
 ## Required reading
 
 * [Elixir DateTime docs](https://hexdocs.pm/elixir/DateTime.html)
@@ -62,7 +46,7 @@ they really are.
 * [Elixir Date docs](https://hexdocs.pm/elixir/Date.html)
 * [Elixir Time docs](https://hexdocs.pm/elixir/Time.html)
 * [Elixir Calendar docs](https://hexdocs.pm/elixir/Calendar.html)
-* [How to save datetimes for future events (when UTC is not the right answer)](http://www.creativedeletion.com/2015/03/19/persisting_future_datetimes.html)
+* [How to store future timestamps](./pages/Future-UTC-DateTime.md)
   * tldr: rules change, so don't convert to UTC too early. The future might
       change the timezone conversion rules.
 
@@ -73,11 +57,29 @@ they really are.
 ## Examples
 
 ```elixir
+iex> DateTimeParser.parse("19 September 2018 08:15:22 AM")
+{:ok, ~N[2018-09-19 08:15:22]}
+
 iex> DateTimeParser.parse_datetime("19 September 2018 08:15:22 AM")
 {:ok, ~N[2018-09-19 08:15:22]}
 
-iex> DateTimeParser.parse_datetime("2034-01-13")
+iex> DateTimeParser.parse_datetime("2034-01-13", assume_time: true)
 {:ok, ~N[2034-01-13 00:00:00]}
+
+iex> DateTimeParser.parse_datetime("2034-01-13", assume_time: ~T[06:00:00])
+{:ok, ~N[2034-01-13 06:00:00]}
+
+iex> DateTimeParser.parse("invalid date 10:30pm")
+{:ok, ~T[22:30:00]}
+
+iex> DateTimeParser.parse("2019-03-11T99:99:99")
+{:ok, ~D[2019-03-11]}
+
+iex> DateTimeParser.parse("2019-03-11T10:30:00pm UNK")
+{:ok, ~N[2019-03-11T22:30:00]}
+
+iex> DateTimeParser.parse("2019-03-11T22:30:00.234+00:00")
+{:ok, ~U[2019-03-11T22:30:00.234Z]}
 
 iex> DateTimeParser.parse_date("2034-01-13")
 {:ok, ~D[2034-01-13]}
@@ -85,18 +87,26 @@ iex> DateTimeParser.parse_date("2034-01-13")
 iex> DateTimeParser.parse_date("01/01/2017")
 {:ok, ~D[2017-01-01]}
 
+iex> DateTimeParser.parse_datetime("1564154204")
+{:ok, ~U[2019-07-26T15:16:44Z]}
+
+iex> DateTimeParser.parse_datetime("41261.6013888889")
+{:ok, ~N[2012-12-18T14:26:00]}
+
+iex> DateTimeParser.parse_date("44262")
+{:ok, ~D[2021-03-07]}
+# This is a serial number date, commonly found in spreadsheets, eg: `=VALUE("03/07/2021")`
+
 iex> DateTimeParser.parse_datetime("1/1/18 3:24 PM")
 {:ok, ~N[2018-01-01T15:24:00]}
 
 iex> DateTimeParser.parse_datetime("1/1/18 3:24 PM", assume_utc: true)
 {:ok, ~U[2018-01-01T15:24:00Z]}
-# the ~U is a DateTime sigil introduced in Elixir 1.9.0
 
-iex> DateTimeParser.parse_datetime(~s|"Dec 1, 2018 7:39:53 AM PST"|)
+iex> DateTimeParser.parse_datetime(~s|"Dec 1, 2018 7:39:53 AM PST"|, to_utc: true)
 {:ok, ~U[2018-12-01T14:39:53Z]}
-# Notice that the date is converted to UTC by default
 
-iex> {:ok, datetime} = DateTimeParser.parse_datetime(~s|"Dec 1, 2018 7:39:53 AM PST"|, to_utc: false)
+iex> {:ok, datetime} = DateTimeParser.parse_datetime(~s|"Dec 1, 2018 7:39:53 AM PST"|)
 iex> datetime
 #DateTime<2018-12-01 07:39:53-07:00 PDT PST8PDT>
 
@@ -105,6 +115,9 @@ iex> DateTimeParser.parse_time("10:13pm")
 
 iex> DateTimeParser.parse_time("10:13:34")
 {:ok, ~T[10:13:34]}
+
+iex> DateTimeParser.parse_time("18:14:21.145851000000Z")
+{:ok, ~T[18:14:21.145851]}
 
 iex> DateTimeParser.parse_datetime(nil)
 {:error, "Could not parse nil"}
@@ -127,6 +140,23 @@ end
 ## Changelog
 
 [View Changelog](./CHANGELOG.md)
+
+## Upgrading from 0.x to 1.0
+
+* If you use `parse_datetime/1`, then change to `parse_datetime/2` with the
+  second argument as a keyword list to `assume_time: true` and `to_utc: true`.
+  In 0.x, it would merge `~T[00:00:00]` if the time tokens could not be parsed;
+  in 1.x, you have to opt into this behavior. Also in 0.x, a non-UTC timezone
+  would automatically convert to UTC; in 1.x, the original timezone will be
+  kept instead.
+* If you use `parse_date/1`, then change to `parse_date/2` with the second
+  argument as a keyword list to `assume_date: true`. In 0.x, it would merge
+  `Date.utc_today()` with the found date tokens; in 1.x, you need to opt into
+  this behavior.
+* If you use `parse_time`, there is no breaking change but parsing has been
+  improved.
+* Not a breaking change, but 1.x introduces `parse/2` that will return the best
+  struct from the tokens. This may influence your usage.
 
 ## Contributing
 

@@ -16,6 +16,8 @@
     string. This is replaced with an opt-in option of `assume_date`. See next
     point. If you relied on this, to upgrade add the option; eg:
     `DateTimeParser.parse_date(string, assume_date: true)`
+- **BREAKING** Change `parse_datetime` to no longer convert DateTime to UTC
+    timezone.
 - Change `parse_date` to accept options:
   - `assume_date: true | %Date{} | false` with the default of false.
 

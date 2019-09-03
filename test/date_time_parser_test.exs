@@ -134,6 +134,11 @@ defmodule DateTimeParserTest do
     test_datetime_parsing("62.0", ~N[1900-03-02T00:00:00])
   end
 
+  describe "parse/1 - serial options" do
+    test_parsing("62", ~N[1900-03-02T00:00:00], assume_time: true)
+    test_parsing("62.0", ~N[1900-03-02T00:00:00])
+  end
+
   describe "parse_datetime/1 - epoch" do
     test_datetime_parsing("99999999999", DateTime.from_naive!(~N[5138-11-16T09:46:39], "Etc/UTC"))
     test_datetime_parsing("9999999999", DateTime.from_naive!(~N[2286-11-20T17:46:39], "Etc/UTC"))
@@ -424,7 +429,11 @@ defmodule DateTimeParserTest do
     for month <- ~w[04 06 09 11] do
       @month month
 
-      test_datetime_error("2017-#{@month}-31 00:00:00 UTC", "Could not parse 2017-#{@month}-31 00:00:00 UTC")
+      test_datetime_error(
+        "2017-#{@month}-31 00:00:00 UTC",
+        "Could not parse 2017-#{@month}-31 00:00:00 UTC"
+      )
+
       test_date_error("2017-#{@month}-31", "Could not parse 2017-#{@month}-31")
     end
   end

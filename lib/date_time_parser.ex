@@ -9,14 +9,18 @@ defmodule DateTimeParser do
   format `ymd`. Sometimes, if the conditions are right, it can even parse `dmy` with dashes if the
   month is a vocal month (eg, `"Jan"`).
 
-  If the string starts with 10-11 digits with optional precision, then we'll try to parse it as a
-  Unix epoch timestamp.
+  If the string is 10-11 digits with optional precision, then we'll try to parse it as a Unix
+  [Epoch] timestamp.
 
-  If the string starts with 1-5 digits with optional precision, then we'll try to parse it as a
-  serial timestamp (spreadsheet time) treating 1899-12-31 as 1. This will cause Excel-produced dates
-  from 1900-01-01 until 1900-03-01 to be incorrect, as they really are. If the string represents an
-  integer, then we will parse a date from it. If it is a flaot, then we'll parse a NaiveDateTime
-  from it.
+  If the string is 1-5 digits with optional precision, then we'll try to parse it as a [Serial]
+  timestamp (spreadsheet time) treating 1899-12-31 as 1. This will cause Excel-produced dates from
+  1900-01-01 until 1900-03-01 to be incorrect, as they really are.
+
+  |digits|parser|range|notes|
+  |---|----|---|---|
+  |1-5|Serial|low = `1900-01-01`, high = `2173-10-15`. Negative numbers go to `1626-03-17`|Floats indicate time. Integers do not.|
+  |6-9|Tokenizer|any|This allows for "20190429" to be parsed as `2019-04-29`|
+  |10-11|Epoch|low = `1976-03-03T09:46:40`, high = `5138-11-16 09:46:39`|If padded with 0s, then it can capture entire range. Negative numbers not yet supported|
 
   ## Examples
 
@@ -100,7 +104,10 @@ defmodule DateTimeParser do
   @type assume_time :: {:assume_time, bool() | Time.t()}
   @type assume_utc :: {:assume_utc, bool()}
   @type to_utc :: {:to_utc, bool()}
+
   @typedoc """
+  Options applicable for `parse_datetime/2`
+
   * `:assume_utc` Default `false`.
   Only applicable for strings where parsing could not determine a timezone. Instead of returning a
   NaiveDateTime, this option will assume them to be in UTC timezone, and therefore return a
@@ -112,26 +119,36 @@ defmodule DateTimeParser do
   know that your timestamps are in the future and are going to store it for later use, it may be
   better to _not_ convert to UTC since government organizations may change timezone rules before
   the timestamp elapses, therefore making the UTC timestamp wrong or invalid.
+
+  * `:assume_time` Default `false`.
+  If a time cannot be determined, then it will not be assumed by default. If you supply `true`, then
+  `~T[00:00:00]` will be assumed. You can also supply your own time, and the found tokens will be
+  merged with it.
   """
   @type parse_datetime_options :: [assume_utc() | to_utc() | assume_time()]
+
   @typedoc """
+  Options applicable for `parse_date/2`
+
   * `:assume_date` Default `false`.
-    Only applicable for strings where parsing could not determine all components. If assume_date
-    is provided as true, the parsed tokens will be merged with `Date.utc_today()`. If assume_date
-    is provided a %Date{}, then the parsed tokens will be merged with it. Otherwise, missing
-    information will not be assumed.
+  If a date cannot be fully determined, then it will not be assumed by default. If you supply
+  `true`, then `Date.utc_today()` will be assumed. You can also supply your own date, and the found
+  tokens will be merged with it.
   """
   @type parse_date_options :: [assume_date()]
-  @typedoc "Combination of t:parse_date_options and t:parse_datetime_options"
+
+  @typedoc """
+  Options for `parse/2`. Combination of `t:parse_date_options/0` and `t:parse_datetime_options/0`.
+  """
   @type parse_options :: parse_datetime_options() | parse_date_options()
 
   @doc """
   Parse a `%DateTime{}`, `%NaiveDateTime{}`, `%Date{}`, or `%Time{}` from a string.
 
-  Accepts `t:parse_options`
+  Accepts `t:parse_options/0`
   """
   @spec parse(String.t() | nil, parse_options()) ::
-          {:ok, DateTime.t() | NaiveDateTime.t(), Date.t(), Time.t()} | {:error, String.t()}
+          {:ok, DateTime.t() | NaiveDateTime.t() | Date.t() | Time.t()} | {:error, String.t()}
   def parse(string, opts \\ []) do
     with {:error, _} <- parse_datetime(string, opts),
          {:error, _} <- parse_date(string, opts) do
@@ -141,7 +158,7 @@ defmodule DateTimeParser do
 
   @doc """
   Parse a `%DateTime{}` or `%NaiveDateTime{}` from a string. Accepts options
-  `t:parse_datetime_options`
+  `t:parse_datetime_options/0`
   """
   @spec parse_datetime(String.t() | nil, parse_datetime_options()) ::
           {:ok, DateTime.t() | NaiveDateTime.t()} | {:error, String.t()}
@@ -207,7 +224,7 @@ defmodule DateTimeParser do
   end
 
   @doc """
-  Parse `%Date{}` from a string.
+  Parse `%Date{}` from a string. Accepts options `t:parse_date_options/0`
   """
   @spec parse_date(String.t() | nil, parse_date_options()) ::
           {:ok, Date.t()} | {:error, String.t()}
