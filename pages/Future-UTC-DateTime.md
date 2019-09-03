@@ -38,7 +38,7 @@ There are 3 elements at play:
 3. The provided timestamp is based on the location the user is in, and that
    location follows a set of rules of how time changes throughout the year.
 
-We need to store timestamps in an database column made for timestamps so we can
+We need to store timestamps in a database column made for timestamps so we can
 achieve #1. This can be more complicated given your database, but using Postgres
 as an example, it internally converts to UTC and queries against that. If you're
 using Ecto as your data mapper, it must always be in UTC before storage.
