@@ -95,6 +95,7 @@ defmodule DateTimeParser.Formatters do
 
   def format({:microsecond, value}) do
     val = value |> to_string |> String.slice(0, 6)
+
     {
       val |> String.pad_trailing(6, "0") |> String.to_integer(),
       val |> byte_size()
