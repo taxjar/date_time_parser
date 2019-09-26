@@ -100,10 +100,10 @@ defmodule DateTimeParser do
   @serial_regex ~r|\A-?\d{1,5}(?:\.\d{1,10})?\z|
   @time_regex ~r|(?<time>\d{1,2}:\d{2}(?::\d{2})?(?:.*)?)|
 
-  @type assume_date :: {:assume_date, bool() | Date.t()}
-  @type assume_time :: {:assume_time, bool() | Time.t()}
-  @type assume_utc :: {:assume_utc, bool()}
-  @type to_utc :: {:to_utc, bool()}
+  @type assume_date :: {:assume_date, boolean() | Date.t()}
+  @type assume_time :: {:assume_time, boolean() | Time.t()}
+  @type assume_utc :: {:assume_utc, boolean()}
+  @type to_utc :: {:to_utc, boolean()}
 
   @typedoc """
   Options applicable for `parse_datetime/2`
