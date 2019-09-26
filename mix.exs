@@ -82,6 +82,7 @@ defmodule DateTimeParser.MixProject do
       source_ref: @version,
       extras: [
         "README.md",
+        "pages/Future-UTC-DateTime.md",
         "CHANGELOG.md",
         "EXAMPLES.md",
         "LICENSE.md"

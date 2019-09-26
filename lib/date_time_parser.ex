@@ -50,11 +50,10 @@ defmodule DateTimeParser do
     {:ok, DateTime.from_naive!(~N[2018-01-01T15:24:00Z], "Etc/UTC")}
     # or ~U[2018-01-01T15:24:00Z] in Elixir 1.9.0+
 
-    iex> DateTimeParser.parse_datetime(~s|"Dec 1, 2018 7:39:53 AM PST"|)
+    iex> DateTimeParser.parse_datetime(~s|"Dec 1, 2018 7:39:53 AM PST"|, to_utc: true)
     {:ok, DateTime.from_naive!(~N[2018-12-01T14:39:53Z], "Etc/UTC")}
-    # Notice that the date is converted to UTC by default
 
-    iex> {:ok, datetime} = DateTimeParser.parse_datetime(~s|"Dec 1, 2018 7:39:53 AM PST"|, to_utc: false)
+    iex> {:ok, datetime} = DateTimeParser.parse_datetime(~s|"Dec 1, 2018 7:39:53 AM PST"|)
     iex> datetime
     #DateTime<2018-12-01 07:39:53-07:00 PDT PST8PDT>
 
@@ -77,13 +76,16 @@ defmodule DateTimeParser do
 
   Options:
     * `:assume_utc` Default `false`.
-    Only applicable for strings where parsing could not determine a timezone. Instead of returning
-    a NaiveDateTime, this option will assume them to be in UTC timezone, and therefore return a
-    DateTime
+    Only applicable for strings where parsing could not determine a timezone. Instead of returning a
+    NaiveDateTime, this option will assume them to be in UTC timezone, and therefore return a
+    DateTime. If the timezone is determined, then it will continue to be returned in the original
+    timezone. See `to_utc` option to also convert it to UTC.
 
-    * `:to_utc` Default `true`.
-    If there's a timezone detected in the string, then attempt to convert to UTC timezone. This is
-    helpful for storing in databases with Ecto.
+    * `:to_utc` Default `false`.
+    If there's a timezone detected in the string, then attempt to convert to UTC timezone. If you
+    know that your timestamps are in the future and are going to store it for later use, it may be
+    better to _not_ convert to UTC since government organizations may change timezone rules before
+    the timestamp elapses, therefore making the UTC timestamp wrong or invalid.
   """
 
   import DateTimeParser.Formatters
@@ -269,7 +271,7 @@ defmodule DateTimeParser do
   end
 
   defp maybe_convert_to_utc(%DateTime{} = datetime, opts) do
-    if Keyword.get(opts, :to_utc, true) do
+    if Keyword.get(opts, :to_utc, false) do
       Timex.Timezone.convert(datetime, "Etc/UTC")
     else
       datetime
