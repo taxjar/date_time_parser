@@ -235,6 +235,7 @@ defmodule DateTimeParser do
         naive_datetime
     end
   end
+
   defp to_datetime(%Date{}, _tokens), do: :error
 
   defp validate_day(%{day: day, month: month} = date)

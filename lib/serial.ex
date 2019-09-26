@@ -13,17 +13,21 @@ defmodule DateTimeParser.Serial do
     end
   end
 
-  def from_tokens(tokens) do
-    if is_float(tokens[:serial]) do
-      {serial_date, serial_time} = split_float(tokens[:serial])
-      erl_time = time_from_serial(serial_time)
-      erl_date = date_from_serial(serial_date)
-      with {:ok, datetime} <- NaiveDateTime.from_erl({erl_date, erl_time}), do: datetime
-    else
-      erl_date = date_from_serial(tokens[:serial])
-      with {:ok, date} <- Date.from_erl(erl_date), do: date
-    end
+  def from_tokens(nil), do: :error
+
+  def from_tokens(float) when is_float(float) do
+    {serial_date, serial_time} = split_float(float)
+    erl_time = time_from_serial(serial_time)
+    erl_date = date_from_serial(serial_date)
+    with {:ok, datetime} <- NaiveDateTime.from_erl({erl_date, erl_time}), do: datetime
   end
+
+  def from_tokens(integer) when is_integer(integer) do
+    erl_date = date_from_serial(integer)
+    with {:ok, date} <- Date.from_erl(erl_date), do: date
+  end
+
+  def from_tokens(tokens), do: from_tokens(tokens[:serial])
 
   def time_from_serial(0.0), do: {0, 0, 0}
 
