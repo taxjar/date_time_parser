@@ -9,8 +9,14 @@ defmodule DateTimeParser do
   format `ymd`. Sometimes, if the conditions are right, it can even parse `dmy` with dashes if the
   month is a vocal month (eg, `"Jan"`).
 
-  If the string is 10-11 digits with optional precision, then we'll try to parse it as a Unix epoch
-  timestamp.
+  If the string starts with 10-11 digits with optional precision, then we'll try to parse it as a
+  Unix epoch timestamp.
+
+  If the string starts with 1-5 digits with optional precision, then we'll try to parse it as a
+  serial timestamp (spreadsheet time) treating 1899-12-31 as 1. This will cause Excel-produced dates
+  from 1900-01-01 until 1900-03-01 to be incorrect, as they really are. If the string represents an
+  integer, then we will parse a date from it. If it is a flaot, then we'll parse a NaiveDateTime
+  from it.
 
   ## Examples
 
@@ -29,6 +35,13 @@ defmodule DateTimeParser do
 
     iex> DateTimeParser.parse_datetime("1564154204")
     {:ok, DateTime.from_naive!(~N[2019-07-26T15:16:44Z], "Etc/UTC")}
+
+    iex> DateTimeParser.parse_datetime("41261.6013888889")
+    {:ok, ~N[2012-12-18T14:26:00]}
+
+    iex> DateTimeParser.parse_date("44262")
+    {:ok, ~D[2021-03-07]}
+    # This is a serial number date, commonly found in spreadsheets, eg: `=VALUE("03/07/2021")`
 
     iex> DateTimeParser.parse_datetime("1/1/18 3:24 PM")
     {:ok, ~N[2018-01-01T15:24:00]}
@@ -74,9 +87,11 @@ defmodule DateTimeParser do
   """
 
   import DateTimeParser.Formatters
-  alias DateTimeParser.Epoch
+  alias DateTimeParser.{Epoch, Serial}
 
   @epoch_regex ~r|\A\d{10,11}(?:\.\d{1,10})?\z|
+  @serial_regex ~r|\A-?\d{1,5}(?:\.\d{1,10})?\z|
+
   @spec parse_datetime(String.t() | nil, Keyword.t()) ::
           {:ok, DateTime.t() | NaiveDateTime.t()} | {:error, String.t()}
   def parse_datetime(string, opts \\ [])
@@ -102,6 +117,7 @@ defmodule DateTimeParser do
     cond do
       String.contains?(string, "/") -> DateTimeParser.DateTime.parse_us(string)
       Regex.match?(@epoch_regex, string) -> Epoch.parse(string)
+      Regex.match?(@serial_regex, string) -> Serial.parse(string)
       true -> DateTimeParser.DateTime.parse(string)
     end
   end
@@ -124,10 +140,10 @@ defmodule DateTimeParser do
   def parse_time(value), do: {:error, "Could not parse #{value}"}
 
   defp do_time_parse(string) do
-    if Regex.match?(@epoch_regex, string) do
-      Epoch.parse(string)
-    else
-      DateTimeParser.Time.parse(string)
+    cond do
+      Regex.match?(@epoch_regex, string) -> Epoch.parse(string)
+      Regex.match?(@serial_regex, string) -> Serial.parse(string)
+      true -> DateTimeParser.Time.parse(string)
     end
   end
 
@@ -154,35 +170,57 @@ defmodule DateTimeParser do
     cond do
       String.contains?(string, "/") -> DateTimeParser.Date.parse_us(string)
       Regex.match?(@epoch_regex, string) -> Epoch.parse(string)
+      Regex.match?(@serial_regex, string) -> Serial.parse(string)
       true -> DateTimeParser.Date.parse(string)
     end
   end
 
   defp to_time(tokens) do
-    if tokens[:unix_epoch] do
-      with %Time{} = time <- tokens |> Epoch.from_tokens() |> DateTime.to_time() do
-        {:ok, time}
-      end
-    else
-      DateTimeParser.Time.from_tokens(tokens)
+    cond do
+      tokens[:unix_epoch] ->
+        with %Time{} = time <- tokens |> Epoch.from_tokens() |> DateTime.to_time() do
+          {:ok, time}
+        end
+
+      tokens[:serial] ->
+        case Serial.from_tokens(tokens) do
+          %NaiveDateTime{} = datetime -> {:ok, NaiveDateTime.to_time(datetime)}
+          true -> :error
+        end
+
+      true ->
+        DateTimeParser.Time.from_tokens(tokens)
     end
   end
 
   defp to_date(tokens) do
-    if tokens[:unix_epoch] do
-      with %Date{} = date <- tokens |> Epoch.from_tokens() |> DateTime.to_date() do
-        {:ok, date}
-      end
-    else
-      DateTimeParser.Date.from_tokens(tokens)
+    cond do
+      tokens[:serial] ->
+        case Serial.from_tokens(tokens) do
+          %NaiveDateTime{} = naive_datetime -> {:ok, NaiveDateTime.to_date(naive_datetime)}
+          %Date{} = date -> {:ok, date}
+        end
+
+      tokens[:unix_epoch] ->
+        with %Date{} = date <- tokens |> Epoch.from_tokens() |> DateTime.to_date() do
+          {:ok, date}
+        end
+
+      true ->
+        DateTimeParser.Date.from_tokens(tokens)
     end
   end
 
   defp to_naive_datetime(tokens) do
-    if tokens[:unix_epoch] do
-      Epoch.from_tokens(tokens)
-    else
-      DateTimeParser.DateTime.from_tokens(tokens)
+    cond do
+      tokens[:serial] ->
+        Serial.from_tokens(tokens)
+
+      tokens[:unix_epoch] ->
+        Epoch.from_tokens(tokens)
+
+      true ->
+        DateTimeParser.DateTime.from_tokens(tokens)
     end
   end
 
@@ -197,6 +235,8 @@ defmodule DateTimeParser do
         naive_datetime
     end
   end
+
+  defp to_datetime(%Date{}, _tokens), do: :error
 
   defp validate_day(%{day: day, month: month} = date)
        when month in [1, 3, 5, 7, 8, 10, 12] and day in 1..31,

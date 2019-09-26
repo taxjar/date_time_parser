@@ -123,6 +123,14 @@ defmodule DateTimeParserTest do
     test_datetime_parsing("jul-10-18", "2018-07-10T00:00:00")
   end
 
+  describe "parse_datetime/1 - serial" do
+    test_datetime_parsing("41261.6013888889", ~N[2012-12-18T14:26:00])
+    test_datetime_parsing("-45103.1454398148", ~N[1776-07-04T20:30:34])
+    test_datetime_parsing("-363.0", ~N[1899-01-01T00:00:00])
+    test_datetime_parsing("2.0", ~N[1900-01-01T00:00:00])
+    test_datetime_parsing("62.0", ~N[1900-03-02T00:00:00])
+  end
+
   describe "parse_datetime/1 - epoch" do
     test_datetime_parsing("99999999999", DateTime.from_naive!(~N[5138-11-16T09:46:39], "Etc/UTC"))
     test_datetime_parsing("9999999999", DateTime.from_naive!(~N[2286-11-20T17:46:39], "Etc/UTC"))
@@ -355,6 +363,14 @@ defmodule DateTimeParserTest do
     test_date_parsing("0000000000", ~D[1970-01-01])
   end
 
+  describe "parse_date/1 - serial" do
+    test_date_parsing("41261.6013888889", ~D[2012-12-18])
+    test_date_parsing("-45103.1454398148", ~D[1776-07-04])
+    test_date_parsing("-363", ~D[1899-01-01])
+    test_date_parsing("2", ~D[1900-01-01])
+    test_date_parsing("62", ~D[1900-03-02])
+  end
+
   describe "parse_time/1" do
     test_time_parsing("00:00.0", ~T[00:00:00])
     test_time_parsing("07:09.3", ~T[07:09:00])
@@ -369,6 +385,11 @@ defmodule DateTimeParserTest do
     test_time_parsing("9999999999.999999", ~T[17:46:39.999999])
     test_time_parsing("9999999999.9999999999", ~T[17:46:39.999999])
     test_time_parsing("0000000000", ~T[00:00:00])
+  end
+
+  describe "parse_time/1 - serial" do
+    test_time_parsing("41261.6013888889", ~T[14:26:00])
+    test_time_parsing("-45103.1454398148", ~T[20:30:34])
   end
 
   describe "errors" do
