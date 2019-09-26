@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.0
+
+- Add Serial time support
+
 ## 0.1.4
 
 - Refactor
