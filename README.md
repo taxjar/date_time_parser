@@ -15,13 +15,26 @@ first. All other cases will use the international format `ymd`. Sometimes, if
 the conditions are right, it can even parse `dmy` with dashes if the month is a
 vocal month (eg, `"Jan"`).
 
+If the string consists of only numbers, then we will try two other parsers
+depending on the number of digits: [Epoch] or [Serial]. Otherwise, we'll try the
+tokenizer.
+
 If the string is 10-11 digits with optional precision, then we'll try to parse
-it as a Unix epoch timestamp.
+it as a Unix [Epoch] timestamp.
 
 If the string is 1-5 digits with optional precision, then we'll try to parse it
-as a serial timestamp (spreadsheet time) treating 1899-12-31 as 1. This will
+as a [Serial] timestamp (spreadsheet time) treating 1899-12-31 as 1. This will
 cause Excel-produced dates from 1900-01-01 until 1900-03-01 to be incorrect, as
 they really are.
+
+|digits|parser|range|notes|
+|---|----|---|---|
+|1-5|Serial|low = `1900-01-01`, high = `2173-10-15`. Negative numbers go to `1626-03-17`|Floats indicate time. Integers do not.|
+|6-9|Tokenizer|any|This allows for "20190429" to be parsed as `2019-04-29`|
+|10-11|Epoch|low = `1976-03-03T09:46:40`, high = `5138-11-16 09:46:39`|If padded with 0s, then it can capture entire range. Negative numbers not yet supported|
+
+[Epoch]: https://en.wikipedia.org/wiki/Unix_time
+[Serial]: https://support.office.com/en-us/article/date-systems-in-excel-e7fe7167-48a9-4b96-bb53-5612a800b487
 
 ## Planned Breaking Changes
 
