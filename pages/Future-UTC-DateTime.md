@@ -73,4 +73,4 @@ the upcoming law change and anticipate it?).
 
 ## Credits
 
-http://www.creativedeletion.com/2015/03/19/persisting_future_datetimes.html
+[http://www.creativedeletion.com/2015/03/19/persisting_future_datetimes.html](http://www.creativedeletion.com/2015/03/19/persisting_future_datetimes.html)

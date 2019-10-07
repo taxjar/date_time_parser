@@ -9,10 +9,10 @@ defmodule DateTimeParser do
   format `ymd`. Sometimes, if the conditions are right, it can even parse `dmy` with dashes if the
   month is a vocal month (eg, `"Jan"`).
 
-  If the string is 10-11 digits with optional precision, then we'll try to parse it as a Unix
-  [Epoch] timestamp.
+  If the string is 10-11 digits with optional precision, then we'll try to parse it as a Unix Epoch
+  timestamp.
 
-  If the string is 1-5 digits with optional precision, then we'll try to parse it as a [Serial]
+  If the string is 1-5 digits with optional precision, then we'll try to parse it as a Serial
   timestamp (spreadsheet time) treating 1899-12-31 as 1. This will cause Excel-produced dates from
   1900-01-01 until 1900-03-01 to be incorrect, as they really are.
 
@@ -117,8 +117,9 @@ defmodule DateTimeParser do
   * `:to_utc` Default `false`.
   If there's a timezone detected in the string, then attempt to convert to UTC timezone. If you
   know that your timestamps are in the future and are going to store it for later use, it may be
-  better to _not_ convert to UTC since government organizations may change timezone rules before
-  the timestamp elapses, therefore making the UTC timestamp wrong or invalid.
+  better to convert to UTC and keep the original timestamp since government organizations may change
+  timezone rules before the timestamp elapses, therefore making the UTC timestamp wrong or invalid.
+  [Check out the guide on future timestamps](./future-utc-datetime.html).
 
   * `:assume_time` Default `false`.
   If a time cannot be determined, then it will not be assumed by default. If you supply `true`, then
@@ -266,7 +267,7 @@ defmodule DateTimeParser do
           {:ok, %NaiveDateTime{} = datetime} ->
             {:ok, NaiveDateTime.to_time(datetime)}
 
-          true ->
+          _ ->
             :error
         end
 
@@ -285,7 +286,7 @@ defmodule DateTimeParser do
           {:ok, %Date{} = date} ->
             {:ok, date}
 
-          true ->
+          _ ->
             :error
         end
 
@@ -307,7 +308,7 @@ defmodule DateTimeParser do
           {:ok, %NaiveDateTime{} = naive_datetime} ->
             {:ok, naive_datetime}
 
-          true ->
+          _ ->
             :error
         end
 
@@ -324,8 +325,6 @@ defmodule DateTimeParser do
   defp to_datetime(%NaiveDateTime{} = naive_datetime, tokens) do
     DateTimeParser.DateTime.from_naive_datetime_and_tokens(naive_datetime, tokens)
   end
-
-  defp to_datetime(%Date{}, _tokens), do: :error
 
   defp validate_day(%{day: day, month: month} = date)
        when month in [1, 3, 5, 7, 8, 10, 12] and day in 1..31,

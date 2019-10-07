@@ -81,7 +81,6 @@ defmodule DateTimeParser.MixProject do
       main: "DateTimeParser",
       source_ref: @version,
       extras: [
-        "README.md",
         "pages/Future-UTC-DateTime.md",
         "CHANGELOG.md",
         "EXAMPLES.md",
@@ -93,9 +92,11 @@ defmodule DateTimeParser.MixProject do
   defp aliases() do
     [
       tests: [
+        "format --check-formatted",
         "compile --force --warnings-as-errors",
         "test",
-        "credo --strict"
+        "credo --strict",
+        "dialyzer"
       ],
       profile: ["run bench/profile.exs"],
       benchmark: [

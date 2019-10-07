@@ -1,25 +1,26 @@
 # Changelog
 
-## Unreleased
+## 1.0.0
 
 - Add `parse/2` that will respond with the best match. This function accepts all
     options introduced below.
-- **BREAKING** Change `parse_datetime` to no longer assume time. Previously, it
-    would assume `00:00:00` if it could not be parsed. This is replaced with an
-    opt-in option `assume_time`. See next point. If you relied on , to upgrade
-    add the option; eg: `DateTimeParser.parse_datetime(string, assume_time:
-    true)`
 - Change `parse_datetime` to accept options:
   - `assume_time: true | %Time{} | false` with the default of false.
+- **BREAKING** Change `parse_datetime` to no longer assume time. Previously, it
+    would assume `00:00:00` if it could not be parsed. This is replaced with an
+    opt-in option `assume_time`. See next point. If you relied on this, to
+    upgrade add the option; eg: `DateTimeParser.parse_datetime(string,
+    assume_time: true)`
+- **BREAKING** Change `parse_datetime` to no longer convert DateTime to UTC
+    timezone. If you relied on this, to upgrade add the option; eg:
+    `DateTimeParser.parse_datetime(string, to_utc: true)`
+- Change `parse_date` to accept options:
+  - `assume_date: true | %Date{} | false` with the default of false.
 - **BREAKING** Change `parse_date` to no longer assume a date. Previously, it
     would assume the current date, and replace the found information from the
     string. This is replaced with an opt-in option of `assume_date`. See next
     point. If you relied on this, to upgrade add the option; eg:
     `DateTimeParser.parse_date(string, assume_date: true)`
-- **BREAKING** Change `parse_datetime` to no longer convert DateTime to UTC
-    timezone.
-- Change `parse_date` to accept options:
-  - `assume_date: true | %Date{} | false` with the default of false.
 
 ## 0.2.0
 

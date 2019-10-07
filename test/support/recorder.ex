@@ -48,6 +48,6 @@ defmodule DateTimeParserTest.Recorder do
     )
   end
 
-  defp format_options([]), do: ""
+  defp format_options([]), do: " "
   defp format_options(options), do: "`#{inspect(options)}`"
 end

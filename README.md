@@ -11,8 +11,10 @@ DateTime, NaiveDateTime if timezone is not determined, Date, or Time.
 You're currently looking at the master branch. [Check out the docs for the latest
 published version.](https://hexdocs.pm/date_time_parser)
 
+## Documentation
+
 The biggest ambiguity between datetime formats is whether it's `ymd` (year month
-day), `mdy` (month day year), or `dmy` (day month year); this is resolved by
+ay), `mdy` (month day year), or `dmy` (day month year); this is resolved by
 checking if there are slashes or dashes. If slashes, then it will try `dmy`
 first. All other cases will use the international format `ymd`. Sometimes, if
 the conditions are right, it can even parse `dmy` with dashes if the month is a
@@ -49,10 +51,6 @@ they really are.
 * [How to store future timestamps](./pages/Future-UTC-DateTime.md)
   * tldr: rules change, so don't convert to UTC too early. The future might
       change the timezone conversion rules.
-
-## Documentation
-
-[Online Documentation](https://hexdocs.pm/date_time_parser)
 
 ## Examples
 
