@@ -5,6 +5,7 @@ set -e
 previous_version="${1}"
 release_version="${2}"
 
+mix hex.outdated
 mix tests
 git add EXAMPLES.md
 

@@ -64,8 +64,8 @@ defmodule DateTimeParser.MixProject do
     ]
     |> add_dep_if({:benchee, "~> 1.0", only: [:bench], runtime: false}, ">= 1.6.0")
     |> add_dep_if({:credo, "~> 1.1", only: [:dev, :test], runtime: false}, ">= 1.5.0")
-    |> add_dep_if({:dialyxir, "~> 1.0.0-rc.6", only: [:dev, :test], runtime: false}, ">= 1.6.0")
-    |> add_dep_if({:ex_doc, "~> 0.20.0", only: :dev, runtime: false}, ">= 1.7.0")
+    |> add_dep_if({:dialyxir, "~> 1.0.0-rc.7", only: [:dev, :test], runtime: false}, ">= 1.6.0")
+    |> add_dep_if({:ex_doc, "~> 0.20", only: :dev, runtime: false}, ">= 1.7.0")
   end
 
   defp add_dep_if(deps, dep, version) do
