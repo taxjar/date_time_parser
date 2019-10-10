@@ -14,7 +14,7 @@ published version.](https://hexdocs.pm/date_time_parser)
 ## Documentation
 
 The biggest ambiguity between datetime formats is whether it's `ymd` (year month
-ay), `mdy` (month day year), or `dmy` (day month year); this is resolved by
+day), `mdy` (month day year), or `dmy` (day month year); this is resolved by
 checking if there are slashes or dashes. If slashes, then it will try `dmy`
 first. All other cases will use the international format `ymd`. Sometimes, if
 the conditions are right, it can even parse `dmy` with dashes if the month is a
