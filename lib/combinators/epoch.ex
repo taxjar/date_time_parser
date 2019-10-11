@@ -5,6 +5,12 @@ defmodule DateTimeParser.Combinators.Epoch do
 
   @separator string(".")
 
+  def sign do
+    string("-")
+    |> unwrap_and_tag(:sign)
+    |> label("Sign indicating positive or negative")
+  end
+
   def unix_epoch_second do
     integer(min: 10, max: 11)
     |> unwrap_and_tag(:unix_epoch)
@@ -19,10 +25,14 @@ defmodule DateTimeParser.Combinators.Epoch do
 
   def unix_epoch do
     choice([
-      unix_epoch_second()
+      sign()
+      |> optional()
+      |> concat(unix_epoch_second())
       |> concat(@separator |> ignore())
       |> concat(unix_epoch_subsecond()),
-      unix_epoch_second()
+      sign()
+      |> optional()
+      |> concat(unix_epoch_second())
     ])
     |> eos()
   end

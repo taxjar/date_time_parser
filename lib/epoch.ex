@@ -8,7 +8,10 @@ defmodule DateTimeParser.Epoch do
   defparsec(:parse, unix_epoch())
 
   def from_tokens(tokens) do
-    with {:ok, datetime} <- DateTime.from_unix(tokens[:unix_epoch]) do
+    with pos_or_neg <- sign(tokens[:sign]),
+         seconds when not is_nil(seconds) <- tokens[:unix_epoch],
+         seconds <- pos_or_neg * seconds,
+         {:ok, datetime} <- DateTime.from_unix(seconds) do
       case tokens[:unix_epoch_subsecond] do
         nil ->
           {:ok, datetime}
@@ -24,4 +27,7 @@ defmodule DateTimeParser.Epoch do
       end
     end
   end
+
+  defp sign("-"), do: -1
+  defp sign(_), do: 1
 end
