@@ -160,7 +160,22 @@ defmodule DateTimeParserTest do
 
     test_datetime_parsing("0000000000", DateTime.from_naive!(~N[1970-01-01T00:00:00], "Etc/UTC"))
 
+    test_datetime_parsing(
+      "0000000000.0000000001",
+      DateTime.from_naive!(~N[1970-01-01T00:00:00.000001], "Etc/UTC")
+    )
+
+    test_datetime_parsing(
+      "0000000000.000001",
+      DateTime.from_naive!(~N[1970-01-01T00:00:00.000001], "Etc/UTC")
+    )
+
     test_datetime_parsing("-0000000001", DateTime.from_naive!(~N[1969-12-31T23:59:59], "Etc/UTC"))
+
+    test_datetime_parsing(
+      "-0000000001.0001",
+      DateTime.from_naive!(~N[1969-12-31T23:59:58.999900], "Etc/UTC")
+    )
   end
 
   describe "parse_datetime/1 - MDY" do
