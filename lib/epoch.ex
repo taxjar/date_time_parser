@@ -1,21 +1,36 @@
 defmodule DateTimeParser.Epoch do
   @moduledoc false
 
-  import NimbleParsec
-  import DateTimeParser.Formatters, only: [format: 1]
-  import DateTimeParser.Combinators.Epoch
+  @token_key :unix_epoch
 
-  defparsec(:parse, unix_epoch())
+  import DateTimeParser.Formatters, only: [format: 1]
+
+  def parse(%{"seconds" => raw_seconds, "subseconds" => raw_subseconds}) do
+    with {seconds, _} <- Integer.parse(raw_seconds) do
+      parsed_epoch =
+        case(Integer.parse(raw_subseconds)) do
+          :error ->
+            {seconds, nil}
+
+          {subseconds, _} ->
+            {seconds, subseconds}
+        end
+
+      {:ok, [{@token_key, parsed_epoch}], nil, nil, nil, nil}
+    end
+  end
 
   def from_tokens(tokens) do
-    with {:ok, datetime} <- DateTime.from_unix(tokens[:unix_epoch]) do
-      case tokens[:unix_epoch_subsecond] do
+    {seconds, subseconds} = tokens[@token_key]
+
+    with {:ok, datetime} <- DateTime.from_unix(seconds) do
+      case subseconds do
         nil ->
           {:ok, datetime}
 
-        subsecond ->
+        subseconds ->
           truncated_subsecond =
-            subsecond
+            subseconds
             |> Integer.digits()
             |> Enum.take(6)
             |> Integer.undigits()
