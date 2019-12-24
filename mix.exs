@@ -12,6 +12,7 @@ defmodule DateTimeParser.MixProject do
       elixir: ">= 1.3.0",
       elixirc_paths: elixirc_paths(Mix.env()),
       aliases: aliases(),
+      dialyzer: [ignore_warnings: ".dialyzer_ignore.exs"],
       package: package(),
       docs: docs(),
       start_permanent: Mix.env() == :prod,

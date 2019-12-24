@@ -85,7 +85,7 @@ defmodule DateTimeParserTest do
     test_parsing("2017/08/08", "2017-08-08")
     test_parsing("2019/01/31 0:01", "2019-01-31T00:01:00")
     # Ruby gets the time wrong
-    test_parsing("20190118 949 CST", "2019-01-18T14:49:00Z", to_utc: true)
+    test_parsing("20190118 949 CST", "2019-01-18T15:49:00Z", to_utc: true)
     test_parsing("29/Aug./2018", "2018-08-29")
     test_parsing("29/Sep./2018", "2018-09-29")
     test_parsing("9/10/2018 11:08:13 AM", "2018-09-10T11:08:13")
@@ -95,20 +95,21 @@ defmodule DateTimeParserTest do
     test_parsing(~s|"=\""9/5/2018\"""|, "2018-09-05")
     test_parsing(~s|"Apr 1, 2016 12:02:53 AM PDT"|, "2016-04-01T19:02:53Z", to_utc: true)
     test_parsing(~s|"Apr 1, 2017 2:21:25 AM PDT"|, "2017-04-01T09:21:25Z", to_utc: true)
-    test_parsing(~s|"Dec 1, 2018 7:39:53 AM PST"|, "2018-12-01T14:39:53Z", to_utc: true)
+    test_parsing(~s|"Dec 1, 2018 7:39:53 AM PST"|, "2018-12-01T15:39:53Z", to_utc: true)
     test_parsing("Fri Mar  2 09:01:57 2018", "2018-03-02T09:01:57")
     test_parsing("Sun Jul  1 00:31:18 2018", "2018-07-01T00:31:18")
     test_parsing("Fri Mar 31 2017 21:41:40 GMT+0000 (UTC)", "2017-03-31T21:41:40Z")
     test_parsing("Friday 02 February 2018 10:42:21 AM", "2018-02-02T10:42:21")
-    test_parsing(~s|"Jan 1, 2013 06:34:31 PM PST"|, "2013-01-02T01:34:31Z", to_utc: true)
-    test_parsing(~s|"Jan 1, 2014 6:44:47 AM PST"|, "2014-01-01T13:44:47Z", to_utc: true)
+    test_parsing(~s|"Jan 1, 2013 06:34:31 PM PST"|, "2013-01-02T02:34:31Z", to_utc: true)
+    test_parsing(~s|"Jan 1, 2014 6:44:47 AM PST"|, "2014-01-01T14:44:47Z", to_utc: true)
+    test_parsing(~s|"Mar 28, 2014 6:44:47 AM PDT"|, "2014-03-28T13:44:47Z", to_utc: true)
     test_parsing("Jan-01-19", "2019-01-01")
     test_parsing("Jan-01-19", "2019-01-01T00:00:00", assume_time: true)
     test_parsing("Jan-01-19", "2019-01-01T10:13:15", assume_time: ~T[10:13:15])
     test_parsing("Jan-01-2018", "2018-01-01")
     test_parsing("Monday 01 October 2018 06:34:19 AM", "2018-10-01T06:34:19")
     test_parsing("Monday 02 October 2017 9:04:49 AM", "2017-10-02T09:04:49")
-    test_parsing(~s|"Nov 16, 2017 9:41:28 PM PST"|, "2017-11-17T04:41:28Z", to_utc: true)
+    test_parsing(~s|"Nov 16, 2017 9:41:28 PM PST"|, "2017-11-17T05:41:28Z", to_utc: true)
     # This isn't a valid time with PM specified
     test_parsing(~s|"Nov 20, 2016 22:09:23 PM"|, "2016-11-20T22:09:23")
     test_parsing(~s|"Sat, 29 Sep 2018 21:36:28 -0400"|, "2018-09-30T01:36:28Z", to_utc: true)
@@ -290,7 +291,7 @@ defmodule DateTimeParserTest do
       string = "2019-01-01T00:00:00 PST"
       {:ok, result} = DateTimeParser.parse_datetime(string, to_utc: true)
 
-      assert result == DateTime.from_naive!(~N[2019-01-01 07:00:00], "Etc/UTC")
+      assert result == DateTime.from_naive!(~N[2019-01-01 08:00:00], "Etc/UTC")
     end
 
     test "to_utc: true returns NaiveDateTime when timezone is undetermined" do
@@ -321,7 +322,7 @@ defmodule DateTimeParserTest do
 
       assert naive_datetime_result == ~N[2019-01-01 00:00:00]
 
-      assert %{zone_abbr: "PDT", time_zone: "PST8PDT", utc_offset: -28_800, std_offset: 3600} =
+      assert %{zone_abbr: "PST", time_zone: "PST8PDT", utc_offset: -28_800, std_offset: 0} =
                result
     end
 
