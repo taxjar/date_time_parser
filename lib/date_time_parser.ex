@@ -75,9 +75,16 @@ defmodule DateTimeParser do
     iex> DateTimeParser.parse_datetime(~s|"Mar 28, 2018 7:39:53 AM PDT"|, to_utc: true)
     {:ok, DateTime.from_naive!(~N[2018-03-28T14:39:53Z], "Etc/UTC")}
 
-    iex> {:ok, datetime} = DateTimeParser.parse_datetime(~s|"Dec 1, 2018 7:39:53 AM PST"|)
+    iex> {:ok, datetime} = DateTimeParser.parse_datetime(~s|"Mar 1, 2018 7:39:53 AM PST"|)
     iex> datetime
-    #DateTime<2018-12-01 07:39:53-08:00 PST PST8PDT>
+    #DateTime<2018-03-01 07:39:53-08:00 PST PST8PDT>
+
+    iex> DateTimeParser.parse_datetime(~s|"Mar 1, 2018 7:39:53 AM PST"|, to_utc: true)
+    {:ok, DateTime.from_naive!(~N[2018-03-01T15:39:53Z], "Etc/UTC")}
+
+    iex> {:ok, datetime} = DateTimeParser.parse_datetime(~s|"Mar 28, 2018 7:39:53 AM PDT"|)
+    iex> datetime
+    #DateTime<2018-03-28 07:39:53-07:00 PDT PST8PDT>
 
     iex> DateTimeParser.parse_time("10:13pm")
     {:ok, ~T[22:13:00]}
