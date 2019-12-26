@@ -72,12 +72,19 @@ defmodule DateTimeParser do
     {:ok, DateTime.from_naive!(~N[2018-01-01T15:24:00Z], "Etc/UTC")}
     # or ~U[2018-01-01T15:24:00Z] in Elixir 1.9.0+
 
-    iex> DateTimeParser.parse_datetime(~s|"Dec 1, 2018 7:39:53 AM PST"|, to_utc: true)
-    {:ok, DateTime.from_naive!(~N[2018-12-01T14:39:53Z], "Etc/UTC")}
+    iex> DateTimeParser.parse_datetime(~s|"Mar 28, 2018 7:39:53 AM PDT"|, to_utc: true)
+    {:ok, DateTime.from_naive!(~N[2018-03-28T14:39:53Z], "Etc/UTC")}
 
-    iex> {:ok, datetime} = DateTimeParser.parse_datetime(~s|"Dec 1, 2018 7:39:53 AM PST"|)
+    iex> {:ok, datetime} = DateTimeParser.parse_datetime(~s|"Mar 1, 2018 7:39:53 AM PST"|)
     iex> datetime
-    #DateTime<2018-12-01 07:39:53-07:00 PDT PST8PDT>
+    #DateTime<2018-03-01 07:39:53-08:00 PST PST8PDT>
+
+    iex> DateTimeParser.parse_datetime(~s|"Mar 1, 2018 7:39:53 AM PST"|, to_utc: true)
+    {:ok, DateTime.from_naive!(~N[2018-03-01T15:39:53Z], "Etc/UTC")}
+
+    iex> {:ok, datetime} = DateTimeParser.parse_datetime(~s|"Mar 28, 2018 7:39:53 AM PDT"|)
+    iex> datetime
+    #DateTime<2018-03-28 07:39:53-07:00 PDT PST8PDT>
 
     iex> DateTimeParser.parse_time("10:13pm")
     {:ok, ~T[22:13:00]}
@@ -360,7 +367,9 @@ defmodule DateTimeParser do
 
   defp maybe_convert_to_utc(%DateTime{} = datetime, opts) do
     if Keyword.get(opts, :to_utc, false) do
-      Timex.Timezone.convert(datetime, "Etc/UTC")
+      # empty TimezoneInfo defaults to UTC. Doing this to avoid Dialyzer errors
+      # since :utc is not in the typespec
+      Timex.Timezone.convert(datetime, %Timex.TimezoneInfo{})
     else
       datetime
     end

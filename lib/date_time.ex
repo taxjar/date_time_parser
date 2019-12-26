@@ -72,17 +72,17 @@ defmodule DateTimeParser.DateTime do
     )
   end
 
-  defp timezone_from_tokens(tokens) do
+  defp timezone_from_tokens(tokens, naive_datetime) do
     with zone <- format_token(tokens, :zone_abbr),
          offset <- format_token(tokens, :utc_offset),
          true <- Enum.any?([zone, offset]) do
-      Timex.Timezone.get(offset || zone)
+      Timex.Timezone.get(offset || zone, naive_datetime)
     end
   end
 
   def from_naive_datetime_and_tokens(naive_datetime, tokens) do
     with timezone when not is_nil(timezone) <- tokens[:zone_abbr] || tokens[:utc_offset],
-         %{} = timezone_info <- timezone_from_tokens(tokens) do
+         %{} = timezone_info <- timezone_from_tokens(tokens, naive_datetime) do
       naive_datetime
       |> DateTime.from_naive!("Etc/UTC")
       |> Map.merge(%{
