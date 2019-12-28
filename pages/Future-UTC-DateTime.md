@@ -17,11 +17,11 @@ store it in your database.
 
 Today (in year 2019), Washington state recognizes Daylight Savings Time and it
 shifts back and forth an hour over the year. Since the timestamp is in the
-summer, it's shifted back an hour.
+summer, it's shifted forward an hour.
 
 In 2020, Washington enacts a new law that declares that they will no longer be
-participate in Daylight Savings Time and permanently stay in Daylight Savings;
-meaning it's always shifted forward one hour year-round.
+participate in Daylight Savings Time; meaning it's always shifted back one
+hour year-round.
 
 You've already stored your timestamps in the future converted to UTC using the
 old rules. How do you know to fix all your timestamps in your database for users

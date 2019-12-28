@@ -1,13 +1,14 @@
-defmodule DateTimeParser.DateTime do
+defmodule DateTimeParser.Parser.DateTime do
   @moduledoc false
+  @behaviour DateTimeParser.Parser
 
   import NimbleParsec
   import DateTimeParser.Combinators.Date
   import DateTimeParser.Combinators.DateTime
   import DateTimeParser.Formatters, only: [format_token: 2, clean: 1]
 
-  defparsec(
-    :parse,
+  defparsecp(
+    :do_parse,
     vocal_day()
     |> optional()
     |> choice([
@@ -17,8 +18,8 @@ defmodule DateTimeParser.DateTime do
     ])
   )
 
-  defparsec(
-    :parse_us,
+  defparsecp(
+    :do_parse_us,
     vocal_day()
     |> optional()
     |> choice([
@@ -28,7 +29,18 @@ defmodule DateTimeParser.DateTime do
     ])
   )
 
-  def from_tokens(tokens, opts) do
+  @impl DateTimeParser.Parser
+  def preflight(parser), do: {:ok, parser}
+
+  @impl DateTimeParser.Parser
+  def parse(%{string: string} = parser) do
+    case do_parse(string) do
+      {:ok, tokens, _, _, _, _} -> from_tokens(parser, tokens)
+      _ -> {:error, :failed_to_parse}
+    end
+  end
+
+  def from_tokens(%{opts: opts}, tokens) do
     parsed_values =
       clean(%{
         year: format_token(tokens, :year),
@@ -40,6 +52,17 @@ defmodule DateTimeParser.DateTime do
         microsecond: format_token(tokens, :microsecond)
       })
 
+    with {:ok, ndt} <- to_naive_date_time(opts, parsed_values),
+         {:ok, ndt} <- validate_day(ndt),
+         {:ok, dt} <- to_datetime(ndt, tokens),
+         {:ok, dt} <- maybe_convert_to_utc(dt, opts) do
+      {:ok, dt}
+    end
+  end
+
+  def validate_day(ndt), do: DateTimeParser.Parser.Date.validate_day(ndt)
+
+  defp to_naive_date_time(opts, parsed_values) do
     case Keyword.get(opts, :assume_time, false) do
       false ->
         NaiveDateTime.new(
@@ -95,4 +118,39 @@ defmodule DateTimeParser.DateTime do
       _ -> naive_datetime
     end
   end
+
+  defp maybe_convert_to_utc(%DateTime{zone_abbr: "Etc/UTC"} = datetime, _opts) do
+    {:ok, datetime}
+  end
+
+  defp maybe_convert_to_utc(%NaiveDateTime{} = naive_datetime, opts) do
+    if Keyword.get(opts, :assume_utc, false) do
+      naive_datetime
+      |> DateTime.from_naive!("Etc/UTC")
+      |> maybe_convert_to_utc(opts)
+    else
+      {:ok, naive_datetime}
+    end
+  end
+
+  defp maybe_convert_to_utc(%DateTime{} = datetime, opts) do
+    if Keyword.get(opts, :to_utc, false) do
+      # empty TimezoneInfo defaults to UTC. Doing this to avoid Dialyzer errors
+      # since :utc is not in the typespec
+      case Timex.Timezone.convert(datetime, %Timex.TimezoneInfo{}) do
+        {:error, _} = error -> error
+        converted_datetime -> {:ok, converted_datetime}
+      end
+    else
+      {:ok, datetime}
+    end
+  end
+
+  defp to_datetime(%DateTime{} = datetime, _tokens), do: {:ok, datetime}
+
+  defp to_datetime(%NaiveDateTime{} = ndt, tokens) do
+    {:ok, from_naive_datetime_and_tokens(ndt, tokens)}
+  end
+
+  defp to_datetime(_error, _), do: :error
 end
