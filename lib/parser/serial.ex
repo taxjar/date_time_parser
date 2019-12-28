@@ -1,39 +1,61 @@
-defmodule DateTimeParser.Serial do
+defmodule DateTimeParser.Parser.Serial do
   @moduledoc false
+  @behaviour DateTimeParser.Parser
+  @serial_regex ~r|\A(?<days>-?\d{1,5})(?:\.(?<time>\d{1,10}))?\z|
 
-  def parse(string) do
-    if String.contains?(string, ".") do
-      with {float, _} <- Float.parse(string) do
-        {:ok, [serial: float], nil, nil, nil, nil}
-      end
-    else
-      with {integer, _} <- Integer.parse(string) do
-        {:ok, [serial: integer], nil, nil, nil, nil}
-      end
+  @impl DateTimeParser.Parser
+  def preflight(%{string: string} = parser) do
+    case Regex.named_captures(@serial_regex, string) do
+      nil -> {:error, :not_compatible}
+      results -> {:ok, %{parser | preflight: results}}
     end
   end
 
-  def from_tokens(tokens, opts) do
-    with {:ok, date_or_datetime} <- from_tokens(tokens[:serial]) do
-      assume_time(date_or_datetime, opts[:assume_time])
+  @impl DateTimeParser.Parser
+  def parse(%{preflight: %{"time" => nil, "day" => day}} = parser) do
+    case Integer.parse(day) do
+      {num, ""} -> from_tokens(parser, num)
+      _ -> {:error, :failed_to_parse_integer}
     end
   end
 
-  def from_tokens(nil), do: :error
+  def parse(%{string: string} = parser) do
+    case Float.parse(string) do
+      {num, ""} -> from_tokens(parser, num)
+      _ -> {:error, :failed_to_parse_float}
+    end
+  end
 
-  def from_tokens(float) when is_float(float) do
+  def from_tokens(%{context: context, opts: opts}, serial) do
+    with {:ok, date_or_datetime} <- from_serial(serial) do
+      for_context(context, date_or_datetime, opts[:assume_time])
+    end
+  end
+
+  defp for_context(:datetime, %NaiveDateTime{} = ndt, _), do: {:ok, ndt}
+  defp for_context(:datetime, %Date{} = date, true), do: assume_time(date, ~T[00:00:00])
+  defp for_context(:datetime, %Date{} = date, %Time{} = time), do: assume_time(date, time)
+  defp for_context(:date, %Date{} = date, _), do: {:ok, date}
+  defp for_context(:date, %NaiveDateTime{} = ndt, _), do: {:ok, NaiveDateTime.to_date(ndt)}
+  defp for_context(:time, %NaiveDateTime{} = ndt, _), do: {:ok, NaiveDateTime.to_time(ndt)}
+
+  defp for_context(context, result, _opts) do
+    {:error, "cannot convert #{inspect(result)} to context #{context}"}
+  end
+
+  def from_serial(nil), do: :error
+
+  def from_serial(float) when is_float(float) do
     {serial_date, serial_time} = split_float(float)
     erl_time = time_from_serial(serial_time)
     erl_date = date_from_serial(serial_date)
     NaiveDateTime.from_erl({erl_date, erl_time})
   end
 
-  def from_tokens(integer) when is_integer(integer) do
+  def from_serial(integer) when is_integer(integer) do
     erl_date = date_from_serial(integer)
     Date.from_erl(erl_date)
   end
-
-  defp assume_time(datetime, true), do: assume_time(datetime, ~T[00:00:00])
 
   defp assume_time(%Date{} = date, %Time{} = time) do
     NaiveDateTime.new(
@@ -46,8 +68,6 @@ defmodule DateTimeParser.Serial do
       time.microsecond
     )
   end
-
-  defp assume_time(datetime, _), do: {:ok, datetime}
 
   def time_from_serial(0.0), do: {0, 0, 0}
 

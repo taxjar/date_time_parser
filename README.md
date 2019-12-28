@@ -143,6 +143,20 @@ def deps do
 end
 ```
 
+## Configuration
+
+```elixir
+# This is the default config
+alias DateTimeParser.Parser
+config :date_time_parser, parsers: [Parser.Epoch, Parser.Serial, Parser.Tokenizer]
+
+# To enable only specific parsers, include them in the :parsers key.
+config :date_time_parser, parsers: [Parser.Tokenizer]
+
+# Or in runtime, pass in the parsers in the function.
+DateTimeParser.parse(mystring, parsers: [Parser.Tokenizer])
+```
+
 ## Changelog
 
 [View Changelog](./CHANGELOG.md)

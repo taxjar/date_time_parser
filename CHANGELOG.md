@@ -36,6 +36,8 @@
 - Add support for parsing negative epoch times. (#24) (thanks @tmr08c)
 - Add bang variants, `parse!/2`, `parse_datetime!/2`, `parse_time!/2`, and
     `parse_date!/2`
+- Added `parsers: []` option to add or disable parsers. This is helpful if you
+    are don't want to consider Serial or Epoch timestamps.
 
 ## 0.2.0
 

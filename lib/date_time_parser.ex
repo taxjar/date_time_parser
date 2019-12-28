@@ -111,19 +111,18 @@ defmodule DateTimeParser do
   """
 
   import DateTimeParser.Formatters
-  alias DateTimeParser.{Epoch, Serial}
-
-  @epoch_regex ~r|\A(?<sign>-)?(?<seconds>\d{10,11})(?:\.(?<subseconds>\d{1,10}))?\z|
-  @serial_regex ~r|\A-?\d{1,5}(?:\.\d{1,10})?\z|
-  @time_regex ~r|(?<time>\d{1,2}:\d{2}(?::\d{2})?(?:.*)?)|
+  alias DateTimeParser.Parser
 
   @type assume_date :: {:assume_date, boolean() | Date.t()}
   @type assume_time :: {:assume_time, boolean() | Time.t()}
   @type assume_utc :: {:assume_utc, boolean()}
   @type to_utc :: {:to_utc, boolean()}
 
+  @typedoc "List of modules that implement the `DateTimeParser.Parser` behaviour."
+  @type parsers :: {:parsers, list(atom())}
+
   @typedoc """
-  Options applicable for `parse_datetime/2`
+  Options for `parse_datetime/2`
 
   * `:assume_utc` Default `false`.
   Only applicable for strings where parsing could not determine a timezone. Instead of returning a
@@ -142,23 +141,37 @@ defmodule DateTimeParser do
   If a time cannot be determined, then it will not be assumed by default. If you supply `true`, then
   `~T[00:00:00]` will be assumed. You can also supply your own time, and the found tokens will be
   merged with it.
+
+  * `:parsers` Default `#{inspect(DateTimeParser.Parser.available_parsers())}`.
+  The parsers to use when analyzing the string. When `Parser.Tokenizer`, the appropriate tokenizer will be
+  used depending on the function used.
   """
-  @type parse_datetime_options :: [assume_utc() | to_utc() | assume_time()]
+  @type parse_datetime_options :: [assume_utc() | to_utc() | assume_time() | parsers()]
 
   @typedoc """
-  Options applicable for `parse_date/2`
+  Options for `parse_date/2`
 
   * `:assume_date` Default `false`.
   If a date cannot be fully determined, then it will not be assumed by default. If you supply
   `true`, then `Date.utc_today()` will be assumed. You can also supply your own date, and the found
   tokens will be merged with it.
   """
-  @type parse_date_options :: [assume_date()]
+  @type parse_date_options :: [assume_date() | parsers()]
 
   @typedoc """
-  Options for `parse/2`. Combination of `t:parse_date_options/0` and `t:parse_datetime_options/0`.
+  Options for `parse_time/2`.
+
+  See `t:parse_datetime_options/0` for further definition.
   """
-  @type parse_options :: parse_datetime_options() | parse_date_options()
+  @type parse_time_options :: [parsers()]
+
+  @typedoc """
+  Options for `parse/2`.
+
+  Combination of `t:parse_date_options/0` and `t:parse_datetime_options/0` and
+  `t:parse_time_options/0`
+  """
+  @type parse_options :: parse_datetime_options() | parse_date_options() | parse_time_options()
 
   @doc """
   Parse a `%DateTime{}`, `%NaiveDateTime{}`, `%Date{}`, or `%Time{}` from a string.
@@ -172,7 +185,7 @@ defmodule DateTimeParser do
   def parse(string, opts) when is_binary(string) do
     with {:error, _} <- parse_datetime(string, opts),
          {:error, _} <- parse_date(string, opts) do
-      parse_time(string)
+      parse_time(string, opts)
     end
   end
 
@@ -203,12 +216,8 @@ defmodule DateTimeParser do
   def parse_datetime(string, opts \\ [])
 
   def parse_datetime(string, opts) when is_binary(string) do
-    with cleaned_string <- clean(string),
-         {:ok, tokens, _, _, _, _} <- do_datetime_parse(cleaned_string),
-         {:ok, naive_datetime} <- to_naive_datetime(tokens, opts),
-         datetime <- to_datetime(naive_datetime, tokens),
-         {:ok, datetime} <- validate_day(datetime),
-         datetime <- maybe_convert_to_utc(datetime, opts) do
+    with {:ok, parser} <- string |> clean() |> Parser.build(:datetime, opts),
+         {:ok, datetime} <- parser.mod.parse(parser) do
       {:ok, datetime}
     else
       _ ->
@@ -233,62 +242,33 @@ defmodule DateTimeParser do
     end
   end
 
-  defp do_datetime_parse(string) do
-    cond do
-      String.contains?(string, "/") ->
-        DateTimeParser.DateTime.parse_us(string)
-
-      epoch_regex_capture = Regex.named_captures(@epoch_regex, string) ->
-        Epoch.parse(epoch_regex_capture)
-
-      Regex.match?(@serial_regex, string) ->
-        Serial.parse(string)
-
-      true ->
-        DateTimeParser.DateTime.parse(string)
-    end
-  end
-
   @doc """
-  Parse `%Time{}` from a string.
+  Parse `%Time{}` from a string. Accepts options `t:parse_time_options/0`
   """
-  @spec parse_time(String.t() | nil) :: {:ok, Time.t()} | {:error, String.t()}
-  def parse_time(string) when is_binary(string) do
-    case string |> clean() |> do_time_parse() do
-      {:ok, tokens, _, _, _, _} ->
-        to_time(tokens)
+  @spec parse_time(String.t() | nil, parse_time_options()) ::
+          {:ok, Time.t()} | {:error, String.t()}
+  def parse_time(string, opts \\ [])
 
+  def parse_time(string, opts) when is_binary(string) do
+    with {:ok, parser} <- string |> clean() |> Parser.build(:time, opts),
+         {:ok, time} <- parser.mod.parse(parser) do
+      {:ok, time}
+    else
       _ ->
         {:error, "Could not parse #{inspect(string)}"}
     end
   end
 
-  def parse_time(value), do: {:error, "Could not parse #{inspect(value)}"}
+  def parse_time(value, _opts), do: {:error, "Could not parse #{inspect(value)}"}
 
   @doc """
   Parse `%Time{}` from a string. Raises a `DateTimeParser.ParseError` when parsing fails.
   """
-  @spec parse_time!(String.t() | nil) :: Time.t() | no_return()
-  def parse_time!(string) do
-    case parse_time(string) do
+  @spec parse_time!(String.t() | nil, parse_time_options()) :: Time.t() | no_return()
+  def parse_time!(string, opts \\ []) do
+    case parse_time(string, opts) do
       {:ok, result} -> result
       {:error, message} -> raise(__MODULE__.ParseError, message)
-    end
-  end
-
-  defp do_time_parse(string) do
-    cond do
-      epoch_regex_capture = Regex.named_captures(@epoch_regex, string) ->
-        Epoch.parse(epoch_regex_capture)
-
-      Regex.match?(@serial_regex, string) ->
-        Serial.parse(string)
-
-      true ->
-        case Regex.named_captures(@time_regex, string) do
-          %{"time" => time} -> DateTimeParser.Time.parse(time)
-          _ -> DateTimeParser.Time.parse(string)
-        end
     end
   end
 
@@ -302,10 +282,8 @@ defmodule DateTimeParser do
   def parse_date(string, opts \\ [])
 
   def parse_date(string, opts) when is_binary(string) do
-    with cleaned_string <- clean(string),
-         {:ok, tokens, _, _, _, _} <- do_parse_date(cleaned_string),
-         {:ok, date} <- to_date(tokens, opts),
-         {:ok, _} <- validate_day(date) do
+    with {:ok, parser} <- string |> clean() |> Parser.build(:date, opts),
+         {:ok, date} <- parser.mod.parse(parser) do
       {:ok, date}
     else
       _ ->
@@ -326,135 +304,6 @@ defmodule DateTimeParser do
     case parse_date(string, opts) do
       {:ok, result} -> result
       {:error, message} -> raise(__MODULE__.ParseError, message)
-    end
-  end
-
-  defp do_parse_date(string) do
-    cond do
-      String.contains?(string, "/") ->
-        DateTimeParser.Date.parse_us(string)
-
-      epoch_regex_capture = Regex.named_captures(@epoch_regex, string) ->
-        Epoch.parse(epoch_regex_capture)
-
-      Regex.match?(@serial_regex, string) ->
-        Serial.parse(string)
-
-      true ->
-        DateTimeParser.Date.parse(string)
-    end
-  end
-
-  defp to_time(tokens) do
-    cond do
-      tokens[:unix_epoch] ->
-        with {:ok, datetime} <- Epoch.from_tokens(tokens) do
-          {:ok, DateTime.to_time(datetime)}
-        end
-
-      tokens[:serial] ->
-        case Serial.from_tokens(tokens, []) do
-          {:ok, %NaiveDateTime{} = datetime} ->
-            {:ok, NaiveDateTime.to_time(datetime)}
-
-          _ ->
-            :error
-        end
-
-      true ->
-        DateTimeParser.Time.from_tokens(tokens)
-    end
-  end
-
-  defp to_date(tokens, opts) do
-    cond do
-      tokens[:serial] ->
-        case Serial.from_tokens(tokens, opts) do
-          {:ok, %NaiveDateTime{} = naive_datetime} ->
-            {:ok, NaiveDateTime.to_date(naive_datetime)}
-
-          {:ok, %Date{} = date} ->
-            {:ok, date}
-
-          _ ->
-            :error
-        end
-
-      tokens[:unix_epoch] ->
-        with {:ok, datetime} <- Epoch.from_tokens(tokens),
-             %Date{} = date <- DateTime.to_date(datetime) do
-          {:ok, date}
-        end
-
-      true ->
-        DateTimeParser.Date.from_tokens(tokens, opts)
-    end
-  end
-
-  defp to_naive_datetime(tokens, opts) do
-    cond do
-      tokens[:serial] ->
-        case Serial.from_tokens(tokens, opts) do
-          {:ok, %NaiveDateTime{} = naive_datetime} ->
-            {:ok, naive_datetime}
-
-          _ ->
-            :error
-        end
-
-      tokens[:unix_epoch] ->
-        Epoch.from_tokens(tokens)
-
-      true ->
-        DateTimeParser.DateTime.from_tokens(tokens, opts)
-    end
-  end
-
-  defp to_datetime(%DateTime{} = datetime, _tokens), do: datetime
-
-  defp to_datetime(%NaiveDateTime{} = naive_datetime, tokens) do
-    DateTimeParser.DateTime.from_naive_datetime_and_tokens(naive_datetime, tokens)
-  end
-
-  defp validate_day(%{day: day, month: month} = date)
-       when month in [1, 3, 5, 7, 8, 10, 12] and day in 1..31,
-       do: {:ok, date}
-
-  defp validate_day(%{day: day, month: month} = date)
-       when month in [4, 6, 9, 11] and day in 1..30,
-       do: {:ok, date}
-
-  defp validate_day(%{day: day, month: 2} = date)
-       when day in 1..28,
-       do: {:ok, date}
-
-  defp validate_day(%{day: 29, month: 2, year: year} = date) do
-    if Timex.is_leap?(year),
-      do: {:ok, date},
-      else: :error
-  end
-
-  defp validate_day(_), do: :error
-
-  defp maybe_convert_to_utc(%NaiveDateTime{} = naive_datetime, opts) do
-    if Keyword.get(opts, :assume_utc, false) do
-      naive_datetime
-      |> DateTime.from_naive!("Etc/UTC")
-      |> maybe_convert_to_utc(opts)
-    else
-      naive_datetime
-    end
-  end
-
-  defp maybe_convert_to_utc(%DateTime{zone_abbr: "Etc/UTC"} = datetime, _opts), do: datetime
-
-  defp maybe_convert_to_utc(%DateTime{} = datetime, opts) do
-    if Keyword.get(opts, :to_utc, false) do
-      # empty TimezoneInfo defaults to UTC. Doing this to avoid Dialyzer errors
-      # since :utc is not in the typespec
-      Timex.Timezone.convert(datetime, %Timex.TimezoneInfo{})
-    else
-      datetime
     end
   end
 end
