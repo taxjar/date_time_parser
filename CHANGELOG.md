@@ -22,6 +22,8 @@
     point. If you relied on this, to upgrade add the option; eg:
     `DateTimeParser.parse_date(string, assume_date: true)`
 - Fixed a UTC conversion issue between Daylight/Standard time (#20)
+- Added `parsers: []` option to disable parsers. This is helpful if you are
+    don't want to consider Serial or Epoch timestamps.
 
 ## 0.2.0
 

@@ -5,6 +5,54 @@ defmodule DateTimeParserTest do
 
   doctest DateTimeParser
 
+  describe "config" do
+    test "parse/2, can turn off parsers" do
+      assert {:error, _} = DateTimeParser.parse("000", parsers: [])
+      assert {:ok, _} = DateTimeParser.parse("000", parsers: [:serial])
+
+      assert {:error, _} = DateTimeParser.parse("0000000001", parsers: [])
+      assert {:ok, _} = DateTimeParser.parse("0000000001", parsers: [:epoch])
+
+      assert {:error, _} = DateTimeParser.parse("2019-01-01", parsers: [])
+      assert {:ok, _} = DateTimeParser.parse("2019-01-01", parsers: [:tokenizer])
+    end
+
+    test "parse_date/2, can turn off parsers" do
+      assert {:error, _} = DateTimeParser.parse_date("000", parsers: [])
+      assert {:ok, %Date{}} = DateTimeParser.parse_date("000", parsers: [:serial])
+
+      assert {:error, _} = DateTimeParser.parse_date("0000000001", parsers: [])
+      assert {:ok, %Date{}} = DateTimeParser.parse_date("0000000001", parsers: [:epoch])
+
+      assert {:error, _} = DateTimeParser.parse_date("2019-01-01", parsers: [])
+      assert {:ok, %Date{}} = DateTimeParser.parse_date("2019-01-01", parsers: [:tokenizer])
+    end
+
+    test "parse_time/2, can turn off parsers" do
+      assert {:error, _} = DateTimeParser.parse_time("000.0", parsers: [])
+      assert {:ok, %Time{}} = DateTimeParser.parse_time("000.0", parsers: [:serial])
+
+      assert {:error, _} = DateTimeParser.parse_time("0000000001", parsers: [])
+      assert {:ok, %Time{}} = DateTimeParser.parse_time("0000000001", parsers: [:epoch])
+
+      assert {:error, _} = DateTimeParser.parse_time("10:30", parsers: [])
+      assert {:ok, %Time{}} = DateTimeParser.parse_time("10:30", parsers: [:tokenizer])
+    end
+
+    test "parse_datetime/2, can turn off parsers" do
+      assert {:error, _} = DateTimeParser.parse_datetime("100.0", parsers: [])
+      assert {:ok, %NaiveDateTime{}} = DateTimeParser.parse_datetime("100.0", parsers: [:serial])
+
+      assert {:error, _} = DateTimeParser.parse_datetime("0000000001", parsers: [])
+      assert {:ok, %DateTime{}} = DateTimeParser.parse_datetime("0000000001", parsers: [:epoch])
+
+      assert {:error, _} = DateTimeParser.parse_datetime("2019-01-01T10:30:00", parsers: [])
+
+      assert {:ok, %NaiveDateTime{}} =
+               DateTimeParser.parse_datetime("2019-01-01T10:30:00", parsers: [:tokenizer])
+    end
+  end
+
   describe "compare with Ruby/Rails datetime parsing" do
     test_parsing(" 01 Feb 2013", "2013-02-01")
     test_parsing(" 03 Jan 2013 10:15:26 -0800", "2013-01-03T18:15:26Z", to_utc: true)

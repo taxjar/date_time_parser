@@ -7,7 +7,7 @@ defmodule DateTimeParser.Epoch do
   def parse(%{"seconds" => raw_seconds, "subseconds" => raw_subseconds}) do
     with {seconds, ""} <- Integer.parse(raw_seconds) do
       parsed_epoch =
-        case(raw_subseconds) do
+        case raw_subseconds do
           "" ->
             {seconds, {0, 0}}
 
