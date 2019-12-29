@@ -102,7 +102,7 @@ defmodule DateTimeParser do
   """
 
   import DateTimeParser.Formatters
-  alias DateTimeParser.{Epoch, Parser, Serial}
+  alias DateTimeParser.Parser
 
   @type assume_date :: {:assume_date, boolean() | Date.t()}
   @type assume_time :: {:assume_time, boolean() | Time.t()}
@@ -131,7 +131,7 @@ defmodule DateTimeParser do
   `~T[00:00:00]` will be assumed. You can also supply your own time, and the found tokens will be
   merged with it.
 
-  * `:parsers` Default `[:epoch, :serial, :tokenizer]`.
+  * `:parsers` Default `#{inspect(DateTimeParser.Parser.available_parsers())}`.
   The parsers to use when analyzing the string. When `:tokenizer`, the appropriate tokenizer will be
   used depending on the function used.
   """
@@ -258,12 +258,12 @@ defmodule DateTimeParser do
   defp to_time(tokens, _opts) do
     cond do
       tokens[:unix_epoch] ->
-        with {:ok, datetime} <- Epoch.from_tokens(tokens) do
+        with {:ok, datetime} <- Parser.Epoch.from_tokens(tokens) do
           {:ok, DateTime.to_time(datetime)}
         end
 
       tokens[:serial] ->
-        case Serial.from_tokens(tokens, []) do
+        case Parser.Serial.from_tokens(tokens, []) do
           {:ok, %NaiveDateTime{} = datetime} ->
             {:ok, NaiveDateTime.to_time(datetime)}
 
@@ -272,14 +272,14 @@ defmodule DateTimeParser do
         end
 
       true ->
-        DateTimeParser.Time.from_tokens(tokens)
+        Parser.Time.from_tokens(tokens)
     end
   end
 
   defp to_date(tokens, opts) do
     cond do
       tokens[:serial] ->
-        case Serial.from_tokens(tokens, opts) do
+        case Parser.Serial.from_tokens(tokens, opts) do
           {:ok, %NaiveDateTime{} = naive_datetime} ->
             {:ok, NaiveDateTime.to_date(naive_datetime)}
 
@@ -291,20 +291,20 @@ defmodule DateTimeParser do
         end
 
       tokens[:unix_epoch] ->
-        with {:ok, datetime} <- Epoch.from_tokens(tokens),
+        with {:ok, datetime} <- Parser.Epoch.from_tokens(tokens),
              %Date{} = date <- DateTime.to_date(datetime) do
           {:ok, date}
         end
 
       true ->
-        DateTimeParser.Date.from_tokens(tokens, opts)
+        Parser.Date.from_tokens(tokens, opts)
     end
   end
 
   defp to_naive_datetime(tokens, opts) do
     cond do
       tokens[:serial] ->
-        case Serial.from_tokens(tokens, opts) do
+        case Parser.Serial.from_tokens(tokens, opts) do
           {:ok, %NaiveDateTime{} = naive_datetime} ->
             {:ok, naive_datetime}
 
@@ -313,17 +313,17 @@ defmodule DateTimeParser do
         end
 
       tokens[:unix_epoch] ->
-        Epoch.from_tokens(tokens)
+        Parser.Epoch.from_tokens(tokens)
 
       true ->
-        DateTimeParser.DateTime.from_tokens(tokens, opts)
+        Parser.DateTime.from_tokens(tokens, opts)
     end
   end
 
   defp to_datetime(%DateTime{} = datetime, _tokens), do: datetime
 
   defp to_datetime(%NaiveDateTime{} = naive_datetime, tokens) do
-    DateTimeParser.DateTime.from_naive_datetime_and_tokens(naive_datetime, tokens)
+    Parser.DateTime.from_naive_datetime_and_tokens(naive_datetime, tokens)
   end
 
   defp validate_day(%{day: day, month: month} = date)

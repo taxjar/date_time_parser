@@ -1,4 +1,4 @@
-defmodule DateTimeParser.Date do
+defmodule DateTimeParser.Parser.Date do
   @moduledoc false
 
   import NimbleParsec

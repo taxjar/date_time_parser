@@ -149,7 +149,7 @@ end
 # This is the default config, even if not configured.
 config DateTimeParser, parsers: [:epoch, :serial, :tokenizer]
 
-# To disable some parsers, exclude it from the :parsers key.
+# To enable only specific parsers, include them in the :parsers key.
 config DateTimeParser, parsers: [:tokenizer]
 
 # Or in runtime, pass in the parsers in the function.

@@ -1,4 +1,4 @@
-defmodule DateTimeParser.Serial do
+defmodule DateTimeParser.Parser.Serial do
   @moduledoc false
 
   def parse(string) do

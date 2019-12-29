@@ -1,4 +1,4 @@
-defmodule DateTimeParser.Epoch do
+defmodule DateTimeParser.Parser.Epoch do
   @moduledoc false
 
   @token_key :unix_epoch
