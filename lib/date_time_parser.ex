@@ -103,7 +103,7 @@ defmodule DateTimeParser do
   import DateTimeParser.Formatters
   alias DateTimeParser.{Epoch, Serial}
 
-  @epoch_regex ~r|\A\d{10,11}(?:\.\d{1,10})?\z|
+  @epoch_regex ~r|\A(?<seconds>\d{10,11})(?:\.(?<subseconds>\d{1,10}))?\z|
   @serial_regex ~r|\A-?\d{1,5}(?:\.\d{1,10})?\z|
   @time_regex ~r|(?<time>\d{1,2}:\d{2}(?::\d{2})?(?:.*)?)|
 
@@ -191,10 +191,17 @@ defmodule DateTimeParser do
 
   defp do_datetime_parse(string) do
     cond do
-      String.contains?(string, "/") -> DateTimeParser.DateTime.parse_us(string)
-      Regex.match?(@epoch_regex, string) -> Epoch.parse(string)
-      Regex.match?(@serial_regex, string) -> Serial.parse(string)
-      true -> DateTimeParser.DateTime.parse(string)
+      String.contains?(string, "/") ->
+        DateTimeParser.DateTime.parse_us(string)
+
+      epoch_regex_capture = Regex.named_captures(@epoch_regex, string) ->
+        Epoch.parse(epoch_regex_capture)
+
+      Regex.match?(@serial_regex, string) ->
+        Serial.parse(string)
+
+      true ->
+        DateTimeParser.DateTime.parse(string)
     end
   end
 
@@ -217,8 +224,8 @@ defmodule DateTimeParser do
 
   defp do_time_parse(string) do
     cond do
-      Regex.match?(@epoch_regex, string) ->
-        Epoch.parse(string)
+      epoch_regex_capture = Regex.named_captures(@epoch_regex, string) ->
+        Epoch.parse(epoch_regex_capture)
 
       Regex.match?(@serial_regex, string) ->
         Serial.parse(string)
@@ -255,10 +262,17 @@ defmodule DateTimeParser do
 
   defp do_parse_date(string) do
     cond do
-      String.contains?(string, "/") -> DateTimeParser.Date.parse_us(string)
-      Regex.match?(@epoch_regex, string) -> Epoch.parse(string)
-      Regex.match?(@serial_regex, string) -> Serial.parse(string)
-      true -> DateTimeParser.Date.parse(string)
+      String.contains?(string, "/") ->
+        DateTimeParser.Date.parse_us(string)
+
+      epoch_regex_capture = Regex.named_captures(@epoch_regex, string) ->
+        Epoch.parse(epoch_regex_capture)
+
+      Regex.match?(@serial_regex, string) ->
+        Serial.parse(string)
+
+      true ->
+        DateTimeParser.Date.parse(string)
     end
   end
 
