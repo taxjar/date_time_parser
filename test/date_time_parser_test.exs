@@ -145,6 +145,21 @@ defmodule DateTimeParserTest do
     test_datetime_parsing("9999999999", DateTime.from_naive!(~N[2286-11-20T17:46:39], "Etc/UTC"))
 
     test_datetime_parsing(
+      "9999999999.009",
+      DateTime.from_naive!(~N[2286-11-20T17:46:39.009], "Etc/UTC")
+    )
+
+    test_datetime_parsing(
+      "9999999999.090",
+      DateTime.from_naive!(~N[2286-11-20T17:46:39.090], "Etc/UTC")
+    )
+
+    test_datetime_parsing(
+      "9999999999.900",
+      DateTime.from_naive!(~N[2286-11-20T17:46:39.900], "Etc/UTC")
+    )
+
+    test_datetime_parsing(
       "9999999999.999",
       DateTime.from_naive!(~N[2286-11-20T17:46:39.999], "Etc/UTC")
     )
@@ -152,6 +167,16 @@ defmodule DateTimeParserTest do
     test_datetime_parsing(
       "9999999999.999999",
       DateTime.from_naive!(~N[2286-11-20T17:46:39.999999], "Etc/UTC")
+    )
+
+    test_datetime_parsing(
+      "9999999999.0000000009",
+      DateTime.from_naive!(~N[2286-11-20T17:46:39.000000], "Etc/UTC")
+    )
+
+    test_datetime_parsing(
+      "9999999999.0000009000",
+      DateTime.from_naive!(~N[2286-11-20T17:46:39.000000], "Etc/UTC")
     )
 
     test_datetime_parsing(
@@ -377,6 +402,7 @@ defmodule DateTimeParserTest do
   describe "parse_date/1 - epoch" do
     test_date_parsing("99999999999", ~D[5138-11-16])
     test_date_parsing("9999999999", ~D[2286-11-20])
+    test_date_parsing("9999999999.009", ~D[2286-11-20])
     test_date_parsing("9999999999.999", ~D[2286-11-20])
     test_date_parsing("9999999999.999999", ~D[2286-11-20])
     test_date_parsing("9999999999.9999999999", ~D[2286-11-20])
@@ -401,6 +427,14 @@ defmodule DateTimeParserTest do
   describe "parse_time/1 - epoch" do
     test_time_parsing("99999999999", ~T[09:46:39])
     test_time_parsing("9999999999", ~T[17:46:39])
+    test_time_parsing("9999999999.000001", ~T[17:46:39.000001])
+    test_time_parsing("9999999999.000010", ~T[17:46:39.000010])
+    test_time_parsing("9999999999.000100", ~T[17:46:39.000100])
+    test_time_parsing("9999999999.001000", ~T[17:46:39.001000])
+    test_time_parsing("9999999999.010000", ~T[17:46:39.010000])
+    test_time_parsing("9999999999.100000", ~T[17:46:39.100000])
+    test_time_parsing("9999999999.009", ~T[17:46:39.009])
+    test_time_parsing("9999999999.900", ~T[17:46:39.900])
     test_time_parsing("9999999999.999", ~T[17:46:39.999])
     test_time_parsing("9999999999.999999", ~T[17:46:39.999999])
     test_time_parsing("9999999999.9999999999", ~T[17:46:39.999999])
