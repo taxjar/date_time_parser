@@ -103,7 +103,7 @@ defmodule DateTimeParser do
   import DateTimeParser.Formatters
   alias DateTimeParser.{Epoch, Serial}
 
-  @epoch_regex ~r|\A(?<seconds>\d{10,11})(?:\.(?<subseconds>\d{1,10}))?\z|
+  @epoch_regex ~r|\A(?<sign>-)?(?<seconds>\d{10,11})(?:\.(?<subseconds>\d{1,10}))?\z|
   @serial_regex ~r|\A-?\d{1,5}(?:\.\d{1,10})?\z|
   @time_regex ~r|(?<time>\d{1,2}:\d{2}(?::\d{2})?(?:.*)?)|
 
