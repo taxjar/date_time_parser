@@ -43,7 +43,14 @@ defmodule DateTimeParser.Epoch do
   defp parse_subseconds(raw_subseconds, true) do
     with {:ok, {truncated_microseconds, number_of_subsecond_digits}} <-
            parse_subseconds(raw_subseconds, false) do
-      {:ok, {1 * :math.pow(10, 6) - truncated_microseconds, number_of_subsecond_digits}}
+      negative_truncated_microseconds =
+        if truncated_microseconds > 0 do
+          ((1 * :math.pow(10, 6)) |> trunc()) - truncated_microseconds
+        else
+          truncated_microseconds
+        end
+
+      {:ok, {negative_truncated_microseconds, number_of_subsecond_digits}}
     end
   end
 
