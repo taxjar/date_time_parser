@@ -5,7 +5,7 @@ defmodule DateTimeParser.Epoch do
   @max_subsecond_digits 6
 
   def parse(%{"seconds" => raw_seconds, "subseconds" => raw_subseconds}) do
-    with {seconds, _} <- Integer.parse(raw_seconds) do
+    with {seconds, ""} <- Integer.parse(raw_seconds) do
       parsed_epoch =
         case(raw_subseconds) do
           "" ->
