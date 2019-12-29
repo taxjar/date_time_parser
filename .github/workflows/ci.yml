@@ -1,21 +1,34 @@
 name: Elixir CI
 
-on: push
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
+    env:
+      MIX_ENV: test
     container:
       image: elixir:1.9.1-slim
-
     steps:
     - uses: actions/checkout@v1
     - name: Install Dependencies
       run: |
         mix local.rebar --force
-        mix local.hex --force
+        mix local.hex --if-missing --force
         mix deps.get
+    - name: Compile
+      run: mix compile --force --warnings-as-errors
     - name: Run Tests
-      run: mix tests
+      run: mix test
+    - name: Check Formatting
+      run: mix format --check-formatted
+    - name: Check Style
+      run: mix credo --strict
+    - name: Check Types
+      run: mix dialyzer
