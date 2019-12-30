@@ -412,6 +412,52 @@ defmodule DateTimeParserTest do
     test_time_parsing("-45103.1454398148", ~T[20:30:34])
   end
 
+  describe "bang variants" do
+    test "parse! successfully returns results" do
+      assert %NaiveDateTime{} = DateTimeParser.parse!("2019-01-01T01:01:01")
+      assert %DateTime{} = DateTimeParser.parse!("2019-01-01T01:01:01Z")
+      assert %Date{} = DateTimeParser.parse!("2019-01-01")
+      assert %Time{} = DateTimeParser.parse!("9:30pm")
+    end
+
+    test "parse! raises an error when fails to parse" do
+      assert_raise DateTimeParser.Error, "Could not parse foo", fn ->
+        DateTimeParser.parse!("foo")
+      end
+    end
+
+    test "parse_datetime! successfully returns results" do
+      assert %NaiveDateTime{} = DateTimeParser.parse_datetime!("2019-01-01T01:01:01")
+      assert %DateTime{} = DateTimeParser.parse_datetime!("2019-01-01T01:01:01Z")
+    end
+
+    test "parse_datetime! raises an error when fails to parse" do
+      assert_raise DateTimeParser.Error, "Could not parse foo", fn ->
+        DateTimeParser.parse_datetime!("foo")
+      end
+    end
+
+    test "parse_date! successfully returns results" do
+      assert %Date{} = DateTimeParser.parse_date!("2019-01-01")
+    end
+
+    test "parse_date! raises an error when fails to parse" do
+      assert_raise DateTimeParser.Error, "Could not parse foo", fn ->
+        DateTimeParser.parse_date!("foo")
+      end
+    end
+
+    test "parse_time! successfully returns results" do
+      assert %Time{} = DateTimeParser.parse_time!("10:30pm")
+    end
+
+    test "parse_time! raises an error when fails to parse" do
+      assert_raise DateTimeParser.Error, "Could not parse foo", fn ->
+        DateTimeParser.parse_time!("foo")
+      end
+    end
+  end
+
   describe "errors" do
     test "returns an error when not recognized" do
       assert DateTimeParser.parse_datetime("2017-24-32 16:09:53 UTC") ==

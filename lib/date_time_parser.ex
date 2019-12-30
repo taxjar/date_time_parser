@@ -165,8 +165,24 @@ defmodule DateTimeParser do
   end
 
   @doc """
-  Parse a `%DateTime{}` or `%NaiveDateTime{}` from a string. Accepts options
-  `t:parse_datetime_options/0`
+  Parse a `%DateTime{}`, `%NaiveDateTime{}`, `%Date{}`, or `%Time{}` from a string. Raises a
+  `DateTimeParser.Error` when parsing fails.
+
+  Accepts `t:parse_options/0`.
+  """
+  @spec parse!(String.t() | nil, parse_options()) ::
+          DateTime.t() | NaiveDateTime.t() | Date.t() | Time.t() | no_return()
+  def parse!(string, opts \\ []) do
+    case parse(string, opts) do
+      {:ok, result} -> result
+      {:error, message} -> raise(__MODULE__.Error, message)
+    end
+  end
+
+  @doc """
+  Parse a `%DateTime{}` or `%NaiveDateTime{}` from a string.
+
+  Accepts options `t:parse_datetime_options/0`
   """
   @spec parse_datetime(String.t() | nil, parse_datetime_options()) ::
           {:ok, DateTime.t() | NaiveDateTime.t()} | {:error, String.t()}
@@ -188,6 +204,21 @@ defmodule DateTimeParser do
 
   def parse_datetime(nil, _opts), do: {:error, "Could not parse nil"}
   def parse_datetime(value, _opts), do: {:error, "Could not parse #{value}"}
+
+  @doc """
+  Parse a `%DateTime{}` or `%NaiveDateTime{}` from a string. Raises a `DateTimeParser.Error` when
+  parsing fails.
+
+  Accepts options `t:parse_datetime_options/0`.
+  """
+  @spec parse_datetime!(String.t() | nil, parse_datetime_options()) ::
+          DateTime.t() | NaiveDateTime.t() | no_return()
+  def parse_datetime!(string, opts \\ []) do
+    case parse_datetime(string, opts) do
+      {:ok, result} -> result
+      {:error, message} -> raise(__MODULE__.Error, message)
+    end
+  end
 
   defp do_datetime_parse(string) do
     cond do
@@ -215,6 +246,17 @@ defmodule DateTimeParser do
   def parse_time(nil), do: {:error, "Could not parse nil"}
   def parse_time(value), do: {:error, "Could not parse #{value}"}
 
+  @doc """
+  Parse `%Time{}` from a string. Raises a `DateTimeParser.Error` when parsing fails.
+  """
+  @spec parse_time!(String.t() | nil) :: Time.t() | no_return()
+  def parse_time!(string) do
+    case parse_time(string) do
+      {:ok, result} -> result
+      {:error, message} -> raise(__MODULE__.Error, message)
+    end
+  end
+
   defp do_time_parse(string) do
     cond do
       Regex.match?(@epoch_regex, string) ->
@@ -232,7 +274,9 @@ defmodule DateTimeParser do
   end
 
   @doc """
-  Parse `%Date{}` from a string. Accepts options `t:parse_date_options/0`
+  Parse `%Date{}` from a string.
+
+  Accepts options `t:parse_date_options/0`
   """
   @spec parse_date(String.t() | nil, parse_date_options()) ::
           {:ok, Date.t()} | {:error, String.t()}
@@ -252,6 +296,20 @@ defmodule DateTimeParser do
 
   def parse_date(nil, _opts), do: {:error, "Could not parse nil"}
   def parse_date(value, _opts), do: {:error, "Could not parse #{value}"}
+
+  @doc """
+  Parse a `%Date{}` from a string. Raises a `DateTimeParser.Error` when parsing fails.
+
+  Accepts options `t:parse_date_options/0`.
+  """
+  @spec parse_date!(String.t() | nil, parse_datetime_options()) ::
+          Date.t() | no_return()
+  def parse_date!(string, opts \\ []) do
+    case parse_date(string, opts) do
+      {:ok, result} -> result
+      {:error, message} -> raise(__MODULE__.Error, message)
+    end
+  end
 
   defp do_parse_date(string) do
     cond do
