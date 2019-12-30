@@ -12,7 +12,7 @@ defmodule DateTimeParser.Parser do
     opts = Keyword.merge([tokenizer: get_tokenizer(opts[:context], string)], opts)
 
     opts
-    |> Keyword.get(:parsers, Application.get_env(DateTimeParser, :parsers, @default_parsers))
+    |> Keyword.get(:parsers, Application.get_env(:date_time_parser, :parsers, @default_parsers))
     |> Enum.find_value({:error, :no_parser}, fn parser ->
       apply(__MODULE__, parser, [string, opts])
     end)

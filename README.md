@@ -147,10 +147,10 @@ end
 
 ```elixir
 # This is the default config, even if not configured.
-config DateTimeParser, parsers: [:epoch, :serial, :tokenizer]
+config :date_time_parser, parsers: [:epoch, :serial, :tokenizer]
 
 # To enable only specific parsers, include them in the :parsers key.
-config DateTimeParser, parsers: [:tokenizer]
+config :date_time_parser, parsers: [:tokenizer]
 
 # Or in runtime, pass in the parsers in the function.
 DateTimeParser.parse(mystring, parsers: [:tokenizer])
