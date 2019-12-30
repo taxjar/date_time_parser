@@ -3,6 +3,7 @@ defmodule DateTimeParser.Epoch do
 
   @token_key :unix_epoch
   @max_subsecond_digits 6
+  @one_second_in_microseconds (1 * :math.pow(10, 6)) |> trunc()
 
   def parse(%{"sign" => sign, "seconds" => raw_seconds, "subseconds" => raw_subseconds}) do
     is_negative = if sign == "-", do: true, else: false
@@ -45,7 +46,7 @@ defmodule DateTimeParser.Epoch do
            parse_subseconds(raw_subseconds, false) do
       negative_truncated_microseconds =
         if truncated_microseconds > 0 do
-          ((1 * :math.pow(10, 6)) |> trunc()) - truncated_microseconds
+          @one_second_in_microseconds - truncated_microseconds
         else
           truncated_microseconds
         end
