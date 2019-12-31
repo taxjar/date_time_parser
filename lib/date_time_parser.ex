@@ -20,7 +20,7 @@ defmodule DateTimeParser do
   |---|----|---|---|
   |1-5|Serial|low = `1900-01-01`, high = `2173-10-15`. Negative numbers go to `1626-03-17`|Floats indicate time. Integers do not.|
   |6-9|Tokenizer|any|This allows for "20190429" to be parsed as `2019-04-29`|
-  |10-11|Epoch|low = `1976-03-03T09:46:40`, high = `5138-11-16 09:46:39`|If padded with 0s, then it can capture entire range. Negative numbers not yet supported|
+  |10-11|Epoch|low = `-1100-02-15 14:13:21`, high = `5138-11-16 09:46:39`|If padded with 0s, then it can capture entire range.|
 
   ## Examples
 
@@ -57,6 +57,15 @@ defmodule DateTimeParser do
 
     iex> DateTimeParser.parse_datetime("1564154204")
     {:ok, DateTime.from_naive!(~N[2019-07-26T15:16:44Z], "Etc/UTC")}
+
+    iex> DateTimeParser.parse_datetime("1564154204.123")
+    {:ok, DateTime.from_naive!(~N[2019-07-26T15:16:44.123Z], "Etc/UTC")}
+
+    iex> DateTimeParser.parse_datetime("-1564154204")
+    {:ok, DateTime.from_naive!(~N[1920-06-08T08:43:16Z], "Etc/UTC")}
+
+    iex> DateTimeParser.parse_datetime("-1564154204.123")
+    {:ok, DateTime.from_naive!(~N[1920-06-08T08:43:15.877Z], "Etc/UTC")}
 
     iex> DateTimeParser.parse_datetime("41261.6013888889")
     {:ok, ~N[2012-12-18T14:26:00]}
