@@ -36,7 +36,7 @@ they really are.
 |---|----|---|---|
 |1-5|Serial|low = `1900-01-01`, high = `2173-10-15`. Negative numbers go to `1626-03-17`|Floats indicate time. Integers do not.|
 |6-9|Tokenizer|any|This allows for "20190429" to be parsed as `2019-04-29`|
-|10-11|Epoch|low = `1976-03-03T09:46:40`, high = `5138-11-16 09:46:39`|If padded with 0s, then it can capture entire range. Negative numbers not yet supported|
+  |10-11|Epoch|low = `-1100-02-15 14:13:21`, high = `5138-11-16 09:46:39`|If padded with 0s, then it can capture entire range.|
 
 [Epoch]: https://en.wikipedia.org/wiki/Unix_time
 [Serial]: https://support.office.com/en-us/article/date-systems-in-excel-e7fe7167-48a9-4b96-bb53-5612a800b487

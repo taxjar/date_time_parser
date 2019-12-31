@@ -185,6 +185,27 @@ defmodule DateTimeParserTest do
     )
 
     test_datetime_parsing("0000000000", DateTime.from_naive!(~N[1970-01-01T00:00:00], "Etc/UTC"))
+
+    test_datetime_parsing("-0000000001", DateTime.from_naive!(~N[1969-12-31T23:59:59], "Etc/UTC"))
+
+    test_datetime_parsing(
+      "-0000000001.0000000001",
+      DateTime.from_naive!(~N[1969-12-31T23:59:58.000000], "Etc/UTC")
+    )
+
+    # example from the Wikipedia article
+    test_datetime_parsing("-0386380800", DateTime.from_naive!(~N[1957-10-04T00:00:00], "Etc/UTC"))
+    test_datetime_parsing("-9999999999", DateTime.from_naive!(~N[1653-02-10T06:13:21], "Etc/UTC"))
+    # this matches Ruby
+    test_datetime_parsing(
+      "-99999999999",
+      DateTime.from_naive!(~N[-1199-02-15T14:13:21], "Etc/UTC")
+    )
+
+    test_datetime_parsing(
+      "-9999999999.9999999999",
+      DateTime.from_naive!(~N[1653-02-10T06:13:20.000001], "Etc/UTC")
+    )
   end
 
   describe "parse_datetime/1 - MDY" do
@@ -407,6 +428,13 @@ defmodule DateTimeParserTest do
     test_date_parsing("9999999999.999999", ~D[2286-11-20])
     test_date_parsing("9999999999.9999999999", ~D[2286-11-20])
     test_date_parsing("0000000000", ~D[1970-01-01])
+    test_date_parsing("-0000000001", ~D[1969-12-31])
+    test_date_parsing("-0000000001.001", ~D[1969-12-31])
+    test_date_parsing("-0000000001.111111", ~D[1969-12-31])
+    test_date_parsing("-9999999999.009", ~D[1653-02-10])
+    test_date_parsing("-9999999999.999", ~D[1653-02-10])
+    test_date_parsing("-9999999999.999999", ~D[1653-02-10])
+    test_date_parsing("-9999999999.9999999999", ~D[1653-02-10])
   end
 
   describe "parse_date/1 - serial" do
@@ -439,6 +467,20 @@ defmodule DateTimeParserTest do
     test_time_parsing("9999999999.999999", ~T[17:46:39.999999])
     test_time_parsing("9999999999.9999999999", ~T[17:46:39.999999])
     test_time_parsing("0000000000", ~T[00:00:00])
+    test_time_parsing("-9999999999.9999999999", ~T[06:13:20.000001])
+    test_time_parsing("-9999999999.999999", ~T[06:13:20.000001])
+    test_time_parsing("-9999999999.99999", ~T[06:13:20.00001])
+    test_time_parsing("-9999999999.9999", ~T[06:13:20.0001])
+    test_time_parsing("-9999999999.999", ~T[06:13:20.001])
+    test_time_parsing("-9999999999.99", ~T[06:13:20.01])
+    test_time_parsing("-9999999999.9", ~T[06:13:20.1])
+    test_time_parsing("-0000000001.0000000001", ~T[23:59:58.000000])
+    test_time_parsing("-0000000001.000001", ~T[23:59:58.999999])
+    test_time_parsing("-0000000001.00001", ~T[23:59:58.99999])
+    test_time_parsing("-0000000001.0001", ~T[23:59:58.9999])
+    test_time_parsing("-0000000001.001", ~T[23:59:58.999])
+    test_time_parsing("-0000000001.01", ~T[23:59:58.99])
+    test_time_parsing("-0000000001.1", ~T[23:59:58.9])
   end
 
   describe "parse_time/1 - serial" do
