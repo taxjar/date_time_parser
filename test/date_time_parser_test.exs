@@ -421,7 +421,7 @@ defmodule DateTimeParserTest do
     end
 
     test "parse! raises an error when fails to parse" do
-      assert_raise DateTimeParser.Error, "Could not parse foo", fn ->
+      assert_raise DateTimeParser.ParseError, "Could not parse foo", fn ->
         DateTimeParser.parse!("foo")
       end
     end
@@ -432,7 +432,7 @@ defmodule DateTimeParserTest do
     end
 
     test "parse_datetime! raises an error when fails to parse" do
-      assert_raise DateTimeParser.Error, "Could not parse foo", fn ->
+      assert_raise DateTimeParser.ParseError, "Could not parse foo", fn ->
         DateTimeParser.parse_datetime!("foo")
       end
     end
@@ -442,7 +442,7 @@ defmodule DateTimeParserTest do
     end
 
     test "parse_date! raises an error when fails to parse" do
-      assert_raise DateTimeParser.Error, "Could not parse foo", fn ->
+      assert_raise DateTimeParser.ParseError, "Could not parse foo", fn ->
         DateTimeParser.parse_date!("foo")
       end
     end
@@ -452,7 +452,7 @@ defmodule DateTimeParserTest do
     end
 
     test "parse_time! raises an error when fails to parse" do
-      assert_raise DateTimeParser.Error, "Could not parse foo", fn ->
+      assert_raise DateTimeParser.ParseError, "Could not parse foo", fn ->
         DateTimeParser.parse_time!("foo")
       end
     end

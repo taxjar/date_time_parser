@@ -175,7 +175,7 @@ defmodule DateTimeParser do
   def parse!(string, opts \\ []) do
     case parse(string, opts) do
       {:ok, result} -> result
-      {:error, message} -> raise(__MODULE__.Error, message)
+      {:error, message} -> raise(__MODULE__.ParseError, message)
     end
   end
 
@@ -216,7 +216,7 @@ defmodule DateTimeParser do
   def parse_datetime!(string, opts \\ []) do
     case parse_datetime(string, opts) do
       {:ok, result} -> result
-      {:error, message} -> raise(__MODULE__.Error, message)
+      {:error, message} -> raise(__MODULE__.ParseError, message)
     end
   end
 
@@ -253,7 +253,7 @@ defmodule DateTimeParser do
   def parse_time!(string) do
     case parse_time(string) do
       {:ok, result} -> result
-      {:error, message} -> raise(__MODULE__.Error, message)
+      {:error, message} -> raise(__MODULE__.ParseError, message)
     end
   end
 
@@ -307,7 +307,7 @@ defmodule DateTimeParser do
   def parse_date!(string, opts \\ []) do
     case parse_date(string, opts) do
       {:ok, result} -> result
-      {:error, message} -> raise(__MODULE__.Error, message)
+      {:error, message} -> raise(__MODULE__.ParseError, message)
     end
   end
 
