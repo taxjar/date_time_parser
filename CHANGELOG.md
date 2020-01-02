@@ -2,26 +2,40 @@
 
 ## 1.0.0
 
-- Add `parse/2` that will respond with the best match. This function accepts all
-    options introduced below.
-- Change `parse_datetime` to accept options:
-  - `assume_time: true | %Time{} | false` with the default of false.
-- **BREAKING** Change `parse_datetime` to no longer assume time. Previously, it
+### Breaking
+
+- Change `parse_datetime` to no longer assume time. Previously, it
     would assume `00:00:00` if it could not be parsed. This is replaced with an
     opt-in option `assume_time`. See next point. If you relied on this, to
     upgrade add the option; eg: `DateTimeParser.parse_datetime(string,
     assume_time: true)`
-- **BREAKING** Change `parse_datetime` to no longer convert DateTime to UTC
+- Change `parse_datetime` to no longer convert DateTime to UTC
     timezone. If you relied on this, to upgrade add the option; eg:
     `DateTimeParser.parse_datetime(string, to_utc: true)`
-- Change `parse_date` to accept options:
-  - `assume_date: true | %Date{} | false` with the default of false.
-- **BREAKING** Change `parse_date` to no longer assume a date. Previously, it
+- Change `parse_date` to no longer assume a date. Previously, it
     would assume the current date, and replace the found information from the
-    string. This is replaced with an opt-in option of `assume_date`. See next
-    point. If you relied on this, to upgrade add the option; eg:
+    string. This is replaced with an opt-in option of `assume_date`. If you
+    relied on this, to upgrade add the option; eg:
     `DateTimeParser.parse_date(string, assume_date: true)`
-- Fixed a UTC conversion issue between Daylight/Standard time (#20)
+
+### Bugs
+
+- Fix a UTC conversion bug between Daylight/Standard time (#20). If you're
+    using an earlier version and converting to UTC, please upgrade to >=
+    1.0.0-rc2 immediately.
+- Fix an epoch subsecond parsing bug (#16) (thanks @tmr08c)
+
+### Features
+
+- Add `parse/2` that will respond with the best match. This function accepts all
+    options introduced below.
+- Change `parse_datetime/1` to `parse_datetime/2` to accept options:
+  - `assume_time: true | %Time{} | false` with the default of false.
+- Change `parse_date/1` to `parse_date/2` to accept options:
+  - `assume_date: true | %Date{} | false` with the default of false.
+- Add support for parsing negative epoch times. (#24) (thanks @tmr08c)
+- Add bang variants, `parse!/2`, `parse_datetime!/2`, `parse_time!/2`, and
+    `parse_date!/2`
 
 ## 0.2.0
 
