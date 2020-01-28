@@ -162,6 +162,12 @@ defmodule DateTimeParser.Combinators.Date do
     |> concat(year())
   end
 
+  def year4_month_day do
+    year4()
+    |> concat(date_separator() |> optional())
+    |> concat(month_day())
+  end
+
   def year_month_day do
     year()
     |> concat(date_separator() |> optional())
@@ -229,6 +235,7 @@ defmodule DateTimeParser.Combinators.Date do
   def us_date do
     choice([
       day_long_month_year(),
+      year4_month_day(),
       month_day_year(),
       day_month_year(),
       year_month_day(),
