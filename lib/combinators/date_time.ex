@@ -6,7 +6,7 @@ defmodule DateTimeParser.Combinators.DateTime do
   import DateTimeParser.Combinators.TimeZone
   import NimbleParsec
 
-  @datetime_separator ~w(t - +) ++ [" "]
+  @datetime_separator ~w[t - +] ++ [" "]
 
   def datetime_separator do
     @datetime_separator
