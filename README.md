@@ -36,7 +36,8 @@ they really are.
 |---|----|---|---|
 |1-5|Serial|low = `1900-01-01`, high = `2173-10-15`. Negative numbers go to `1626-03-17`|Floats indicate time. Integers do not.|
 |6-9|Tokenizer|any|This allows for "20190429" to be parsed as `2019-04-29`|
-  |10-11|Epoch|low = `-1100-02-15 14:13:21`, high = `5138-11-16 09:46:39`|If padded with 0s, then it can capture entire range.|
+|10-11|Epoch|low = `-1100-02-15 14:13:21`, high = `5138-11-16 09:46:39`|If padded with 0s, then it can capture entire range.|
+|else|Tokenizer|any| |
 
 [Epoch]: https://en.wikipedia.org/wiki/Unix_time
 [Serial]: https://support.office.com/en-us/article/date-systems-in-excel-e7fe7167-48a9-4b96-bb53-5612a800b487
@@ -101,12 +102,19 @@ iex> DateTimeParser.parse_datetime("1/1/18 3:24 PM")
 iex> DateTimeParser.parse_datetime("1/1/18 3:24 PM", assume_utc: true)
 {:ok, ~U[2018-01-01T15:24:00Z]}
 
-iex> DateTimeParser.parse_datetime(~s|"Dec 1, 2018 7:39:53 AM PST"|, to_utc: true)
-{:ok, ~U[2018-12-01T14:39:53Z]}
+iex> DateTimeParser.parse_datetime(~s|"Mar 28, 2018 7:39:53 AM PDT"|, to_utc: true)
+{:ok, DateTime.from_naive!(~N[2018-03-28T14:39:53Z], "Etc/UTC")}
 
-iex> {:ok, datetime} = DateTimeParser.parse_datetime(~s|"Dec 1, 2018 7:39:53 AM PST"|)
+iex> {:ok, datetime} = DateTimeParser.parse_datetime(~s|"Mar 1, 2018 7:39:53 AM PST"|)
 iex> datetime
-#DateTime<2018-12-01 07:39:53-07:00 PDT PST8PDT>
+#DateTime<2018-03-01 07:39:53-08:00 PST PST8PDT>
+
+iex> DateTimeParser.parse_datetime(~s|"Mar 1, 2018 7:39:53 AM PST"|, to_utc: true)
+{:ok, DateTime.from_naive!(~N[2018-03-01T15:39:53Z], "Etc/UTC")}
+
+iex> {:ok, datetime} = DateTimeParser.parse_datetime(~s|"Mar 28, 2018 7:39:53 AM PDT"|)
+iex> datetime
+#DateTime<2018-03-28 07:39:53-07:00 PDT PST8PDT>
 
 iex> DateTimeParser.parse_time("10:13pm")
 {:ok, ~T[22:13:00]}

@@ -21,6 +21,7 @@ defmodule DateTimeParser do
   |1-5|Serial|low = `1900-01-01`, high = `2173-10-15`. Negative numbers go to `1626-03-17`|Floats indicate time. Integers do not.|
   |6-9|Tokenizer|any|This allows for "20190429" to be parsed as `2019-04-29`|
   |10-11|Epoch|low = `-1100-02-15 14:13:21`, high = `5138-11-16 09:46:39`|If padded with 0s, then it can capture entire range.|
+  |else|Tokenizer|any| |
 
   ## Examples
 
