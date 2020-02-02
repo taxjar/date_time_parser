@@ -41,7 +41,7 @@ defmodule DateTimeParser.Combinators.Date do
     "nov" => 11,
     "dec" => 12
   }
-  @date_separator ~w(, . / -) ++ [" "]
+  @date_separator [",", ".", "/", "-", " "]
 
   def vocal_month_to_numeric_month(value), do: Map.get(@months_map, value)
   def to_integer(value) when is_binary(value), do: String.to_integer(value)
