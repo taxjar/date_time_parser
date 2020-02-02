@@ -52,7 +52,8 @@ defmodule DateTimeParser.Parser.DateTime do
         microsecond: format_token(tokens, :microsecond)
       })
 
-    with {:ok, ndt} <- to_naive_date_time(opts, parsed_values),
+    with true <- DateTimeParser.Parser.Date.parsed_date?(parsed_values),
+         {:ok, ndt} <- to_naive_date_time(opts, parsed_values),
          {:ok, ndt} <- validate_day(ndt),
          {:ok, dt} <- to_datetime(ndt, tokens),
          {:ok, dt} <- maybe_convert_to_utc(dt, opts) do
@@ -65,15 +66,19 @@ defmodule DateTimeParser.Parser.DateTime do
   defp to_naive_date_time(opts, parsed_values) do
     case Keyword.get(opts, :assume_time, false) do
       false ->
-        NaiveDateTime.new(
-          parsed_values[:year],
-          parsed_values[:month],
-          parsed_values[:day],
-          parsed_values[:hour],
-          parsed_values[:minute],
-          parsed_values[:second] || 0,
-          parsed_values[:microsecond] || {0, 0}
-        )
+        if DateTimeParser.Parser.Time.parsed_time?(parsed_values) do
+          NaiveDateTime.new(
+            parsed_values[:year],
+            parsed_values[:month],
+            parsed_values[:day],
+            parsed_values[:hour],
+            parsed_values[:minute],
+            parsed_values[:second] || 0,
+            parsed_values[:microsecond] || {0, 0}
+          )
+        else
+          {:error, :cannot_assume_time}
+        end
 
       %Time{} = assumed_time ->
         assume_time(parsed_values, assumed_time)

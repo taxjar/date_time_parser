@@ -24,6 +24,7 @@
     using an earlier version and converting to UTC, please upgrade to >=
     1.0.0-rc2 immediately.
 - Fix an epoch subsecond parsing bug (#16) (thanks @tmr08c)
+- Updated for compatibility with Elixir 1.10.0
 
 ### Features
 

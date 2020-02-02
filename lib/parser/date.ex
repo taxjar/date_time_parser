@@ -63,8 +63,13 @@ defmodule DateTimeParser.Parser.Date do
 
   def validate_day(_), do: :error
 
-  defp for_context(:date, parsed_values, false),
-    do: Date.new(parsed_values[:year], parsed_values[:month], parsed_values[:day])
+  defp for_context(:date, parsed_values, false) do
+    if parsed_date?(parsed_values) do
+      Date.new(parsed_values[:year], parsed_values[:month], parsed_values[:day])
+    else
+      {:error, :cannot_assume_date}
+    end
+  end
 
   defp for_context(:date, parsed_values, true),
     do: {:ok, Map.merge(Date.utc_today(), parsed_values)}
@@ -76,4 +81,8 @@ defmodule DateTimeParser.Parser.Date do
 
   defp for_context(:datetime, _parsed_values, _),
     do: {:error, "Could not parse a datetime out of a date"}
+
+  def parsed_date?(parsed_values) do
+    !Enum.any?([parsed_values[:year], parsed_values[:month], parsed_values[:day]], &is_nil/1)
+  end
 end

@@ -32,6 +32,10 @@ defmodule DateTimeParser.Parser.Time do
     end
   end
 
+  def parsed_time?(parsed_values) do
+    !Enum.any?([parsed_values[:hour], parsed_values[:minute]], &is_nil/1)
+  end
+
   defp extract_time(string) do
     case Regex.named_captures(@time_regex, string) do
       %{"time" => time} -> time
