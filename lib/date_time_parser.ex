@@ -167,12 +167,16 @@ defmodule DateTimeParser do
   """
   @spec parse(String.t() | nil, parse_options()) ::
           {:ok, DateTime.t() | NaiveDateTime.t() | Date.t() | Time.t()} | {:error, String.t()}
-  def parse(string, opts \\ []) do
+  def parse(string, opts \\ [])
+
+  def parse(string, opts) when is_binary(string) do
     with {:error, _} <- parse_datetime(string, opts),
          {:error, _} <- parse_date(string, opts) do
       parse_time(string)
     end
   end
+
+  def parse(value, _opts), do: {:error, "Could not parse #{inspect(value)}"}
 
   @doc """
   Parse a `%DateTime{}`, `%NaiveDateTime{}`, `%Date{}`, or `%Time{}` from a string. Raises a
@@ -208,12 +212,11 @@ defmodule DateTimeParser do
       {:ok, datetime}
     else
       _ ->
-        {:error, "Could not parse #{string}"}
+        {:error, "Could not parse #{inspect(string)}"}
     end
   end
 
-  def parse_datetime(nil, _opts), do: {:error, "Could not parse nil"}
-  def parse_datetime(value, _opts), do: {:error, "Could not parse #{value}"}
+  def parse_datetime(value, _opts), do: {:error, "Could not parse #{inspect(value)}"}
 
   @doc """
   Parse a `%DateTime{}` or `%NaiveDateTime{}` from a string. Raises a `DateTimeParser.ParseError` when
@@ -256,12 +259,11 @@ defmodule DateTimeParser do
         to_time(tokens)
 
       _ ->
-        {:error, "Could not parse #{string}"}
+        {:error, "Could not parse #{inspect(string)}"}
     end
   end
 
-  def parse_time(nil), do: {:error, "Could not parse nil"}
-  def parse_time(value), do: {:error, "Could not parse #{value}"}
+  def parse_time(value), do: {:error, "Could not parse #{inspect(value)}"}
 
   @doc """
   Parse `%Time{}` from a string. Raises a `DateTimeParser.ParseError` when parsing fails.
@@ -307,12 +309,11 @@ defmodule DateTimeParser do
       {:ok, date}
     else
       _ ->
-        {:error, "Could not parse #{string}"}
+        {:error, "Could not parse #{inspect(string)}"}
     end
   end
 
-  def parse_date(nil, _opts), do: {:error, "Could not parse nil"}
-  def parse_date(value, _opts), do: {:error, "Could not parse #{value}"}
+  def parse_date(value, _opts), do: {:error, "Could not parse #{inspect(value)}"}
 
   @doc """
   Parse a `%Date{}` from a string. Raises a `DateTimeParser.ParseError` when parsing fails.

@@ -63,8 +63,8 @@
 |`01-01-2018`|`2018-01-01`|parse| |
 |`01-Feb-18`|`2018-02-01`|parse| |
 |`01-Jul`|`2019-07-01`|parse|`[assume_date: ~D[2019-01-05]]`|
-|`01-Jul`|`Could not parse 01-Jul`|parse| |
-|`01-Jul`|`Could not parse 01-Jul`|parse_datetime| |
+|`01-Jul`|`Could not parse "01-Jul"`|parse| |
+|`01-Jul`|`Could not parse "01-Jul"`|parse_datetime| |
 |`01-Jul-18`|`2018-07-01`|parse| |
 |`01.09.2018`|`2018-09-01`|parse| |
 |`01.11.2018`|`2018-11-01`|parse| |
@@ -94,7 +94,7 @@
 |`07:09.3`|`07:09:00`|parse_time| |
 |`08:53.0`|`08:53:00`|parse_time| |
 |`1-Apr`|`2019-04-01`|parse|`[assume_date: ~D[2019-01-13]]`|
-|`1-Apr`|`Could not parse 1-Apr`|parse| |
+|`1-Apr`|`Could not parse "1-Apr"`|parse| |
 |`1//1/17`|`2017-01-01`|parse| |
 |`1/1/0117`|`0117-01-01`|parse| |
 |`1/1/17 19:12`|`2017-01-01T19:12:00`|parse| |
@@ -153,15 +153,15 @@
 |`2016-11-17 10:36:34.81`|`2016-11-17T10:36:34.81`|parse| |
 |`2016-11-23T16:25:33.971897`|`2016-11-23T16:25:33.971897`|parse| |
 |`2016/1/9`|`2016-01-09`|parse| |
-|`2017-02-29`|`Could not parse 2017-02-29`|parse_date| |
-|`2017-02-29 00:00:00 UTC`|`Could not parse 2017-02-29 00:00:00 UTC`|parse_datetime| |
-|`2017-04-31`|`Could not parse 2017-04-31`|parse_date| |
-|`2017-04-31 00:00:00 UTC`|`Could not parse 2017-04-31 00:00:00 UTC`|parse_datetime| |
-|`2017-06-31`|`Could not parse 2017-06-31`|parse_date| |
-|`2017-06-31 00:00:00 UTC`|`Could not parse 2017-06-31 00:00:00 UTC`|parse_datetime| |
+|`2017-02-29`|`Could not parse "2017-02-29"`|parse_date| |
+|`2017-02-29 00:00:00 UTC`|`Could not parse "2017-02-29 00:00:00 UTC"`|parse_datetime| |
+|`2017-04-31`|`Could not parse "2017-04-31"`|parse_date| |
+|`2017-04-31 00:00:00 UTC`|`Could not parse "2017-04-31 00:00:00 UTC"`|parse_datetime| |
+|`2017-06-31`|`Could not parse "2017-06-31"`|parse_date| |
+|`2017-06-31 00:00:00 UTC`|`Could not parse "2017-06-31 00:00:00 UTC"`|parse_datetime| |
 |`2017-09-29+00:00`|`2017-09-29T00:00:00`|parse| |
-|`2017-09-31`|`Could not parse 2017-09-31`|parse_date| |
-|`2017-09-31 00:00:00 UTC`|`Could not parse 2017-09-31 00:00:00 UTC`|parse_datetime| |
+|`2017-09-31`|`Could not parse "2017-09-31"`|parse_date| |
+|`2017-09-31 00:00:00 UTC`|`Could not parse "2017-09-31 00:00:00 UTC"`|parse_datetime| |
 |`2017-10-06+03:45:16`|`2017-10-06T03:45:16`|parse| |
 |`2017-10-24 04:00:10 PDT`|`2017-10-24T11:00:10Z`|parse|`[to_utc: true]`|
 |`2017-11-04 15:20:47 EDT`|`2017-11-04`|parse_date| |
@@ -176,8 +176,8 @@
 |`2017-11-04 15:20:47+0500`|`2017-11-04T10:20:47Z`|parse_datetime|`[to_utc: true]`|
 |`2017-11-04 15:20:47-0500`|`2017-11-04`|parse_date| |
 |`2017-11-04 15:20:47-0500`|`2017-11-04T20:20:47Z`|parse_datetime|`[to_utc: true]`|
-|`2017-11-31`|`Could not parse 2017-11-31`|parse_date| |
-|`2017-11-31 00:00:00 UTC`|`Could not parse 2017-11-31 00:00:00 UTC`|parse_datetime| |
+|`2017-11-31`|`Could not parse "2017-11-31"`|parse_date| |
+|`2017-11-31 00:00:00 UTC`|`Could not parse "2017-11-31 00:00:00 UTC"`|parse_datetime| |
 |`2017-12-01 03:52`|`2017-12-01T03:52:00`|parse| |
 |`2017/08/08`|`2017-08-08`|parse| |
 |`2019-05-16+04:00`|`2019-05-16`|parse_date| |

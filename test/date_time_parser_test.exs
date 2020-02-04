@@ -498,7 +498,7 @@ defmodule DateTimeParserTest do
     end
 
     test "parse! raises an error when fails to parse" do
-      assert_raise DateTimeParser.ParseError, "Could not parse foo", fn ->
+      assert_raise DateTimeParser.ParseError, ~s|Could not parse "foo"|, fn ->
         DateTimeParser.parse!("foo")
       end
     end
@@ -509,7 +509,7 @@ defmodule DateTimeParserTest do
     end
 
     test "parse_datetime! raises an error when fails to parse" do
-      assert_raise DateTimeParser.ParseError, "Could not parse foo", fn ->
+      assert_raise DateTimeParser.ParseError, ~s|Could not parse "foo"|, fn ->
         DateTimeParser.parse_datetime!("foo")
       end
     end
@@ -519,7 +519,7 @@ defmodule DateTimeParserTest do
     end
 
     test "parse_date! raises an error when fails to parse" do
-      assert_raise DateTimeParser.ParseError, "Could not parse foo", fn ->
+      assert_raise DateTimeParser.ParseError, ~s|Could not parse "foo"|, fn ->
         DateTimeParser.parse_date!("foo")
       end
     end
@@ -529,7 +529,7 @@ defmodule DateTimeParserTest do
     end
 
     test "parse_time! raises an error when fails to parse" do
-      assert_raise DateTimeParser.ParseError, "Could not parse foo", fn ->
+      assert_raise DateTimeParser.ParseError, ~s|Could not parse "foo"|, fn ->
         DateTimeParser.parse_time!("foo")
       end
     end
@@ -538,14 +538,22 @@ defmodule DateTimeParserTest do
   describe "errors" do
     test "returns an error when not recognized" do
       assert DateTimeParser.parse_datetime("2017-24-32 16:09:53 UTC") ==
-               {:error, "Could not parse 2017-24-32 16:09:53 UTC"}
+               {:error, ~s|Could not parse "2017-24-32 16:09:53 UTC"|}
 
       assert DateTimeParser.parse_datetime(nil) == {:error, "Could not parse nil"}
       assert DateTimeParser.parse_date(nil) == {:error, "Could not parse nil"}
       assert DateTimeParser.parse_time(nil) == {:error, "Could not parse nil"}
+      assert DateTimeParser.parse(nil) == {:error, "Could not parse nil"}
+
+      assert DateTimeParser.parse({:ok, "foo"}) == {:error, ~s|Could not parse {:ok, "foo"}|}
+      assert DateTimeParser.parse_date({:ok, "foo"}) == {:error, ~s|Could not parse {:ok, "foo"}|}
+      assert DateTimeParser.parse_time({:ok, "foo"}) == {:error, ~s|Could not parse {:ok, "foo"}|}
+
+      assert DateTimeParser.parse_datetime({:ok, "foo"}) ==
+               {:error, ~s|Could not parse {:ok, "foo"}|}
     end
 
-    test_error("01-Jul", "Could not parse 01-Jul")
+    test_error("01-Jul", ~s|Could not parse "01-Jul"|)
     test_datetime_error("01-Jul")
     test_datetime_error("2017-02-29 00:00:00 UTC")
     test_date_error("2017-02-29")
@@ -555,10 +563,10 @@ defmodule DateTimeParserTest do
 
       test_datetime_error(
         "2017-#{@month}-31 00:00:00 UTC",
-        "Could not parse 2017-#{@month}-31 00:00:00 UTC"
+        ~s|Could not parse "2017-#{@month}-31 00:00:00 UTC"|
       )
 
-      test_date_error("2017-#{@month}-31", "Could not parse 2017-#{@month}-31")
+      test_date_error("2017-#{@month}-31", ~s|Could not parse "2017-#{@month}-31"|)
     end
   end
 end
