@@ -39,7 +39,7 @@ defmodule DateTimeParser do
   and determines the order in which parsers are attempted. These are the available built-in parsers:
   #{for parser <- DateTimeParser.Parser.builtin_parsers(), do: "  * `#{inspect(parser)}`\n"}
     This is the default in this order:
-  #{for parser <- DateTimeParser.Parser.default_parsers(), do: "  1. `#{inspect(parser)}`\n"}.
+  #{for parser <- DateTimeParser.Parser.default_parsers(), do: "  1. `#{inspect(parser)}`\n"}
   """
   @type parse_datetime_options :: [assume_utc() | to_utc() | assume_time() | parsers()]
 

@@ -7,12 +7,16 @@ defmodule DateTimeParser.Parser.Tokenizer do
   `DateTimeParser.Parser.DateTimeUS`) for them. Time will always be parsed with
   `DateTimeParser.Parser.Time`.
   """
+  @behaviour DateTimeParser.Parser
+
   alias DateTimeParser.Parser
 
+  @impl DateTimeParser.Parser
   def preflight(%{string: string, context: context} = parser) do
     {:ok, %{parser | mod: get_token_parser(context, string)}}
   end
 
+  @impl DateTimeParser.Parser
   def parse(_parser) do
     raise DateTimeParser.ParseError, "Cannot parse with DateTimeParser.Parser.Tokenizer"
   end
