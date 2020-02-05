@@ -1,6 +1,7 @@
 defmodule DateTimeParserTest do
   use ExUnit.Case, async: true
   import DateTimeParserTestMacros
+  import ExUnit.CaptureLog
   alias DateTimeParser
   alias DateTimeParser.Parser
 
@@ -10,15 +11,24 @@ defmodule DateTimeParserTest do
     test "parse/2, can turn off parsers" do
       assert {:error, _} = DateTimeParser.parse("000", parsers: [])
       assert {:ok, _} = DateTimeParser.parse("000", parsers: [Parser.Serial])
-      assert {:ok, _} = DateTimeParser.parse("000", parsers: [:serial])
 
       assert {:error, _} = DateTimeParser.parse("0000000001", parsers: [])
       assert {:ok, _} = DateTimeParser.parse("0000000001", parsers: [Parser.Epoch])
-      assert {:ok, _} = DateTimeParser.parse("0000000001", parsers: [:epoch])
 
       assert {:error, _} = DateTimeParser.parse("2019-01-01", parsers: [])
       assert {:ok, _} = DateTimeParser.parse("2019-01-01", parsers: [Parser.Tokenizer])
-      assert {:ok, _} = DateTimeParser.parse("2019-01-01", parsers: [:tokenizer])
+
+      assert capture_log(fn ->
+               assert {:ok, _} = DateTimeParser.parse("000", parsers: [:serial])
+             end) =~ "Using :serial is deprecated"
+
+      assert capture_log(fn ->
+               assert {:ok, _} = DateTimeParser.parse("0000000001", parsers: [:epoch])
+             end) =~ "Using :epoch is deprecated"
+
+      assert capture_log(fn ->
+               assert {:ok, _} = DateTimeParser.parse("2019-01-01", parsers: [:tokenizer])
+             end) =~ "Using :tokenizer is deprecated"
 
       assert {:error, _} = DateTimeParser.parse("2019-01-01", parsers: [])
     end
@@ -26,29 +36,48 @@ defmodule DateTimeParserTest do
     test "parse_date/2, can turn off parsers" do
       assert {:error, _} = DateTimeParser.parse_date("000", parsers: [])
       assert {:ok, %Date{}} = DateTimeParser.parse_date("000", parsers: [Parser.Serial])
-      assert {:ok, %Date{}} = DateTimeParser.parse_date("000", parsers: [:serial])
 
       assert {:error, _} = DateTimeParser.parse_date("0000000001", parsers: [])
       assert {:ok, %Date{}} = DateTimeParser.parse_date("0000000001", parsers: [Parser.Epoch])
-      assert {:ok, %Date{}} = DateTimeParser.parse_date("0000000001", parsers: [:epoch])
 
       assert {:error, _} = DateTimeParser.parse_date("2019-01-01", parsers: [])
       assert {:ok, %Date{}} = DateTimeParser.parse_date("2019-01-01", parsers: [Parser.Tokenizer])
-      assert {:ok, %Date{}} = DateTimeParser.parse_date("2019-01-01", parsers: [:tokenizer])
+
+      assert capture_log(fn ->
+               assert {:ok, %Date{}} = DateTimeParser.parse_date("000", parsers: [:serial])
+             end) =~ "Using :serial is deprecated"
+
+      assert capture_log(fn ->
+               assert {:ok, %Date{}} = DateTimeParser.parse_date("0000000001", parsers: [:epoch])
+             end) =~ "Using :epoch is deprecated"
+
+      assert capture_log(fn ->
+               assert {:ok, %Date{}} =
+                        DateTimeParser.parse_date("2019-01-01", parsers: [:tokenizer])
+             end) =~ "Using :tokenizer is deprecated"
     end
 
     test "parse_time/2, can turn off parsers" do
       assert {:error, _} = DateTimeParser.parse_time("000.0", parsers: [])
       assert {:ok, %Time{}} = DateTimeParser.parse_time("000.0", parsers: [Parser.Serial])
-      assert {:ok, %Time{}} = DateTimeParser.parse_time("000.0", parsers: [:serial])
 
       assert {:error, _} = DateTimeParser.parse_time("0000000001", parsers: [])
       assert {:ok, %Time{}} = DateTimeParser.parse_time("0000000001", parsers: [Parser.Epoch])
-      assert {:ok, %Time{}} = DateTimeParser.parse_time("0000000001", parsers: [:epoch])
 
       assert {:error, _} = DateTimeParser.parse_time("10:30", parsers: [])
       assert {:ok, %Time{}} = DateTimeParser.parse_time("10:30", parsers: [Parser.Tokenizer])
-      assert {:ok, %Time{}} = DateTimeParser.parse_time("10:30", parsers: [:tokenizer])
+
+      assert capture_log(fn ->
+               assert {:ok, %Time{}} = DateTimeParser.parse_time("10:30", parsers: [:tokenizer])
+             end) =~ "Using :tokenizer is deprecated"
+
+      assert capture_log(fn ->
+               assert {:ok, %Time{}} = DateTimeParser.parse_time("000.0", parsers: [:serial])
+             end) =~ "Using :serial is deprecated"
+
+      assert capture_log(fn ->
+               assert {:ok, %Time{}} = DateTimeParser.parse_time("0000000001", parsers: [:epoch])
+             end) =~ "Using :epoch is deprecated"
     end
 
     test "parse_datetime/2, can turn off parsers" do
@@ -57,22 +86,30 @@ defmodule DateTimeParserTest do
       assert {:ok, %NaiveDateTime{}} =
                DateTimeParser.parse_datetime("100.0", parsers: [Parser.Serial])
 
-      assert {:ok, %NaiveDateTime{}} = DateTimeParser.parse_datetime("100.0", parsers: [:serial])
-
       assert {:error, _} = DateTimeParser.parse_datetime("0000000001", parsers: [])
 
       assert {:ok, %DateTime{}} =
                DateTimeParser.parse_datetime("0000000001", parsers: [Parser.Epoch])
-
-      assert {:ok, %DateTime{}} = DateTimeParser.parse_datetime("0000000001", parsers: [:epoch])
 
       assert {:error, _} = DateTimeParser.parse_datetime("2019-01-01T10:30:00", parsers: [])
 
       assert {:ok, %NaiveDateTime{}} =
                DateTimeParser.parse_datetime("2019-01-01T10:30:00", parsers: [Parser.Tokenizer])
 
-      assert {:ok, %NaiveDateTime{}} =
-               DateTimeParser.parse_datetime("2019-01-01T10:30:00", parsers: [:tokenizer])
+      assert capture_log(fn ->
+               assert {:ok, %NaiveDateTime{}} =
+                        DateTimeParser.parse_datetime("100.0", parsers: [:serial])
+             end) =~ "Using :serial is deprecated"
+
+      assert capture_log(fn ->
+               assert {:ok, %DateTime{}} =
+                        DateTimeParser.parse_datetime("0000000001", parsers: [:epoch])
+             end) =~ "Using :epoch is deprecated"
+
+      assert capture_log(fn ->
+               assert {:ok, %NaiveDateTime{}} =
+                        DateTimeParser.parse_datetime("2019-01-01T10:30:00", parsers: [:tokenizer])
+             end) =~ "Using :tokenizer is deprecated"
     end
   end
 

@@ -1,5 +1,9 @@
 defmodule DateTimeParser.Parser.Epoch do
-  @moduledoc false
+  @moduledoc """
+  Parses a Unix Epoch timestamp. This is gated by the number of present digits. It must contain 10
+  or 11 seconds, with an optional subsecond up to 10 digits. Negative epoch timestamps are
+  supported.
+  """
   @behaviour DateTimeParser.Parser
 
   @max_subsecond_digits 6
@@ -80,7 +84,7 @@ defmodule DateTimeParser.Parser.Epoch do
     end
   end
 
-  def from_tokens(%{context: context}, {seconds, {microseconds, precision}}) do
+  defp from_tokens(%{context: context}, {seconds, {microseconds, precision}}) do
     truncated_microseconds =
       microseconds
       |> Integer.digits()

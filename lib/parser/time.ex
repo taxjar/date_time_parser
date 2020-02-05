@@ -1,5 +1,15 @@
 defmodule DateTimeParser.Parser.Time do
-  @moduledoc false
+  @moduledoc """
+  Tokenizes the string for time elements. This will also attempt to extract the time out of the
+  string first before tokenizing to reduce noise in an attempt to be more accurate. For example,
+
+  ```elixir
+  iex> DateTimeParser.parse_time("Hello Johnny 5, it's 9:30PM")
+  {:ok, ~T[21:30:00]}
+  ```
+
+  This will use a regex to extract the part of the string that looks like time, ie, `"9:30PM"`
+  """
   @behaviour DateTimeParser.Parser
   @time_regex ~r|(?<time>\d{1,2}:\d{2}(?::\d{2})?(?:.*)?)|
 
@@ -20,7 +30,7 @@ defmodule DateTimeParser.Parser.Time do
     end
   end
 
-  def from_tokens(%{context: context}, tokens) do
+  defp from_tokens(%{context: context}, tokens) do
     case Time.new(
            format_token(tokens, :hour) || 0,
            format_token(tokens, :minute) || 0,
@@ -32,8 +42,9 @@ defmodule DateTimeParser.Parser.Time do
     end
   end
 
+  @doc false
   def parsed_time?(parsed_values) do
-    !Enum.any?([parsed_values[:hour], parsed_values[:minute]], &is_nil/1)
+    Enum.all?([parsed_values[:hour], parsed_values[:minute]])
   end
 
   defp extract_time(string) do

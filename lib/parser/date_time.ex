@@ -1,5 +1,8 @@
 defmodule DateTimeParser.Parser.DateTime do
-  @moduledoc false
+  @moduledoc """
+  Tokenizes the string for both date and time formats. This prioritizes the international standard
+  for representing dates.
+  """
   @behaviour DateTimeParser.Parser
 
   import NimbleParsec
@@ -40,6 +43,7 @@ defmodule DateTimeParser.Parser.DateTime do
     end
   end
 
+  @doc false
   def from_tokens(%{opts: opts}, tokens) do
     parsed_values =
       clean(%{
@@ -61,7 +65,56 @@ defmodule DateTimeParser.Parser.DateTime do
     end
   end
 
+  @doc false
   def validate_day(ndt), do: DateTimeParser.Parser.Date.validate_day(ndt)
+
+  @doc false
+  def from_naive_datetime_and_tokens(naive_datetime, tokens) do
+    with timezone when not is_nil(timezone) <- tokens[:zone_abbr] || tokens[:utc_offset],
+         %{} = timezone_info <- timezone_from_tokens(tokens, naive_datetime) do
+      naive_datetime
+      |> DateTime.from_naive!("Etc/UTC")
+      |> Map.merge(%{
+        std_offset: timezone_info.offset_std,
+        utc_offset: timezone_info.offset_utc,
+        zone_abbr: timezone_info.abbreviation,
+        time_zone: timezone_info.full_name
+      })
+    else
+      _ -> naive_datetime
+    end
+  end
+
+  @doc """
+  Convert the given NaiveDateTime to a DateTime if the user provided `to_utc: true`. If the result
+  is already in UTC, this will pass through.
+  """
+  def maybe_convert_to_utc(%DateTime{zone_abbr: "Etc/UTC"} = datetime, _opts) do
+    {:ok, datetime}
+  end
+
+  def maybe_convert_to_utc(%NaiveDateTime{} = naive_datetime, opts) do
+    if Keyword.get(opts, :assume_utc, false) do
+      naive_datetime
+      |> DateTime.from_naive!("Etc/UTC")
+      |> maybe_convert_to_utc(opts)
+    else
+      {:ok, naive_datetime}
+    end
+  end
+
+  def maybe_convert_to_utc(%DateTime{} = datetime, opts) do
+    if Keyword.get(opts, :to_utc, false) do
+      # empty TimezoneInfo defaults to UTC. Doing this to avoid Dialyzer errors
+      # since :utc is not in the typespec
+      case Timex.Timezone.convert(datetime, %Timex.TimezoneInfo{}) do
+        {:error, _} = error -> error
+        converted_datetime -> {:ok, converted_datetime}
+      end
+    else
+      {:ok, datetime}
+    end
+  end
 
   defp to_naive_date_time(opts, parsed_values) do
     case Keyword.get(opts, :assume_time, false) do
@@ -105,49 +158,6 @@ defmodule DateTimeParser.Parser.DateTime do
          offset <- format_token(tokens, :utc_offset),
          true <- Enum.any?([zone, offset]) do
       Timex.Timezone.get(offset || zone, naive_datetime)
-    end
-  end
-
-  def from_naive_datetime_and_tokens(naive_datetime, tokens) do
-    with timezone when not is_nil(timezone) <- tokens[:zone_abbr] || tokens[:utc_offset],
-         %{} = timezone_info <- timezone_from_tokens(tokens, naive_datetime) do
-      naive_datetime
-      |> DateTime.from_naive!("Etc/UTC")
-      |> Map.merge(%{
-        std_offset: timezone_info.offset_std,
-        utc_offset: timezone_info.offset_utc,
-        zone_abbr: timezone_info.abbreviation,
-        time_zone: timezone_info.full_name
-      })
-    else
-      _ -> naive_datetime
-    end
-  end
-
-  defp maybe_convert_to_utc(%DateTime{zone_abbr: "Etc/UTC"} = datetime, _opts) do
-    {:ok, datetime}
-  end
-
-  defp maybe_convert_to_utc(%NaiveDateTime{} = naive_datetime, opts) do
-    if Keyword.get(opts, :assume_utc, false) do
-      naive_datetime
-      |> DateTime.from_naive!("Etc/UTC")
-      |> maybe_convert_to_utc(opts)
-    else
-      {:ok, naive_datetime}
-    end
-  end
-
-  defp maybe_convert_to_utc(%DateTime{} = datetime, opts) do
-    if Keyword.get(opts, :to_utc, false) do
-      # empty TimezoneInfo defaults to UTC. Doing this to avoid Dialyzer errors
-      # since :utc is not in the typespec
-      case Timex.Timezone.convert(datetime, %Timex.TimezoneInfo{}) do
-        {:error, _} = error -> error
-        converted_datetime -> {:ok, converted_datetime}
-      end
-    else
-      {:ok, datetime}
     end
   end
 
