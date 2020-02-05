@@ -1,114 +1,6 @@
 defmodule DateTimeParser do
-  @moduledoc """
-  DateTimeParser is a tokenizer for strings that attempts to parse into a `DateTime`,
-  `NaiveDateTime` if timezone is not determined, `Date`, or `Time`.
-
-  The biggest ambiguity between datetime formats is whether it's `ymd` (year month day), `mdy`
-  (month day year), or `dmy` (day month year); this is resolved by checking if there are slashes or
-  dashes. If slashes, then it will try `dmy` first. All other cases will use the international
-  format `ymd`. Sometimes, if the conditions are right, it can even parse `dmy` with dashes if the
-  month is a vocal month (eg, `"Jan"`).
-
-  If the string is 10-11 digits with optional precision, then we'll try to parse it as a Unix Epoch
-  timestamp.
-
-  If the string is 1-5 digits with optional precision, then we'll try to parse it as a Serial
-  timestamp (spreadsheet time) treating 1899-12-31 as 1. This will cause Excel-produced dates from
-  1900-01-01 until 1900-03-01 to be incorrect, as they really are.
-
-  |digits|parser|range|notes|
-  |---|----|---|---|
-  |1-5|Serial|low = `1900-01-01`, high = `2173-10-15`. Negative numbers go to `1626-03-17`|Floats indicate time. Integers do not.|
-  |6-9|Tokenizer|any|This allows for "20190429" to be parsed as `2019-04-29`|
-  |10-11|Epoch|low = `-1100-02-15 14:13:21`, high = `5138-11-16 09:46:39`|If padded with 0s, then it can capture entire range.|
-  |else|Tokenizer|any| |
-
-  ## Examples
-
-    ```elixir
-    iex> DateTimeParser.parse("19 September 2018 08:15:22 AM")
-    {:ok, ~N[2018-09-19 08:15:22]}
-
-    iex> DateTimeParser.parse_datetime("19 September 2018 08:15:22 AM")
-    {:ok, ~N[2018-09-19 08:15:22]}
-
-    iex> DateTimeParser.parse_datetime("2034-01-13", assume_time: true)
-    {:ok, ~N[2034-01-13 00:00:00]}
-
-    iex> DateTimeParser.parse_datetime("2034-01-13", assume_time: ~T[06:00:00])
-    {:ok, ~N[2034-01-13 06:00:00]}
-
-    iex> DateTimeParser.parse("invalid date 10:30pm")
-    {:ok, ~T[22:30:00]}
-
-    iex> DateTimeParser.parse("2019-03-11T99:99:99")
-    {:ok, ~D[2019-03-11]}
-
-    iex> DateTimeParser.parse("2019-03-11T10:30:00pm UNK")
-    {:ok, ~N[2019-03-11T22:30:00]}
-
-    iex> DateTimeParser.parse("2019-03-11T22:30:00.234+00:00")
-    {:ok, DateTime.from_naive!(~N[2019-03-11T22:30:00.234Z], "Etc/UTC")}
-
-    iex> DateTimeParser.parse_date("2034-01-13")
-    {:ok, ~D[2034-01-13]}
-
-    iex> DateTimeParser.parse_date("01/01/2017")
-    {:ok, ~D[2017-01-01]}
-
-    iex> DateTimeParser.parse_datetime("1564154204")
-    {:ok, DateTime.from_naive!(~N[2019-07-26T15:16:44Z], "Etc/UTC")}
-
-    iex> DateTimeParser.parse_datetime("1564154204.123")
-    {:ok, DateTime.from_naive!(~N[2019-07-26T15:16:44.123Z], "Etc/UTC")}
-
-    iex> DateTimeParser.parse_datetime("-1564154204")
-    {:ok, DateTime.from_naive!(~N[1920-06-08T08:43:16Z], "Etc/UTC")}
-
-    iex> DateTimeParser.parse_datetime("-1564154204.123")
-    {:ok, DateTime.from_naive!(~N[1920-06-08T08:43:15.877Z], "Etc/UTC")}
-
-    iex> DateTimeParser.parse_datetime("41261.6013888889")
-    {:ok, ~N[2012-12-18T14:26:00]}
-
-    iex> DateTimeParser.parse_date("44262")
-    {:ok, ~D[2021-03-07]}
-    # This is a serial number date, commonly found in spreadsheets, eg: `=VALUE("03/07/2021")`
-
-    iex> DateTimeParser.parse_datetime("1/1/18 3:24 PM")
-    {:ok, ~N[2018-01-01T15:24:00]}
-
-    iex> DateTimeParser.parse_datetime("1/1/18 3:24 PM", assume_utc: true)
-    {:ok, DateTime.from_naive!(~N[2018-01-01T15:24:00Z], "Etc/UTC")}
-    # or ~U[2018-01-01T15:24:00Z] in Elixir 1.9.0+
-
-    iex> DateTimeParser.parse_datetime(~s|"Mar 28, 2018 7:39:53 AM PDT"|, to_utc: true)
-    {:ok, DateTime.from_naive!(~N[2018-03-28T14:39:53Z], "Etc/UTC")}
-
-    iex> {:ok, datetime} = DateTimeParser.parse_datetime(~s|"Mar 1, 2018 7:39:53 AM PST"|)
-    iex> datetime
-    #DateTime<2018-03-01 07:39:53-08:00 PST PST8PDT>
-
-    iex> DateTimeParser.parse_datetime(~s|"Mar 1, 2018 7:39:53 AM PST"|, to_utc: true)
-    {:ok, DateTime.from_naive!(~N[2018-03-01T15:39:53Z], "Etc/UTC")}
-
-    iex> {:ok, datetime} = DateTimeParser.parse_datetime(~s|"Mar 28, 2018 7:39:53 AM PDT"|)
-    iex> datetime
-    #DateTime<2018-03-28 07:39:53-07:00 PDT PST8PDT>
-
-    iex> DateTimeParser.parse_time("10:13pm")
-    {:ok, ~T[22:13:00]}
-
-    iex> DateTimeParser.parse_time("10:13:34")
-    {:ok, ~T[10:13:34]}
-
-    iex> DateTimeParser.parse_time("18:14:21.145851000000Z")
-    {:ok, ~T[18:14:21.145851]}
-
-    iex> DateTimeParser.parse_datetime(nil)
-    {:error, "Could not parse nil"}
-    ```
-  """
+  @moduledoc "README.md" |> File.read!() |> String.split("<!-- MDOC -->") |> Enum.fetch!(1)
+  @external_resource "README.md"
 
   import DateTimeParser.Formatters
   alias DateTimeParser.Parser
@@ -142,9 +34,12 @@ defmodule DateTimeParser do
   `~T[00:00:00]` will be assumed. You can also supply your own time, and the found tokens will be
   merged with it.
 
-  * `:parsers` Default `#{inspect(DateTimeParser.Parser.available_parsers())}`.
-  The parsers to use when analyzing the string. When `Parser.Tokenizer`, the appropriate tokenizer will be
-  used depending on the function used.
+  * `:parsers` The parsers to use when analyzing the string. When `Parser.Tokenizer`, the appropriate tokenizer
+  will be used depending on the function used and conditions found in the string. **Order matters**
+  and determines the order in which parsers are attempted. These are the available built-in parsers:
+  #{for parser <- DateTimeParser.Parser.builtin_parsers(), do: "  * `#{inspect(parser)}`\n"}
+    This is the default in this order:
+  #{for parser <- DateTimeParser.Parser.default_parsers(), do: "  1. `#{inspect(parser)}`\n"}.
   """
   @type parse_datetime_options :: [assume_utc() | to_utc() | assume_time() | parsers()]
 

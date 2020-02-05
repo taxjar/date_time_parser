@@ -1,5 +1,8 @@
 defmodule DateTimeParser.Parser.Date do
-  @moduledoc false
+  @moduledoc """
+  Tokenizes the string for date formats. This prioritizes the international standard for
+  representing dates.
+  """
   @behaviour DateTimeParser.Parser
 
   import NimbleParsec
@@ -24,6 +27,7 @@ defmodule DateTimeParser.Parser.Date do
     end
   end
 
+  @doc false
   def from_tokens(%{context: context, opts: opts}, tokens) do
     parsed_values =
       clean(%{
@@ -39,7 +43,11 @@ defmodule DateTimeParser.Parser.Date do
     end
   end
 
-  @type dayable :: DateTime.t() | NaiveDateTime.t() | Date.t()
+  @type dayable ::
+          DateTime.t()
+          | NaiveDateTime.t()
+          | Date.t()
+          | %{day: Calendar.day(), month: Calendar.month(), year: Calendar.year()}
 
   @doc "Validate either the Date or [Naive]DateTime has a valid day"
   @spec validate_day(dayable) :: {:ok, dayable} | :error
@@ -63,6 +71,11 @@ defmodule DateTimeParser.Parser.Date do
 
   def validate_day(_), do: :error
 
+  @doc false
+  def parsed_date?(parsed_values) do
+    Enum.all?([parsed_values[:year], parsed_values[:month], parsed_values[:day]])
+  end
+
   defp for_context(:date, parsed_values, false) do
     if parsed_date?(parsed_values) do
       Date.new(parsed_values[:year], parsed_values[:month], parsed_values[:day])
@@ -81,8 +94,4 @@ defmodule DateTimeParser.Parser.Date do
 
   defp for_context(:datetime, _parsed_values, _),
     do: {:error, "Could not parse a datetime out of a date"}
-
-  def parsed_date?(parsed_values) do
-    !Enum.any?([parsed_values[:year], parsed_values[:month], parsed_values[:day]], &is_nil/1)
-  end
 end

@@ -1,5 +1,7 @@
 defmodule DateTimeParser.Parser.DateUS do
-  @moduledoc false
+  @moduledoc """
+  Tokenizes the string for date formats. This prioritizes the US format for representing dates.
+  """
   @behaviour DateTimeParser.Parser
 
   import NimbleParsec
