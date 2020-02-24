@@ -9,47 +9,99 @@ on:
     - master
 
 jobs:
+  formatting:
+    name: "Check Style"
+    runs-on: ubuntu-latest
+    container:
+      image: hexpm/elixir:1.10.1-erlang-22.2.7-alpine-3.11.3
+    steps:
+    - name: "Alpine setup"
+      run: |
+        apk update
+        apk upgrade
+        apk add --no-cache make bash zlib openssl openssh git g++ wget curl ca-certificates
+    - uses: actions/checkout@v1
+    - uses: actions/cache@v1
+      name: "Cache Mix"
+      with:
+        path: ~/.mix
+        key: ${{ runner.os }}-mix-${{ hashFiles('.tool-versions') }}
+    - uses: actions/cache@v1
+      name: "Cache Hex"
+      with:
+        path: ~/.hex
+        key: ${{ runner.os }}-hex-${{ hashFiles('.tool-versions') }}
+    - uses: actions/cache@v1
+      name: "Cache Dependencies"
+      with:
+        path: deps
+        key: ${{ runner.os }}-deps-lock-${{ hashFiles('.tool-versions') }}-${{ hashFiles('mix.lock') }}
+    - name: Setup
+      run: |
+        mix local.rebar --force
+        mix local.hex --force --if-missing
+        mix deps.get --only dev
+    - name: Mix Format
+      run: mix format --check-formatted
+    - name: Credo
+      run: mix credo --strict
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         elixir_version:
-          - 1.4-slim
-          - 1.5-slim
-          - 1.6-slim
-          - 1.7-slim
-          - 1.8-slim
-          - 1.9-slim
-          - 1.10-slim
+          # I can't seem to get local.rebar to run with Erlang 19 re: SSL
+          # - 1.4.5-erlang-19.3.6-alpine-3.11.3
+          - 1.4.5-erlang-20.3.8-alpine-3.11.3
+          # - 1.5.3-erlang-19.3.6-alpine-3.11.3
+          - 1.5.3-erlang-20.3.8-alpine-3.11.3
+          # - 1.6.6-erlang-19.3.6-alpine-3.11.3
+          - 1.6.6-erlang-20.3.8-alpine-3.11.3
+          - 1.6.6-erlang-21.3.8-alpine-3.11.3
+          # - 1.7.4-erlang-19.3.6-alpine-3.11.3
+          - 1.7.4-erlang-20.3.8-alpine-3.11.3
+          - 1.7.4-erlang-21.3.8-alpine-3.11.3
+          - 1.8.2-erlang-20.3.8-alpine-3.11.3
+          - 1.8.2-erlang-21.3.8-alpine-3.11.3
+          - 1.8.2-erlang-22.2.7-alpine-3.11.3
+          - 1.9.4-erlang-20.3.8-alpine-3.11.3
+          - 1.9.4-erlang-21.3.8-alpine-3.11.3
+          - 1.9.4-erlang-22.2.7-alpine-3.11.3
+          - 1.10.1-erlang-21.3.8-alpine-3.11.3
+          - 1.10.1-erlang-22.2.7-alpine-3.11.3
     env:
       MIX_ENV: test
-      MIX_HOME: "$HOME/.cache/mix"
-      HEX_HOME: "$HOME/.cache/hex"
+      CI: "true"
     container:
-      image: elixir:${{ matrix.elixir_version }}
+      image: hexpm/elixir:${{ matrix.elixir_version }}
     steps:
+    - name: "Alpine setup"
+      run: |
+        apk update
+        apk upgrade
+        apk add --no-cache make bash zlib openssl openssh git g++ wget curl ca-certificates
     - uses: actions/checkout@v1
-    - run: mkdir -p .cache/{mix,hex,plt-core,plt-project}
     - uses: actions/cache@v1
-      with:
-        path: .cache/hex
-        key: ${{ runner.os }}-hex-${{ matrix.elixir_version }}
-    - uses: actions/cache@v1
-      with:
-        path: .cache/mix
-        key: ${{ runner.os }}-mix-${{ matrix.elixir_version }}
-    - uses: actions/cache@v1
+      name: "Cache Dependencies"
       with:
         path: deps
-        key: ${{ runner.os }}-deps-${{ matrix.elixir_version }}-${{ hashFiles('mix.lock') }}
+        key: ${{ runner.os }}-deps-${{ matrix.elixir_version }}
     - uses: actions/cache@v1
+      name: "Cache Dialyzer PLTs"
       with:
-        path: .cache/plt
-        key: ${{ runner.os }}-plt-${{ matrix.elixir_version }}-${{ hashFiles('mix.lock') }}
-    - name: Install Dependencies
+        path: priv/plts
+        key: ${{ runner.os }}-plt-${{ matrix.elixir_version }}
+    - name: Install Hex & Rebar
       run: |
         mix local.rebar --force
         mix local.hex --force
+    - name: Install Dependencies
+      run: |
+        rm mix.lock
         mix deps.get
-    - name: Run Tests
-      run: mix tests
+    - name: Compile
+      run: mix compile --force--warnings-as-errors
+    - name: Test
+      run: mix test
+    - name: Typespecs
+      run: mix typespecs
