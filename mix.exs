@@ -70,14 +70,6 @@ defmodule DateTimeParser.MixProject do
     |> add_dep_if({:ex_doc, "~> 0.20", only: :dev, runtime: false}, ">= 1.7.0")
   end
 
-  defp add_dep_if(deps, dep, version) do
-    if Version.match?(System.version(), version) do
-      [dep | deps]
-    else
-      deps
-    end
-  end
-
   defp docs() do
     [
       main: "DateTimeParser",
@@ -91,15 +83,18 @@ defmodule DateTimeParser.MixProject do
     ]
   end
 
+  defp tests() do
+    []
+    |> add_command_if("compile --force --warnings-as-errors", true)
+    |> add_command_if("format --check-formatted", ">= 1.6.0")
+    |> add_command_if("credo --strict", ">= 1.6.0")
+    |> add_command_if("test", true)
+    |> add_command_if("dialyzer", ">= 1.6.0")
+  end
+
   defp aliases() do
     [
-      tests: [
-        "format --check-formatted",
-        "compile --force --warnings-as-errors",
-        "test",
-        "credo --strict",
-        "dialyzer"
-      ],
+      tests: tests(),
       profile: ["run bench/profile.exs"],
       benchmark: [
         "run bench/self.exs",
@@ -107,5 +102,23 @@ defmodule DateTimeParser.MixProject do
         "cmd ruby bench/rails.rb"
       ]
     ]
+  end
+
+  defp add_dep_if(deps, dep, version) do
+    if Version.match?(System.version(), version) do
+      [dep | deps]
+    else
+      deps
+    end
+  end
+
+  defp add_command_if(commands, command, true), do: commands ++ [command]
+
+  defp add_command_if(commands, command, version) do
+    if Version.match?(System.version(), version) do
+      commands ++ [command]
+    else
+      commands
+    end
   end
 end
