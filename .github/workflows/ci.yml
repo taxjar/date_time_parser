@@ -14,20 +14,38 @@ jobs:
     strategy:
       matrix:
         elixir_version:
-          - elixir:1.3-slim
-          - elixir:1.4-slim
-          - elixir:1.5-slim
-          - elixir:1.6-slim
-          - elixir:1.7-slim
-          - elixir:1.8-slim
-          - elixir:1.9-slim
-          - elixir:1.10-slim
+          - 1.4-slim
+          - 1.5-slim
+          - 1.6-slim
+          - 1.7-slim
+          - 1.8-slim
+          - 1.9-slim
+          - 1.10-slim
     env:
       MIX_ENV: test
+      MIX_HOME: "$HOME/.cache/mix"
+      HEX_HOME: "$HOME/.cache/hex"
     container:
-      image: ${{ matrix.elixir_version }}
+      image: elixir:${{ matrix.elixir_version }}
     steps:
     - uses: actions/checkout@v1
+    - run: mkdir -p .cache/{mix,hex,plt-core,plt-project}
+    - uses: actions/cache@v1
+      with:
+        path: .cache/hex
+        key: ${{ runner.os }}-hex-${{ matrix.elixir_version }}
+    - uses: actions/cache@v1
+      with:
+        path: .cache/mix
+        key: ${{ runner.os }}-mix-${{ matrix.elixir_version }}
+    - uses: actions/cache@v1
+      with:
+        path: deps
+        key: ${{ runner.os }}-deps-${{ matrix.elixir_version }}-${{ hashFiles('mix.lock') }}
+    - uses: actions/cache@v1
+      with:
+        path: .cache/plt
+        key: ${{ runner.os }}-plt-${{ matrix.elixir_version }}-${{ hashFiles('mix.lock') }}
     - name: Install Dependencies
       run: |
         mix local.rebar --force

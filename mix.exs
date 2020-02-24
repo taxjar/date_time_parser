@@ -9,10 +9,10 @@ defmodule DateTimeParser.MixProject do
       version: @version,
       homepage_url: "https://hexdocs.pm/date_time_parser",
       source_url: "https://github.com/taxjar/date_time_parser",
-      elixir: ">= 1.3.0",
+      elixir: ">= 1.4.0",
       elixirc_paths: elixirc_paths(Mix.env()),
       aliases: aliases(),
-      dialyzer: [ignore_warnings: ".dialyzer_ignore.exs"],
+      dialyzer: [ignore_warnings: ".dialyzer_ignore.exs"] ++ plt_files(ci: System.get_env("CI")),
       package: package(),
       docs: docs(),
       start_permanent: Mix.env() == :prod,
@@ -121,4 +121,13 @@ defmodule DateTimeParser.MixProject do
       commands
     end
   end
+
+  defp plt_files(ci: "true") do
+    [
+      plt_core_path: ".cache/plt-core",
+      plt_file: {:no_warn, ".cache/plt-project/date_time_parser.plt"}
+    ]
+  end
+
+  defp plt_files(_), do: []
 end
