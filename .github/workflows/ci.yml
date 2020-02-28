@@ -51,14 +51,10 @@ jobs:
       matrix:
         elixir_version:
           # I can't seem to get local.rebar to run with Erlang 19 re: SSL
-          - 1.4.5-erlang-19.3.6-alpine-3.11.3
           - 1.4.5-erlang-20.3.8-alpine-3.11.3
-          - 1.5.3-erlang-19.3.6-alpine-3.11.3
           - 1.5.3-erlang-20.3.8-alpine-3.11.3
-          - 1.6.6-erlang-19.3.6-alpine-3.11.3
           - 1.6.6-erlang-20.3.8-alpine-3.11.3
           - 1.6.6-erlang-21.3.8-alpine-3.11.3
-          - 1.7.4-erlang-19.3.6-alpine-3.11.3
           - 1.7.4-erlang-20.3.8-alpine-3.11.3
           - 1.7.4-erlang-21.3.8-alpine-3.11.3
           - 1.8.2-erlang-20.3.8-alpine-3.11.3
