@@ -115,21 +115,22 @@ defmodule DateTimeParser.MixProject do
   end
 
   defp add_if(commands, command, true), do: commands ++ [command]
-  defp add_if(commands, _command, false), do: commands
   defp add_if(commands, _command, ""), do: commands
-  defp add_if(commands, _command, nil), do: commands
 
-  defp add_if(commands, command, version) do
+  defp add_if(commands, command, version) when is_binary(version) do
     add_if(commands, command, Version.match?(System.version(), version))
   end
 
+  defp add_if(commands, _command, _), do: commands
+
+  @plt_path Path.join(["priv", "plts"])
   defp plt_file() do
     if System.get_env("CI") == "true" do
-      :ok = File.mkdir_p(Path.join(["priv", "plts"]))
+      :ok = File.mkdir_p(@plt_path)
 
       [
-        plt_file: {:no_warn, Path.join(["priv", "plts", "project.plt"])},
-        plt_core_path: Path.join(["priv", "plts"])
+        plt_file: {:no_warn, Path.join([@plt_path, "project.plt"])},
+        plt_core_path: @plt_path
       ]
     else
       []
