@@ -79,7 +79,8 @@ iex> DateTimeParser.parse("2019-03-11T10:30:00pm UNK")
 {:ok, ~N[2019-03-11T22:30:00]}
 
 iex> DateTimeParser.parse("2019-03-11T22:30:00.234+00:00")
-{:ok, ~U[2019-03-11T22:30:00.234Z]}
+{:ok, DateTime.from_naive!(~N[2019-03-11T22:30:00.234Z], "Etc/UTC")}
+# `~U[2019-03-11T22:30:00.234Z]` in Elixir 1.9+
 
 iex> DateTimeParser.parse_date("2034-01-13")
 {:ok, ~D[2034-01-13]}
@@ -88,7 +89,8 @@ iex> DateTimeParser.parse_date("01/01/2017")
 {:ok, ~D[2017-01-01]}
 
 iex> DateTimeParser.parse_datetime("1564154204")
-{:ok, ~U[2019-07-26T15:16:44Z]}
+{:ok, DateTime.from_naive!(~N[2019-07-26T15:16:44Z], "Etc/UTC")}
+# `~U[2019-07-26T15:16:44Z]` in Elixir 1.9+
 
 iex> DateTimeParser.parse_datetime("41261.6013888889")
 {:ok, ~N[2012-12-18T14:26:00]}
@@ -101,7 +103,8 @@ iex> DateTimeParser.parse_datetime("1/1/18 3:24 PM")
 {:ok, ~N[2018-01-01T15:24:00]}
 
 iex> DateTimeParser.parse_datetime("1/1/18 3:24 PM", assume_utc: true)
-{:ok, ~U[2018-01-01T15:24:00Z]}
+{:ok, DateTime.from_naive!(~N[2018-01-01T15:24:00Z], "Etc/UTC")}
+# `~U[2018-01-01T15:24:00Z]` in Elixir 1.9+
 
 iex> DateTimeParser.parse_datetime(~s|"Mar 28, 2018 7:39:53 AM PDT"|, to_utc: true)
 {:ok, DateTime.from_naive!(~N[2018-03-28T14:39:53Z], "Etc/UTC")}

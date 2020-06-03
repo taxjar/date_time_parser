@@ -5,7 +5,9 @@ defmodule DateTimeParserTest do
   alias DateTimeParser
   alias DateTimeParser.Parser
 
-  doctest DateTimeParser
+  if Version.match?(System.version(), ">= 1.5.0") do
+    doctest DateTimeParser
+  end
 
   describe "config" do
     test "parse/2, can turn off parsers" do
@@ -305,11 +307,13 @@ defmodule DateTimeParserTest do
     # example from the Wikipedia article
     test_datetime_parsing("-0386380800", DateTime.from_naive!(~N[1957-10-04T00:00:00], "Etc/UTC"))
     test_datetime_parsing("-9999999999", DateTime.from_naive!(~N[1653-02-10T06:13:21], "Etc/UTC"))
-    # this matches Ruby
-    test_datetime_parsing(
-      "-99999999999",
-      DateTime.from_naive!(~N[-1199-02-15T14:13:21], "Etc/UTC")
-    )
+
+    if Version.match?(System.version(), ">= 1.7.0") do
+      test_datetime_parsing(
+        "-99999999999",
+        NaiveDateTime.new(-1199, 2, 15, 14, 13, 21) |> elem(1) |> DateTime.from_naive!("Etc/UTC")
+      )
+    end
 
     test_datetime_parsing(
       "-9999999999.9999999999",

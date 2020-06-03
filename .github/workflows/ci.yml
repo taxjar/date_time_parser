@@ -9,26 +9,95 @@ on:
     - master
 
 jobs:
-  build:
+  formatting:
+    name: "Check Style"
     runs-on: ubuntu-latest
-    env:
-      MIX_ENV: test
     container:
-      image: elixir:1.10.0-slim
+      image: hexpm/elixir:1.10.1-erlang-22.2.7-alpine-3.11.3
     steps:
+    - name: "Alpine setup"
+      run: |
+        apk update
+        apk upgrade
+        apk add --no-cache make bash zlib openssl openssh git g++ wget curl ca-certificates
     - uses: actions/checkout@v1
-    - name: Install Dependencies
+    - uses: actions/cache@v1
+      name: "Cache Mix"
+      with:
+        path: ~/.mix
+        key: ${{ runner.os }}-mix-${{ hashFiles('.tool-versions') }}
+    - uses: actions/cache@v1
+      name: "Cache Hex"
+      with:
+        path: ~/.hex
+        key: ${{ runner.os }}-hex-${{ hashFiles('.tool-versions') }}
+    - uses: actions/cache@v1
+      name: "Cache Dependencies"
+      with:
+        path: deps
+        key: ${{ runner.os }}-deps-lock-${{ hashFiles('.tool-versions') }}-${{ hashFiles('mix.lock') }}
+    - name: Setup
       run: |
         mix local.rebar --force
-        mix local.hex --if-missing --force
+        mix local.hex --force --if-missing
+        mix deps.get --only dev
+    - name: Mix Format
+      run: mix format --check-formatted
+    - name: Credo
+      run: mix credo --strict
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        elixir_version:
+          # I can't seem to get local.rebar to run with Erlang 19 re: SSL
+          - 1.4.5-erlang-20.3.8-alpine-3.11.3
+          - 1.5.3-erlang-20.3.8-alpine-3.11.3
+          - 1.6.6-erlang-20.3.8-alpine-3.11.3
+          - 1.6.6-erlang-21.3.8-alpine-3.11.3
+          - 1.7.4-erlang-20.3.8-alpine-3.11.3
+          - 1.7.4-erlang-21.3.8-alpine-3.11.3
+          - 1.8.2-erlang-20.3.8-alpine-3.11.3
+          - 1.8.2-erlang-21.3.8-alpine-3.11.3
+          - 1.8.2-erlang-22.2.7-alpine-3.11.3
+          - 1.9.4-erlang-20.3.8-alpine-3.11.3
+          - 1.9.4-erlang-21.3.8-alpine-3.11.3
+          - 1.9.4-erlang-22.2.7-alpine-3.11.3
+          - 1.10.1-erlang-21.3.8-alpine-3.11.3
+          - 1.10.1-erlang-22.2.7-alpine-3.11.3
+    env:
+      MIX_ENV: test
+      CI: "true"
+    container:
+      image: hexpm/elixir:${{ matrix.elixir_version }}
+    steps:
+    - name: "Alpine setup"
+      run: |
+        apk update
+        apk upgrade
+        apk add --no-cache make bash zlib openssl openssh git g++ wget curl ca-certificates
+    - uses: actions/checkout@v1
+    - uses: actions/cache@v1
+      name: "Cache Dependencies"
+      with:
+        path: deps
+        key: ${{ runner.os }}-deps-${{ matrix.elixir_version }}
+    - uses: actions/cache@v1
+      name: "Cache Dialyzer PLTs"
+      with:
+        path: priv/plts
+        key: ${{ runner.os }}-plt-${{ matrix.elixir_version }}
+    - name: Install Hex & Rebar
+      run: |
+        mix local.rebar --force
+        mix local.hex --force
+    - name: Install Dependencies
+      run: |
+        rm mix.lock
         mix deps.get
     - name: Compile
       run: mix compile --force --warnings-as-errors
-    - name: Run Tests
+    - name: Test
       run: mix test
-    - name: Check Formatting
-      run: mix format --check-formatted
-    - name: Check Style
-      run: mix credo --strict
-    - name: Check Types
-      run: mix dialyzer
+    - name: Typespecs
+      run: mix typespecs
