@@ -13,7 +13,7 @@ jobs:
     name: "Check Style"
     runs-on: ubuntu-latest
     container:
-      image: hexpm/elixir:1.10.1-erlang-22.2.7-alpine-3.11.3
+      image: hexpm/elixir:1.10.3-erlang-23.0.2-alpine-3.11.6
     steps:
     - name: "Alpine setup"
       run: |
@@ -63,8 +63,9 @@ jobs:
           - 1.9.4-erlang-20.3.8-alpine-3.11.3
           - 1.9.4-erlang-21.3.8-alpine-3.11.3
           - 1.9.4-erlang-22.2.7-alpine-3.11.3
-          - 1.10.1-erlang-21.3.8-alpine-3.11.3
-          - 1.10.1-erlang-22.2.7-alpine-3.11.3
+          - 1.10.3-erlang-21.3.8-alpine-3.11.3
+          - 1.10.3-erlang-22.3.4.1-alpine-3.11.6
+          - 1.10.3-erlang-23.0.2-alpine-3.11.6
     env:
       MIX_ENV: test
       CI: "true"
