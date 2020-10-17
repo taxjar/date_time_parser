@@ -46,7 +46,9 @@ defmodule DateTimeParser do
     This is the default in this order:
   #{for parser <- DateTimeParser.Parser.default_parsers(), do: "  1. `#{inspect(parser)}`\n"}
   """
-  @type parse_datetime_options :: [assume_utc() | to_utc() | assume_time() | use_1904_date_system() | parsers()]
+  @type parse_datetime_options :: [
+          assume_utc() | to_utc() | assume_time() | use_1904_date_system() | parsers()
+        ]
 
   @typedoc """
   Options for `parse_date/2`
