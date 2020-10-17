@@ -248,7 +248,10 @@ defmodule DateTimeParserTest do
 
   describe "parse/1 - serial options" do
     test_parsing("62", ~N[1900-03-02T00:00:00], assume_time: true)
+    test_parsing("62", ~N[1904-03-03T00:00:00], assume_time: true, use_1904_date_system: true)
     test_parsing("62.0", ~N[1900-03-02T00:00:00])
+    test_parsing("62.0", ~N[1904-03-03T00:00:00], use_1904_date_system: true)
+    test_datetime_parsing("62.0", ~N[1904-03-03T00:00:00], use_1904_date_system: true)
   end
 
   describe "parse_datetime/1 - epoch" do

@@ -8,6 +8,7 @@ defmodule DateTimeParser do
   @type assume_date :: {:assume_date, boolean() | Date.t()}
   @type assume_time :: {:assume_time, boolean() | Time.t()}
   @type assume_utc :: {:assume_utc, boolean()}
+  @type use_1904_date_system :: {:use_1904_date_system, boolean()}
   @type to_utc :: {:to_utc, boolean()}
 
   @typedoc "List of modules that implement the `DateTimeParser.Parser` behaviour."
@@ -34,6 +35,10 @@ defmodule DateTimeParser do
   `~T[00:00:00]` will be assumed. You can also supply your own time, and the found tokens will be
   merged with it.
 
+  * `:use_1904_date_system` Default `false`.
+  For Serial timestamps, the parser will use the 1900 Date System by default. If you supply `true`, then
+  the 1904 Date System will be used to parse the timestamp.
+
   * `:parsers` The parsers to use when analyzing the string. When `Parser.Tokenizer`, the appropriate tokenizer
   will be used depending on the function used and conditions found in the string. **Order matters**
   and determines the order in which parsers are attempted. These are the available built-in parsers:
@@ -41,7 +46,7 @@ defmodule DateTimeParser do
     This is the default in this order:
   #{for parser <- DateTimeParser.Parser.default_parsers(), do: "  1. `#{inspect(parser)}`\n"}
   """
-  @type parse_datetime_options :: [assume_utc() | to_utc() | assume_time() | parsers()]
+  @type parse_datetime_options :: [assume_utc() | to_utc() | assume_time() | use_1904_date_system() | parsers()]
 
   @typedoc """
   Options for `parse_date/2`
