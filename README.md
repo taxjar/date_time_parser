@@ -140,7 +140,7 @@ Add `date_time_parser` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:date_time_parser, "~> 1.0.0"}
+    {:date_time_parser, "~> 1.1.0"}
   ]
 end
 ```
