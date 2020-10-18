@@ -40,7 +40,8 @@ defmodule DateTimeParser.Parser.Serial do
   end
 
   defp from_tokens(%{context: context, opts: opts}, serial) do
-    with {:ok, date_or_datetime} <- from_serial(serial) do
+    with serial <- set_date_system(serial, opts),
+         {:ok, date_or_datetime} <- from_serial(serial) do
       for_context(context, date_or_datetime, opts[:assume_time])
     end
   end
@@ -112,4 +113,8 @@ defmodule DateTimeParser.Parser.Serial do
 
   defp adjust_for_lotus_bug(day) when day > 59, do: day - 1
   defp adjust_for_lotus_bug(day), do: day
+
+  defp set_date_system(serial, opts) do
+    if Keyword.get(opts, :use_1904_date_system, false), do: serial + 1462, else: serial
+  end
 end
