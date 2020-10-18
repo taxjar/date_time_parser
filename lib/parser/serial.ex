@@ -11,6 +11,10 @@ defmodule DateTimeParser.Parser.Serial do
   treating 1900 as a leap year. This bug has been promoted into a requirement in the Ecma Office
   Open XML (OOXML) specification.
 
+  Microsoft Excel on Macintosh defaults to using the 1904 date system. By default, this parser will
+  assume the 1900. If you want to opt-into the 1904 date system, see the `t:use_1904_date_system`
+  option.
+
   See more at https://en.wikipedia.org/wiki/Leap_year_bug
   """
   @behaviour DateTimeParser.Parser
