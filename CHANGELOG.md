@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.0
+
+- Add option `use_1904_date_system` for the serial parser. It defaults to
+    `false`. Most spreadsheet applications use the 1900 date system, but
+    Microsoft Excel on Macintosh in particular used the 1904 date system
+    [@fcapovilla].
+
 ## 1.0.0
 
 ### Breaking
