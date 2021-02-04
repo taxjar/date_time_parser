@@ -227,8 +227,8 @@ defmodule DateTimeParser.Combinators.Date do
       year_month_day(),
       day_month_year(),
       month_day_year(),
-      day_month(),
-      month_day()
+      month_day(),
+      day_month()
     ])
   end
 
@@ -239,8 +239,8 @@ defmodule DateTimeParser.Combinators.Date do
       month_day_year(),
       day_month_year(),
       year_month_day(),
-      day_month(),
-      month_day()
+      month_day(),
+      day_month()
     ])
   end
 end
