@@ -356,6 +356,9 @@ defmodule DateTimeParserTest do
     test_date_parsing("5/2/2019 0:00:00", ~D[2019-05-02])
     test_date_parsing("5/31/2019 12:00:00 AM", ~D[2019-05-31])
     test_date_parsing("5/2/2019 12:00:00 AM", ~D[2019-05-02])
+    test_date_parsing("2/5", ~D[2021-02-05], assume_date: ~D[2021-01-01])
+    test_date_parsing("12/5", ~D[2021-12-05], assume_date: ~D[2021-01-01])
+    test_date_parsing("13/5", ~D[2021-05-13], assume_date: ~D[2021-01-01])
   end
 
   describe "parse_datetime/1 - DMY" do
