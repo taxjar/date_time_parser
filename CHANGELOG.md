@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.1
+
+- Adjust tokenizer to prefer month/day before of day/month when those are the
+    only found tokens. Thanks @mwean raising the issue.
+
 ## 1.1.0
 
 - Add option `use_1904_date_system` for the serial parser. It defaults to
