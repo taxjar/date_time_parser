@@ -248,8 +248,25 @@ DateTimeParser.parse("boomshakalaka:11:11", parsers: [MyParser])
 
 ```
 
-<!-- MDOC -->
+## Should I use this library?
 
+Only as a last resort. Parsing dates from strings is educated guessing at best.
+Since Elixir natively supports [ISO-8601] parsing (see `from_iso8601/2`
+functions), it's highly recommended that you rely on that first and foremost.
+
+When designing your API that involves dates and strings, be specific with your
+requirements and supported DateTime strings, and preferably only support
+[ISO-8601] with no exceptions. There is _no_ ambiguity with this format so
+parsing to DateTime (or Date or Time) will always be correct.
+
+This library is helpful when you _must_ accept ambiguous DateTime string formats
+and having incorrect results is acceptable. Do not use this library when the
+resulting (and possibly incorrect) DateTime has catastrophic and dangerous
+effects in your system.
+
+[ISO-8601]: https://en.wikipedia.org/wiki/ISO_8601
+
+<!-- MDOC -->
 
 ## How to store future timestamps
 
