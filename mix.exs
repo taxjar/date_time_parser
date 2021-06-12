@@ -63,7 +63,7 @@ defmodule DateTimeParser.MixProject do
     [{:exprof, "~> 0.2.0", only: :bench}]
     |> add_if({:nimble_parsec, "~> 0.5.0", runtime: false}, "< 1.6.0")
     |> add_if({:nimble_parsec, "~> 1.0", runtime: false}, ">= 1.6.0")
-    |> add_if({:timex, ">= 3.2.1"}, ">= 1.6.0")
+    |> add_if({:timex, ">= 3.2.1 and <= 3.7.2"}, ">= 1.6.0")
     |> add_if({:timex, "< 3.2.1"}, "< 1.6.0")
     |> add_if({:gettext, "<= 0.16.1"}, "< 1.6.0")
     |> add_if({:benchee, "~> 1.0", only: [:bench], runtime: false}, ">= 1.6.0")
