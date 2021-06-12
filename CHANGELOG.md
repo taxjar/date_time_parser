@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.2
+
+- Correct handling of 12:xx:xx AM timestamps (12hr). These were incorrectly
+    parsed as 12:xx:xx (24hr) timestamps when they should have been 00:xx:xx
+    (24hr) timestamps.
+
 ## 1.1.1
 
 - Adjust tokenizer to prefer month/day before of day/month when those are the
