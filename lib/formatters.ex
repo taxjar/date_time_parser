@@ -2,13 +2,18 @@ defmodule DateTimeParser.Formatters do
   @moduledoc false
 
   def format_token(tokens, :hour) do
-    case tokens |> find_token(:hour) do
-      {:hour, hour} ->
-        if tokens |> find_token(:am_pm) |> format == "PM" && hour < 12 do
-          hour + 12
-        else
-          hour
-        end
+    case {find_token(tokens, :hour), tokens |> find_token(:am_pm) |> format()} do
+      {{:hour, 0}, _} ->
+        0
+
+      {{:hour, 12}, "AM"} ->
+        0
+
+      {{:hour, hour}, "PM"} when hour < 12 ->
+        hour + 12
+
+      {{:hour, hour}, _} ->
+        hour
 
       _ ->
         nil

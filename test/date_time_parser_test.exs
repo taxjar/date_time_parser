@@ -162,7 +162,7 @@ defmodule DateTimeParserTest do
     test_parsing("1/10/2018  8:38pM", "2018-01-10T20:38:00")
     test_parsing("1/17/2018 0:00:00", "2018-01-17T00:00:00")
     test_parsing("1/2/2018 18:06:26", "2018-01-02T18:06:26")
-    test_parsing("1/3/2019 12:00:00 AM", "2019-01-03T12:00:00")
+    test_parsing("1/3/2019 12:00:00 AM", "2019-01-03T00:00:00")
     test_parsing("1/31/2018 0:00:00 UTC", "2018-01-31T00:00:00Z")
     test_parsing("5/12/2019 12:21:58 PM", "2019-05-12T12:21:58")
     test_parsing("2011-01-01 04:19:20 -0:00", "2011-01-01T04:19:20Z")
@@ -204,7 +204,7 @@ defmodule DateTimeParserTest do
     test_parsing("9/20/2017 18:57:24 UTC", "2017-09-20T18:57:24Z")
     test_parsing(~s|"=\""10/1/2018\"""|, "2018-10-01")
     test_parsing(~s|"=\""9/5/2018\"""|, "2018-09-05")
-    test_parsing(~s|"Apr 1, 2016 12:02:53 AM PDT"|, "2016-04-01T19:02:53Z", to_utc: true)
+    test_parsing(~s|"Apr 1, 2016 12:02:53 AM PDT"|, "2016-04-01T07:02:53Z", to_utc: true)
     test_parsing(~s|"Apr 1, 2017 2:21:25 AM PDT"|, "2017-04-01T09:21:25Z", to_utc: true)
     test_parsing(~s|"Dec 1, 2018 7:39:53 AM PST"|, "2018-12-01T15:39:53Z", to_utc: true)
     test_parsing("Fri Mar  2 09:01:57 2018", "2018-03-02T09:01:57")
@@ -337,8 +337,8 @@ defmodule DateTimeParserTest do
     test_datetime_parsing("1/15/2019 3:06", ~N[2019-01-15 03:06:00])
     test_datetime_parsing("4/24/2019 0:00:00", ~N[2019-04-24 00:00:00])
     test_datetime_parsing("5/2/2019 0:00:00", ~N[2019-05-02 00:00:00])
-    test_datetime_parsing("5/31/2019 12:00:00 AM", ~N[2019-05-31 12:00:00])
-    test_datetime_parsing("5/2/2019 12:00:00 AM", ~N[2019-05-02 12:00:00])
+    test_datetime_parsing("5/31/2019 12:00:00 AM", ~N[2019-05-31 00:00:00])
+    test_datetime_parsing("5/2/2019 12:00:00 AM", ~N[2019-05-02 00:00:00])
   end
 
   describe "parse_date/1 - MDY" do
@@ -374,6 +374,13 @@ defmodule DateTimeParserTest do
   end
 
   describe "parse_datetime/1 - YMD" do
+    test_datetime_parsing("2021-03-27 12:00 am", ~N[2021-03-27 00:00:00])
+    test_datetime_parsing("2021-03-27 12:00 pm", ~N[2021-03-27 12:00:00])
+
+    # The AM/PM here is essentially ignored.
+    test_datetime_parsing("2021-03-27 00:00 am", ~N[2021-03-27 00:00:00])
+    test_datetime_parsing("2021-03-27 00:00 pm", ~N[2021-03-27 00:00:00])
+
     test_datetime_parsing("2019-05-16+04:00", ~N[2019-05-16 04:00:00], assume_time: true)
     test_datetime_parsing("34-1-13", ~N[2034-01-13 00:00:00], assume_time: true)
     test_datetime_parsing("2034-1-9", ~N[2034-01-09 00:00:00], assume_time: true)
