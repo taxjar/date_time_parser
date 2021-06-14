@@ -6,6 +6,9 @@
     parsed as 12:xx:xx (24hr) timestamps when they should have been 00:xx:xx
     (24hr) timestamps.
 
+- Lock Timex to >= 3.2.1 and <= 3.7.2 to avoid timezone conversion issues when
+  using `to_utc: true`. Looks like there are some breaking changes (for us)
+
 ## 1.1.1
 
 - Adjust tokenizer to prefer month/day before of day/month when those are the
