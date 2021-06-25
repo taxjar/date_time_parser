@@ -302,4 +302,4 @@ the timezone conversion rules.
 
 ## Special Thanks
 
-[<img src="https://www.taxjar.com/img/lander/logo.svg" height=75 />](https://www.taxjar.com)
+[<img src="https://github.com/taxjar/date_time_parser/blob/master/images/taxjar_sponsor.jpg?raw=true" alt="TaxJar" height=75 />](https://www.taxjar.com)
