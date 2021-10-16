@@ -665,12 +665,23 @@ defmodule DateTimeParserTest do
       assert DateTimeParser.parse_datetime("2017-24-32 16:09:53 UTC") ==
                {:error, ~s|Could not parse "2017-24-32 16:09:53 UTC"|}
 
-      assert DateTimeParser.parse_datetime("2017-01-01 25:00 am") == {:error, ~s|Could not parse "2017-01-01 25:00 am"|}
-      assert DateTimeParser.parse_datetime("2017-01-01 41:00 am") == {:error, ~s|Could not parse "2017-01-01 41:00 am"|}
-      assert DateTimeParser.parse_datetime("2017-01-01 9000:00 am") == {:error, ~s|Could not parse "2017-01-01 9000:00 am"|}
-      assert DateTimeParser.parse_datetime("2017-01-01 24:00:00") == {:error, ~s|Could not parse "2017-01-01 24:00:00"|}
-      assert DateTimeParser.parse_datetime("2017-01-01 99:00:00") == {:error, ~s|Could not parse "2017-01-01 99:00:00"|}
-      assert DateTimeParser.parse_datetime("2017-01-01 00:99:00") == {:error, ~s|Could not parse "2017-01-01 00:99:00"|}
+      assert DateTimeParser.parse_datetime("2017-01-01 25:00 am") ==
+               {:error, ~s|Could not parse "2017-01-01 25:00 am"|}
+
+      assert DateTimeParser.parse_datetime("2017-01-01 41:00 am") ==
+               {:error, ~s|Could not parse "2017-01-01 41:00 am"|}
+
+      assert DateTimeParser.parse_datetime("2017-01-01 9000:00 am") ==
+               {:error, ~s|Could not parse "2017-01-01 9000:00 am"|}
+
+      assert DateTimeParser.parse_datetime("2017-01-01 24:00:00") ==
+               {:error, ~s|Could not parse "2017-01-01 24:00:00"|}
+
+      assert DateTimeParser.parse_datetime("2017-01-01 99:00:00") ==
+               {:error, ~s|Could not parse "2017-01-01 99:00:00"|}
+
+      assert DateTimeParser.parse_datetime("2017-01-01 00:99:00") ==
+               {:error, ~s|Could not parse "2017-01-01 00:99:00"|}
 
       assert DateTimeParser.parse_datetime(nil) == {:error, "Could not parse nil"}
       assert DateTimeParser.parse_date(nil) == {:error, "Could not parse nil"}
