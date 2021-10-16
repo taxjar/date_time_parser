@@ -53,13 +53,13 @@ defmodule DateTimeParser.Combinators.Time do
 
   def hour_minute do
     hour()
-    |> concat(time_separator() |> optional() |> ignore())
+    |> concat(time_separator() |> ignore())
     |> concat(minute())
   end
 
   def hour_minute_second do
     hour_minute()
-    |> concat(time_separator() |> optional() |> ignore())
+    |> concat(time_separator() |> ignore())
     |> concat(second())
   end
 
