@@ -683,6 +683,9 @@ defmodule DateTimeParserTest do
       assert DateTimeParser.parse_datetime("2017-01-01 00:99:00") ==
                {:error, ~s|Could not parse "2017-01-01 00:99:00"|}
 
+      assert DateTimeParser.parse_datetime("2017-01-01 00:00:99") ==
+               {:error, ~s|Could not parse "2017-01-01 00:00:99"|}
+
       assert DateTimeParser.parse_datetime(nil) == {:error, "Could not parse nil"}
       assert DateTimeParser.parse_date(nil) == {:error, "Could not parse nil"}
       assert DateTimeParser.parse_time(nil) == {:error, "Could not parse nil"}
@@ -695,9 +698,6 @@ defmodule DateTimeParserTest do
       assert DateTimeParser.parse_datetime({:ok, "foo"}) ==
                {:error, ~s|Could not parse {:ok, "foo"}|}
     end
-
-    # In this edge-case, invalid seconds are ignored because we can detect the hours and minutes without seconds
-    test_datetime_parsing("2017-01-01 00:00:99", ~N[2017-01-01 00:00:00])
 
     test_error("01-Jul", ~s|Could not parse "01-Jul"|)
     test_datetime_error("01-Jul")
