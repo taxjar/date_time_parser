@@ -75,7 +75,7 @@ defmodule DateTimeParser.Combinators.Time do
   def time do
     choice([
       hour_minute_second(),
-      hour_minute()
+      hour_minute() |> lookahead_not(time_separator())
     ])
     |> concat(space_separator() |> optional() |> ignore())
     |> concat(am_pm() |> optional())
