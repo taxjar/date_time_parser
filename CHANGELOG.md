@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.3
+
+- Stricter handling of time parsing. Require time separators. For example, `949`
+  used to be parsed as `09:15:00` but now is not valid. This is to help decrease
+  false parsing of nonsensical times such as `25:00 am` (incorrectly parsed as
+  `02:05:00`. Thanks @fcapovilla (PR #46)
+
 ## 1.1.2
 
 - Correct handling of 12:xx:xx AM timestamps (12hr). These were incorrectly

@@ -195,8 +195,6 @@ defmodule DateTimeParserTest do
     test_parsing("2017-12-01 03:52", "2017-12-01T03:52:00")
     test_parsing("2017/08/08", "2017-08-08")
     test_parsing("2019/01/31 0:01", "2019-01-31T00:01:00")
-    # Ruby gets the time wrong
-    test_parsing("20190118 949 CST", "2019-01-18T15:49:00Z", to_utc: true)
     test_parsing("29/Aug./2018", "2018-08-29")
     test_parsing("29/Sep./2018", "2018-09-29")
     test_parsing("9/10/2018 11:08:13 AM", "2018-09-10T11:08:13")
