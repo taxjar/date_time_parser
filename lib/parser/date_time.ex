@@ -4,40 +4,15 @@ defmodule DateTimeParser.Parser.DateTime do
   for representing dates.
   """
   @behaviour DateTimeParser.Parser
-
-  import NimbleParsec
-  import DateTimeParser.Combinators.Date
-  import DateTimeParser.Combinators.DateTime
+  alias DateTimeParser.Combinators
   import DateTimeParser.Formatters, only: [format_token: 2, clean: 1]
-
-  defparsecp(
-    :do_parse,
-    vocal_day()
-    |> optional()
-    |> choice([
-      vocal_month_day_time_year(),
-      formal_date_time(),
-      formal_date()
-    ])
-  )
-
-  defparsecp(
-    :do_parse_us,
-    vocal_day()
-    |> optional()
-    |> choice([
-      vocal_month_day_time_year(),
-      us_date_time(),
-      us_date()
-    ])
-  )
 
   @impl DateTimeParser.Parser
   def preflight(parser), do: {:ok, parser}
 
   @impl DateTimeParser.Parser
   def parse(%{string: string} = parser) do
-    case do_parse(string) do
+    case Combinators.parse_datetime(string) do
       {:ok, tokens, _, _, _, _} -> from_tokens(parser, tokens)
       _ -> {:error, :failed_to_parse}
     end
@@ -59,9 +34,8 @@ defmodule DateTimeParser.Parser.DateTime do
     with true <- DateTimeParser.Parser.Date.parsed_date?(parsed_values),
          {:ok, ndt} <- to_naive_date_time(opts, parsed_values),
          {:ok, ndt} <- validate_day(ndt),
-         {:ok, dt} <- to_datetime(ndt, tokens),
-         {:ok, dt} <- maybe_convert_to_utc(dt, opts) do
-      {:ok, dt}
+         {:ok, dt} <- to_datetime(ndt, tokens) do
+      maybe_convert_to_utc(dt, opts)
     end
   end
 

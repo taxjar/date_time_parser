@@ -1,10 +1,12 @@
 defmodule DateTimeParserTest.Recorder do
   @moduledoc "Record results from tests into a Markdown file"
+  @external_resource "test/fixture/playground_header.md"
+  @examples_header File.read!(@external_resource)
 
   if Version.match?(System.version(), ">= 1.5.0") do
     use Agent
     @name {:global, :recorder}
-    @example_file "EXAMPLES.md"
+    @example_file "EXAMPLES.livemd"
 
     def start_link(initial_value \\ []) do
       Agent.start_link(fn -> initial_value end, name: @name)
@@ -30,23 +32,13 @@ defmodule DateTimeParserTest.Recorder do
     end
 
     defp write_headers do
-      File.write(
-        @example_file,
-        """
-        # Examples
-
-        |**Input**|**Output (ISO 8601)**|**Method**|**Options**|
-        |:-------:|:-------------------:|:--------:|:---------:|
-        """
-      )
+      File.write(@example_file, @examples_header)
     end
 
     defp write_result({input, output, method, opts}) do
       File.write(
         @example_file,
-        "|`#{input}`|`#{DateTimeParserTestMacros.to_iso(output)}`|#{method}|#{
-          format_options(opts)
-        }|\n",
+        "|`#{input}`|`#{DateTimeParserTestMacros.to_iso(output)}`|#{method}|#{format_options(opts)}|\n",
         [:append]
       )
     end

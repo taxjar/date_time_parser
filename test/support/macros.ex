@@ -98,9 +98,7 @@ defmodule DateTimeParserTestMacros do
         if unquote(opts) == [] do
           "does not parse timestamp #{unquote(string_timestamp)}"
         else
-          "does not parse timestamp #{unquote(string_timestamp)} with opts #{
-            inspect(unquote(opts))
-          }"
+          "does not parse timestamp #{unquote(string_timestamp)} with opts #{inspect(unquote(opts))}"
         end
 
       test test_name do
@@ -121,9 +119,7 @@ defmodule DateTimeParserTestMacros do
         if unquote(opts) == [] do
           "does not parse datetime #{unquote(string_timestamp)}"
         else
-          "does not parse datetime #{unquote(string_timestamp)} with opts #{
-            inspect(unquote(opts))
-          }"
+          "does not parse datetime #{unquote(string_timestamp)} with opts #{inspect(unquote(opts))}"
         end
 
       test test_name do

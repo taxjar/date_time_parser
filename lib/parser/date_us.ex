@@ -3,23 +3,14 @@ defmodule DateTimeParser.Parser.DateUS do
   Tokenizes the string for date formats. This prioritizes the US format for representing dates.
   """
   @behaviour DateTimeParser.Parser
-
-  import NimbleParsec
-  import DateTimeParser.Combinators.Date
-
-  defparsecp(
-    :do_parse,
-    vocal_day()
-    |> optional()
-    |> concat(us_date())
-  )
+  alias DateTimeParser.Combinators
 
   @impl DateTimeParser.Parser
   def preflight(parser), do: {:ok, parser}
 
   @impl DateTimeParser.Parser
   def parse(%{string: string} = parser) do
-    case do_parse(string) do
+    case Combinators.parse_date_us(string) do
       {:ok, tokens, _, _, _, _} ->
         DateTimeParser.Parser.Date.from_tokens(parser, tokens)
 

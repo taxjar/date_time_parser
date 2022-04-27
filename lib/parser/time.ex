@@ -13,18 +13,15 @@ defmodule DateTimeParser.Parser.Time do
   @behaviour DateTimeParser.Parser
   @time_regex ~r|(?<time>\d{1,2}:\d{2}(?::\d{2})?(?:.*)?)|
 
-  import NimbleParsec
-  import DateTimeParser.Combinators.Time
+  alias DateTimeParser.Combinators
   import DateTimeParser.Formatters, only: [format_token: 2]
-
-  defparsecp(:do_parse, time())
 
   @impl DateTimeParser.Parser
   def preflight(parser), do: {:ok, parser}
 
   @impl DateTimeParser.Parser
   def parse(%{string: string} = parser) do
-    case string |> extract_time() |> do_parse() do
+    case string |> extract_time() |> Combinators.parse_time() do
       {:ok, tokens, _, _, _, _} -> from_tokens(parser, tokens)
       _ -> {:error, :failed_to_parse}
     end

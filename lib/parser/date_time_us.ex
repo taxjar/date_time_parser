@@ -5,27 +5,14 @@ defmodule DateTimeParser.Parser.DateTimeUS do
   """
   @behaviour DateTimeParser.Parser
 
-  import NimbleParsec
-  import DateTimeParser.Combinators.Date
-  import DateTimeParser.Combinators.DateTime
-
-  defparsecp(
-    :do_parse,
-    vocal_day()
-    |> optional()
-    |> choice([
-      vocal_month_day_time_year(),
-      us_date_time(),
-      us_date()
-    ])
-  )
+  alias DateTimeParser.Combinators
 
   @impl DateTimeParser.Parser
   def preflight(parser), do: {:ok, parser}
 
   @impl DateTimeParser.Parser
   def parse(%{string: string} = parser) do
-    case do_parse(string) do
+    case Combinators.parse_datetime_us(string) do
       {:ok, tokens, _, _, _, _} ->
         DateTimeParser.Parser.DateTime.from_tokens(parser, tokens)
 

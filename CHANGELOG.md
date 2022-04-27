@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.4
+
+- Switch to pre-compiled combinators so that NimbleParsec is not needed during
+  compilation-- why have everyone else compile this when we can compile it
+  before publishing?
+- Update examples to be a Livebook
+
 ## 1.1.3
 
 - Stricter time parsing by requiring time separators. For example, `949` used to
