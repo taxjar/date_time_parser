@@ -25,7 +25,7 @@ defmodule DateTimeParser.MixProject do
       ],
       deps: deps(),
       description:
-        "Parse a string into `%DateTime{}`, `%NaiveDateTime{}`, `%Time{}`, or `%Date{}`"
+        "Parse a string into DateTime, NaiveDateTime, Time, or Date struct."
     ]
   end
 
