@@ -189,6 +189,7 @@ UTC or to assume a time when not present.
 |`11 July 2017 1:43:46 PM`|`2017-07-11`|parse_date| |
 |`11 July 2017 1:43:46 PM`|`2017-07-11T13:43:46`|parse_datetime| |
 |`12/5`|`2021-12-05`|parse_date|`[assume_date: ~D[2021-01-01]]`|
+|`12:30PM`|`2020-01-01T12:30:00`|parse|`[assume_date: ~D[2020-01-01]]`|
 |`13/5`|`2021-05-13`|parse_date|`[assume_date: ~D[2021-01-01]]`|
 |`18-07-2018 20:38:34 +00:00`|`2018-07-18T20:38:34Z`|parse| |
 |`18-12-29`|`2018-12-29`|parse| |

@@ -85,6 +85,8 @@ defmodule DateTimeParser do
   def parse(string, opts \\ [])
 
   def parse(string, opts) when is_binary(string) do
+    opts = Keyword.put(opts, :context, :best)
+
     with {:error, _} <- parse_datetime(string, opts),
          {:error, _} <- parse_date(string, opts) do
       parse_time(string, opts)

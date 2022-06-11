@@ -66,6 +66,12 @@ defmodule DateTimeParser.Parser.Date do
     Enum.all?([parsed_values[:year], parsed_values[:month], parsed_values[:day]])
   end
 
+  defp for_context(:best, result, assume_date) do
+    for_context(:date, result, assume_date) ||
+      for_context(:time, result, assume_date) ||
+      for_context(:datetime, result, assume_date)
+  end
+
   defp for_context(:date, parsed_values, false) do
     if parsed_date?(parsed_values) do
       Date.new(parsed_values[:year], parsed_values[:month], parsed_values[:day])

@@ -574,6 +574,7 @@ defmodule DateTimeParserTest do
     test_time_parsing("07:09.3", ~T[07:09:00])
     test_time_parsing("08:53.0", ~T[08:53:00])
     test_time_parsing("10:13.7", ~T[10:13:00])
+    test_parsing("12:30PM", ~N[2020-01-01 12:30:00], assume_date: ~D[2020-01-01])
   end
 
   describe "parse_time/1 - epoch" do

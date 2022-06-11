@@ -16,7 +16,7 @@ defmodule DateTimeParser.Parser do
 
   defstruct [:string, :mod, :preflight, :context, opts: []]
 
-  @type context :: :datetime | :date | :time
+  @type context :: :datetime | :date | :time | :best
   @type t :: %__MODULE__{
           string: String.t(),
           mod: module(),
@@ -65,8 +65,12 @@ defmodule DateTimeParser.Parser do
     |> Enum.map(&to_parser_mod/1)
     |> Enum.find_value({:error, :no_parser}, fn parser_mod ->
       case parser_mod.preflight(parser) do
-        {:ok, parser} -> {:ok, put_new_mod(%{parser | opts: opts}, parser_mod)}
-        {:error, _} -> false
+        {:ok, parser} ->
+          {:ok,
+           put_new_mod(%{parser | context: opts[:context] || context, opts: opts}, parser_mod)}
+
+        {:error, _} ->
+          false
       end
     end)
   end

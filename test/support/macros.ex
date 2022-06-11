@@ -19,17 +19,31 @@ defmodule DateTimeParserTestMacros do
         end
 
       test test_name do
-        assert {:ok, result} = DateTimeParser.parse(unquote(string_timestamp), unquote(opts))
+        case DateTimeParser.parse(unquote(string_timestamp), unquote(opts)) do
+          {:ok, result} ->
+            case unquote(expected_result) do
+              %{} = expected ->
+                assert result == expected
 
-        case unquote(expected_result) do
-          %{} = expected ->
-            assert result == expected
+              expected when is_binary(expected) ->
+                assert to_iso(result) == expected
+            end
 
-          expected when is_binary(expected) ->
-            assert to_iso(result) == expected
+            Recorder.add(
+              unquote(string_timestamp),
+              unquote(expected_result),
+              "parse",
+              unquote(opts)
+            )
+
+          error ->
+            flunk("""
+            #{unquote(string_timestamp)} should parse to #{unquote(expected_result)}
+
+            Got this instead:
+              #{inspect(error)}
+            """)
         end
-
-        Recorder.add(unquote(string_timestamp), unquote(expected_result), "parse", unquote(opts))
       end
     end
   end

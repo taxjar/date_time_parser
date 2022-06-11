@@ -96,9 +96,15 @@ defmodule DateTimeParser.Parser.Epoch do
     end
   end
 
+  defp for_context(:best, result) do
+    for_context(:datetime, result) ||
+      for_context(:date, result) ||
+      for_context(:time, result)
+  end
+
   defp for_context(:datetime, datetime), do: {:ok, datetime}
-  defp for_context(:time, datetime), do: {:ok, DateTime.to_time(datetime)}
   defp for_context(:date, datetime), do: {:ok, DateTime.to_date(datetime)}
+  defp for_context(:time, datetime), do: {:ok, DateTime.to_time(datetime)}
 
   defp for_context(context, result) do
     {:error, "cannot convert #{inspect(result)} to context #{context}"}

@@ -50,6 +50,13 @@ defmodule DateTimeParser.Parser.Serial do
     end
   end
 
+  defp for_context(:best, result, assume_time) do
+    for_context(:datetime, result, assume_time) ||
+      for_context(:date, result, assume_time) ||
+      for_context(:time, result, assume_time) ||
+      for_context(nil, result, assume_time)
+  end
+
   defp for_context(:datetime, %NaiveDateTime{} = ndt, _), do: {:ok, ndt}
   defp for_context(:datetime, %Date{} = date, true), do: assume_time(date, ~T[00:00:00])
   defp for_context(:datetime, %Date{} = date, %Time{} = time), do: assume_time(date, time)
