@@ -67,17 +67,14 @@ defmodule DateTimeParser.Parser.Date do
   end
 
   defp for_context(:best, result, assume_date) do
-    for_context(:date, result, assume_date) ||
-      for_context(:time, result, assume_date) ||
-      for_context(:datetime, result, assume_date)
-  end
-
-  defp for_context(:date, parsed_values, false) do
-    if parsed_date?(parsed_values) do
-      Date.new(parsed_values[:year], parsed_values[:month], parsed_values[:day])
-    else
-      {:error, :cannot_assume_date}
-    end
+    DateTimeParser.Parser.first_ok(
+      [
+        fn -> for_context(:date, result, assume_date) end,
+        fn -> for_context(:time, result, assume_date) end,
+        fn -> for_context(:datetime, result, assume_date) end
+      ],
+      "Could not parse a date"
+    )
   end
 
   defp for_context(:date, parsed_values, true),
@@ -85,6 +82,14 @@ defmodule DateTimeParser.Parser.Date do
 
   defp for_context(:date, parsed_values, %Date{} = date),
     do: {:ok, Map.merge(date, parsed_values)}
+
+  defp for_context(:date, parsed_values, _) do
+    if parsed_date?(parsed_values) do
+      Date.new(parsed_values[:year], parsed_values[:month], parsed_values[:day])
+    else
+      {:error, :cannot_assume_date}
+    end
+  end
 
   defp for_context(:time, _parsed_values, _), do: {:error, "Could not parse a time out of a date"}
 

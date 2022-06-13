@@ -15,10 +15,12 @@ defmodule DateTimeParserTestMacros do
       {:ok, result} ->
         case expected do
           %{} = expected ->
-            assert result == expected
+            assert result == expected,
+                   "Expected #{inspect(expected)} but returned #{inspect(result)} instead"
 
           expected when is_binary(expected) ->
-            assert to_iso(result) == expected
+            assert to_iso(result) == expected,
+                   "Expected #{inspect(expected)} but returned #{inspect(result)} instead"
         end
 
         Recorder.add(
@@ -134,8 +136,8 @@ defmodule DateTimeParserTestMacros do
       when expected != message and not is_nil(expected) ->
         flunk("""
         #{timestamp} should not have parsed. Opts #{inspect(opts)}
-         
-        Expected error: 
+
+        Expected error:
           #{expected}
 
         Got this instead:
@@ -143,7 +145,10 @@ defmodule DateTimeParserTestMacros do
         """)
 
       {:error, message} ->
-        if expected, do: assert(message == expected)
+        if expected do
+          assert message == expected,
+                 "Expected error message #{inspect(expected)} but returned #{inspect(message)} instead"
+        end
 
         Recorder.add(
           timestamp,

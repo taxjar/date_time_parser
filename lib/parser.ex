@@ -94,4 +94,18 @@ defmodule DateTimeParser.Parser do
   end
 
   defp to_parser_mod(mod), do: mod
+
+  @doc false
+  def first_ok(funs, error_msg) do
+    Enum.find_value(
+      funs,
+      {:error, error_msg},
+      fn x ->
+        case x.() do
+          {:error, _} -> false
+          result -> result
+        end
+      end
+    )
+  end
 end

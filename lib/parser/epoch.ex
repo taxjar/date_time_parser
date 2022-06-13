@@ -97,9 +97,14 @@ defmodule DateTimeParser.Parser.Epoch do
   end
 
   defp for_context(:best, result) do
-    for_context(:datetime, result) ||
-      for_context(:date, result) ||
-      for_context(:time, result)
+    DateTimeParser.Parser.first_ok(
+      [
+        fn -> for_context(:datetime, result) end,
+        fn -> for_context(:date, result) end,
+        fn -> for_context(:time, result) end
+      ],
+      "cannot convert #{inspect(result)} to context :best"
+    )
   end
 
   defp for_context(:datetime, datetime), do: {:ok, datetime}

@@ -29,7 +29,8 @@ defmodule DateTimeParser.Parser.Serial do
   end
 
   @impl DateTimeParser.Parser
-  def parse(%{preflight: %{"time" => nil, "day" => day}} = parser) do
+  @empty ["", nil]
+  def parse(%{preflight: %{"time" => time, "days" => day}} = parser) when time in @empty do
     case Integer.parse(day) do
       {num, ""} -> from_tokens(parser, num)
       _ -> {:error, :failed_to_parse_integer}
@@ -51,10 +52,14 @@ defmodule DateTimeParser.Parser.Serial do
   end
 
   defp for_context(:best, result, assume_time) do
-    for_context(:datetime, result, assume_time) ||
-      for_context(:date, result, assume_time) ||
-      for_context(:time, result, assume_time) ||
-      for_context(nil, result, assume_time)
+    DateTimeParser.Parser.first_ok(
+      [
+        fn -> for_context(:datetime, result, assume_time) end,
+        fn -> for_context(:date, result, assume_time) end,
+        fn -> for_context(:time, result, assume_time) end
+      ],
+      "cannot convert #{inspect(result)} to context :best"
+    )
   end
 
   defp for_context(:datetime, %NaiveDateTime{} = ndt, _), do: {:ok, ndt}
