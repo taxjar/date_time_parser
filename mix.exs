@@ -25,8 +25,7 @@ defmodule DateTimeParser.MixProject do
         profile: :bench
       ],
       deps: deps(),
-      description:
-        "Parse a string into DateTime, NaiveDateTime, Time, or Date struct."
+      description: "Parse a string into DateTime, NaiveDateTime, Time, or Date struct."
     ]
   end
 
