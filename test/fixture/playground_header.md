@@ -10,7 +10,8 @@ Mix.install([:date_time_parser])
 
 ## Usage
 
-Use DateTimeParser to parse strings into DateTime, NaiveDateTime, Date, or Time structs. For example:
+Use DateTimeParser to parse strings into DateTime, NaiveDateTime, Date, or Time
+structs. For example:
 
 ```elixir
 [
@@ -23,7 +24,7 @@ Use DateTimeParser to parse strings into DateTime, NaiveDateTime, Date, or Time 
 ]
 ```
 
-or use the bang functions
+or use the bang functions:
 
 ```elixir
 [
@@ -36,7 +37,7 @@ or use the bang functions
 ]
 ```
 
-Errors sometimes occur though when it can't parse the string
+Errors sometimes occur when it can't parse the input:
 
 ```elixir
 [
@@ -48,8 +49,8 @@ Errors sometimes occur though when it can't parse the string
 
 ## Options
 
-You can configure some convenient options as well, for example to automatically convert to
-UTC or to assume a time when not present.
+You can configure some convenient options as well, for example to automatically
+convert to UTC or to assume a time when not present.
 
 ```elixir
 [
