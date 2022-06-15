@@ -63,8 +63,8 @@ defmodule DateTimeParser.Parser.Date do
       when day in 1..28,
       do: {:ok, date}
 
-  def validate_day(%{day: 29, month: 2, year: year} = date) do
-    if Timex.is_leap?(year),
+  def validate_day(%{day: 29, month: 2} = date) do
+    if Date.leap_year?(date),
       do: {:ok, date},
       else: :error
   end
