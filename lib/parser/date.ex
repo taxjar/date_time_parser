@@ -63,10 +63,18 @@ defmodule DateTimeParser.Parser.Date do
       when day in 1..28,
       do: {:ok, date}
 
-  def validate_day(%{day: 29, month: 2} = date) do
-    if Date.leap_year?(date),
+  def validate_day(%{day: 29, month: 2, year: year} = date) do
+    if Calendar.ISO.leap_year?(year),
       do: {:ok, date},
       else: :error
+  end
+
+  def validate_day(%Date{} = date) do
+    if Calendar.ISO.valid_date?(date.year, date.month, date.day) do
+      {:ok, date}
+    else
+      {:error, "not a valid date"}
+    end
   end
 
   def validate_day(_), do: :error
