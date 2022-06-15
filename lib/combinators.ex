@@ -1,5 +1,5 @@
 # Generated from lib/combinators.ex.exs, do not edit.
-# Generated at 2022-06-13 19:38:09Z.
+# Generated at 2022-06-15 20:12:17Z.
 
 defmodule DateTimeParser.Combinators do
   @moduledoc false
@@ -416,7 +416,7 @@ defmodule DateTimeParser.Combinators do
      rest, context, line, offset}
   end
 
-  defp parse_datetime_us__19(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__19(<<x0, _::binary>> = rest, _acc, _stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     {:error,
      "did not expect numeric day from 01-31 while processing word month either fully spelled or 3-letter abbreviation, followed by string \" \", followed by numeric day from 01-31, followed by string \" \", followed by numeric hour from 00-23, followed by string \":\", followed by numeric minute from 00-59, followed by string \":\", followed by numeric second from 00-59, followed by string \".\" or nothing, followed by numeric subsecond up to 24 digits or nothing or numeric hour from 00-23, followed by string \":\", followed by numeric minute from 00-59, followed by string \":\", followed by string \" \" or nothing, followed by am or pm or nothing, followed by string \" \" or nothing, followed by 4 digit year or numeric day from 01-31, followed by date separator or nothing, followed by word month either fully spelled or 3-letter abbreviation, followed by date separator or nothing, followed by 2 or 4 digit year or 4 digit year, followed by date separator or nothing, followed by numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation, followed by date separator or nothing, followed by numeric day from 01-31 or numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation, followed by date separator or nothing, followed by numeric day from 01-31, followed by date separator or nothing, followed by 2 or 4 digit year or numeric day from 01-31, followed by date separator or nothing, followed by numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation, followed by date separator or nothing, followed by 2 or 4 digit year or 2 or 4 digit year, followed by date separator or nothing, followed by numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation, followed by date separator or nothing, followed by numeric day from 01-31 or numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation, followed by date separator or nothing, followed by numeric day from 01-31 or numeric day from 01-31, followed by date separator or nothing, followed by numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation, followed by string \"t\" or string \"-\" or string \"+\" or string \" \" or nothing, followed by numeric hour from 00-23, followed by string \":\", followed by numeric minute from 00-59, followed by string \":\", followed by numeric second from 00-59, followed by string \".\" or nothing, followed by numeric subsecond up to 24 digits or nothing or numeric hour from 00-23, followed by string \":\", followed by numeric minute from 00-59, followed by string \":\", followed by string \" \" or nothing, followed by am or pm or nothing, followed by string \" \" or nothing, followed by timezone with offset, followed by offset with +/- and 4 digits or timezone with offset or offset with +/- and 4 digits or timezone abbreviation or nothing or numeric day from 01-31, followed by date separator or nothing, followed by word month either fully spelled or 3-letter abbreviation, followed by date separator or nothing, followed by 2 or 4 digit year or 4 digit year, followed by date separator or nothing, followed by numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation, followed by date separator or nothing, followed by numeric day from 01-31 or numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation, followed by date separator or nothing, followed by numeric day from 01-31, followed by date separator or nothing, followed by 2 or 4 digit year or numeric day from 01-31, followed by date separator or nothing, followed by numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation, followed by date separator or nothing, followed by 2 or 4 digit year or 2 or 4 digit year, followed by date separator or nothing, followed by numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation, followed by date separator or nothing, followed by numeric day from 01-31 or numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation, followed by date separator or nothing, followed by numeric day from 01-31 or numeric day from 01-31, followed by date separator or nothing, followed by numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation",
@@ -1286,7 +1286,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__43(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__49(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__49(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime_us__43(rest, acc, stack, context, line, offset)
@@ -1900,7 +1900,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__68(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__74(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__74(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime_us__68(rest, acc, stack, context, line, offset)
@@ -2211,7 +2211,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__56(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__92(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__92(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime_us__56(rest, acc, stack, context, line, offset)
@@ -3272,7 +3272,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__125(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__131(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__131(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime_us__125(rest, acc, stack, context, line, offset)
@@ -3681,7 +3681,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__99(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__149(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__149(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime_us__99(rest, acc, stack, context, line, offset)
@@ -4211,7 +4211,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__156(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__162(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__162(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime_us__156(rest, acc, stack, context, line, offset)
@@ -5205,7 +5205,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__186(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__192(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__192(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime_us__186(rest, acc, stack, context, line, offset)
@@ -6061,7 +6061,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__225(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__231(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__231(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime_us__225(rest, acc, stack, context, line, offset)
@@ -6470,7 +6470,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__213(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__249(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__249(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime_us__213(rest, acc, stack, context, line, offset)
@@ -7647,7 +7647,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__290(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__296(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__296(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime_us__290(rest, acc, stack, context, line, offset)
@@ -8056,7 +8056,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__270(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__314(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__314(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime_us__270(rest, acc, stack, context, line, offset)
@@ -8586,7 +8586,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__321(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__327(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__327(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime_us__321(rest, acc, stack, context, line, offset)
@@ -9735,7 +9735,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__363(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__371(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__371(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, _, _, acc | stack] = stack
     parse_datetime_us__363(rest, acc, stack, context, line, offset)
@@ -10729,7 +10729,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__395(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__401(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__401(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime_us__395(rest, acc, stack, context, line, offset)
@@ -11434,7 +11434,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__420(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__426(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__426(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime_us__420(rest, acc, stack, context, line, offset)
@@ -11843,7 +11843,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__408(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__444(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__444(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime_us__408(rest, acc, stack, context, line, offset)
@@ -12904,7 +12904,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__477(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__483(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__483(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime_us__477(rest, acc, stack, context, line, offset)
@@ -13313,7 +13313,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__451(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__501(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__501(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime_us__451(rest, acc, stack, context, line, offset)
@@ -13843,7 +13843,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__508(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__514(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__514(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime_us__508(rest, acc, stack, context, line, offset)
@@ -14837,7 +14837,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__538(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__544(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__544(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime_us__538(rest, acc, stack, context, line, offset)
@@ -15693,7 +15693,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__577(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__583(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__583(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime_us__577(rest, acc, stack, context, line, offset)
@@ -16102,7 +16102,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__565(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__601(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__601(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime_us__565(rest, acc, stack, context, line, offset)
@@ -17279,7 +17279,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__642(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__648(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__648(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime_us__642(rest, acc, stack, context, line, offset)
@@ -17688,7 +17688,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__622(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__666(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__666(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime_us__622(rest, acc, stack, context, line, offset)
@@ -18218,7 +18218,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__673(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__679(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__679(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime_us__673(rest, acc, stack, context, line, offset)
@@ -19703,7 +19703,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__363(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__726(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__726(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 54 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime_us__363(rest, acc, stack, context, line, offset)
@@ -20544,7 +20544,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__363(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__733(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__733(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 54 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime_us__363(rest, acc, stack, context, line, offset)
@@ -20586,7 +20586,7 @@ defmodule DateTimeParser.Combinators do
     )
   end
 
-  defp parse_datetime_us__736(<<":", _::binary>> = rest, acc, stack, context, line, offset) do
+  defp parse_datetime_us__736(<<":", _::binary>> = rest, _acc, stack, context, line, offset) do
     [_, acc | stack] = stack
     parse_datetime_us__363(rest, acc, stack, context, line, offset)
   end
@@ -20990,7 +20990,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__738(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__742(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__742(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 54 and x0 <= 57 do
     [_, acc | stack] = stack
     parse_datetime_us__738(rest, acc, stack, context, line, offset)
@@ -21830,7 +21830,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__738(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__749(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__749(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 54 and x0 <= 57 do
     [_, acc | stack] = stack
     parse_datetime_us__738(rest, acc, stack, context, line, offset)
@@ -22670,7 +22670,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__738(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__756(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__756(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 54 and x0 <= 57 do
     [_, acc | stack] = stack
     parse_datetime_us__738(rest, acc, stack, context, line, offset)
@@ -22968,14 +22968,10 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__777(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__780(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
-       when x0 === 116 or x0 === 109 or x0 === 97 or x0 === 115 or x0 === 100 or x0 === 116 or
-              x0 === 97 or
-              x0 === 115 or x0 === 100 or x0 === 116 or x0 === 101 or x0 === 115 or x0 === 100 or
-              x0 === 116 or
-              x0 === 111 or x0 === 115 or x0 === 100 or x0 === 116 or x0 === 108 or x0 === 107 or
-              x0 === 107 or
-              x0 === 107 or x0 === 97 or x0 === 97 or x0 === 97 or x0 === 97 or x0 === 115 do
+  defp parse_datetime_us__780(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
+       when x0 === 116 or x0 === 109 or x0 === 97 or x0 === 115 or x0 === 100 or x0 === 101 or
+              x0 === 111 or
+              x0 === 108 or x0 === 107 do
     [acc | stack] = stack
     parse_datetime_us__777(rest, acc, stack, context, line, offset)
   end
@@ -24321,7 +24317,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__835(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__850(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__850(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime_us__835(rest, acc, stack, context, line, offset)
@@ -25133,7 +25129,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__835(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__862(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__862(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 54 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime_us__835(rest, acc, stack, context, line, offset)
@@ -25974,7 +25970,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__835(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__869(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__869(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 54 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime_us__835(rest, acc, stack, context, line, offset)
@@ -26016,7 +26012,7 @@ defmodule DateTimeParser.Combinators do
     )
   end
 
-  defp parse_datetime_us__872(<<":", _::binary>> = rest, acc, stack, context, line, offset) do
+  defp parse_datetime_us__872(<<":", _::binary>> = rest, _acc, stack, context, line, offset) do
     [_, acc | stack] = stack
     parse_datetime_us__835(rest, acc, stack, context, line, offset)
   end
@@ -26420,7 +26416,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__874(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__878(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__878(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 54 and x0 <= 57 do
     [_, acc | stack] = stack
     parse_datetime_us__874(rest, acc, stack, context, line, offset)
@@ -27260,7 +27256,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__874(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__885(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__885(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 54 and x0 <= 57 do
     [_, acc | stack] = stack
     parse_datetime_us__874(rest, acc, stack, context, line, offset)
@@ -28100,7 +28096,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__874(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__892(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime_us__892(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 54 and x0 <= 57 do
     [_, acc | stack] = stack
     parse_datetime_us__874(rest, acc, stack, context, line, offset)
@@ -28398,14 +28394,10 @@ defmodule DateTimeParser.Combinators do
     parse_datetime_us__913(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime_us__916(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
-       when x0 === 116 or x0 === 109 or x0 === 97 or x0 === 115 or x0 === 100 or x0 === 116 or
-              x0 === 97 or
-              x0 === 115 or x0 === 100 or x0 === 116 or x0 === 101 or x0 === 115 or x0 === 100 or
-              x0 === 116 or
-              x0 === 111 or x0 === 115 or x0 === 100 or x0 === 116 or x0 === 108 or x0 === 107 or
-              x0 === 107 or
-              x0 === 107 or x0 === 97 or x0 === 97 or x0 === 97 or x0 === 97 or x0 === 115 do
+  defp parse_datetime_us__916(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
+       when x0 === 116 or x0 === 109 or x0 === 97 or x0 === 115 or x0 === 100 or x0 === 101 or
+              x0 === 111 or
+              x0 === 108 or x0 === 107 do
     [acc | stack] = stack
     parse_datetime_us__913(rest, acc, stack, context, line, offset)
   end
@@ -28804,7 +28796,7 @@ defmodule DateTimeParser.Combinators do
      rest, context, line, offset}
   end
 
-  defp parse_datetime__19(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__19(<<x0, _::binary>> = rest, _acc, _stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     {:error,
      "did not expect numeric day from 01-31 while processing word month either fully spelled or 3-letter abbreviation, followed by string \" \", followed by numeric day from 01-31, followed by string \" \", followed by numeric hour from 00-23, followed by string \":\", followed by numeric minute from 00-59, followed by string \":\", followed by numeric second from 00-59, followed by string \".\" or nothing, followed by numeric subsecond up to 24 digits or nothing or numeric hour from 00-23, followed by string \":\", followed by numeric minute from 00-59, followed by string \":\", followed by string \" \" or nothing, followed by am or pm or nothing, followed by string \" \" or nothing, followed by 4 digit year or numeric day from 01-31, followed by date separator or nothing, followed by word month either fully spelled or 3-letter abbreviation, followed by date separator or nothing, followed by 2 or 4 digit year or numeric day from 01-31, followed by date separator or nothing, followed by numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation, followed by date separator, followed by 4 digit year or 2 or 4 digit year, followed by date separator or nothing, followed by numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation, followed by date separator or nothing, followed by numeric day from 01-31 or numeric day from 01-31, followed by date separator or nothing, followed by numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation, followed by date separator or nothing, followed by 2 or 4 digit year or numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation, followed by date separator or nothing, followed by numeric day from 01-31, followed by date separator or nothing, followed by 2 or 4 digit year or numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation, followed by date separator or nothing, followed by numeric day from 01-31 or numeric day from 01-31, followed by date separator or nothing, followed by numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation, followed by string \"t\" or string \"-\" or string \"+\" or string \" \" or nothing, followed by numeric hour from 00-23, followed by string \":\", followed by numeric minute from 00-59, followed by string \":\", followed by numeric second from 00-59, followed by string \".\" or nothing, followed by numeric subsecond up to 24 digits or nothing or numeric hour from 00-23, followed by string \":\", followed by numeric minute from 00-59, followed by string \":\", followed by string \" \" or nothing, followed by am or pm or nothing or nothing, followed by string \" \" or nothing, followed by timezone with offset, followed by offset with +/- and 4 digits or timezone with offset or offset with +/- and 4 digits or timezone abbreviation or nothing or numeric day from 01-31, followed by date separator or nothing, followed by word month either fully spelled or 3-letter abbreviation, followed by date separator or nothing, followed by 2 or 4 digit year or numeric day from 01-31, followed by date separator or nothing, followed by numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation, followed by date separator, followed by 4 digit year or 2 or 4 digit year, followed by date separator or nothing, followed by numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation, followed by date separator or nothing, followed by numeric day from 01-31 or numeric day from 01-31, followed by date separator or nothing, followed by numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation, followed by date separator or nothing, followed by 2 or 4 digit year or numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation, followed by date separator or nothing, followed by numeric day from 01-31, followed by date separator or nothing, followed by 2 or 4 digit year or numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation, followed by date separator or nothing, followed by numeric day from 01-31 or numeric day from 01-31, followed by date separator or nothing, followed by numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation",
@@ -29345,7 +29337,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__43(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__49(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__49(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime__43(rest, acc, stack, context, line, offset)
@@ -29763,7 +29755,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__68(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__74(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__74(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime__68(rest, acc, stack, context, line, offset)
@@ -29990,7 +29982,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__56(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__92(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__92(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime__56(rest, acc, stack, context, line, offset)
@@ -30501,7 +30493,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__111(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__117(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__117(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime__111(rest, acc, stack, context, line, offset)
@@ -30728,7 +30720,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__99(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__135(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__135(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime__99(rest, acc, stack, context, line, offset)
@@ -31094,7 +31086,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__156(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__162(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__162(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime__156(rest, acc, stack, context, line, offset)
@@ -31654,7 +31646,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__186(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__192(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__192(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime__186(rest, acc, stack, context, line, offset)
@@ -32325,7 +32317,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__239(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__245(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__245(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime__239(rest, acc, stack, context, line, offset)
@@ -32552,7 +32544,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__213(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__263(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__263(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime__213(rest, acc, stack, context, line, offset)
@@ -32802,7 +32794,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__270(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__276(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__276(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime__270(rest, acc, stack, context, line, offset)
@@ -33362,7 +33354,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__300(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__306(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__306(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime__300(rest, acc, stack, context, line, offset)
@@ -33598,7 +33590,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__317(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__323(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__323(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime__317(rest, acc, stack, context, line, offset)
@@ -34278,7 +34270,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__359(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__367(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__367(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, _, _, acc | stack] = stack
     parse_datetime__359(rest, acc, stack, context, line, offset)
@@ -34838,7 +34830,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__391(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__397(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__397(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime__391(rest, acc, stack, context, line, offset)
@@ -35277,7 +35269,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__416(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__422(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__422(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime__416(rest, acc, stack, context, line, offset)
@@ -35504,7 +35496,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__404(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__440(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__440(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime__404(rest, acc, stack, context, line, offset)
@@ -36015,7 +36007,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__459(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__465(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__465(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime__459(rest, acc, stack, context, line, offset)
@@ -36242,7 +36234,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__447(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__483(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__483(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime__447(rest, acc, stack, context, line, offset)
@@ -36608,7 +36600,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__504(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__510(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__510(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime__504(rest, acc, stack, context, line, offset)
@@ -37168,7 +37160,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__534(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__540(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__540(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime__534(rest, acc, stack, context, line, offset)
@@ -37839,7 +37831,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__587(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__593(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__593(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime__587(rest, acc, stack, context, line, offset)
@@ -38066,7 +38058,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__561(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__611(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__611(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime__561(rest, acc, stack, context, line, offset)
@@ -38316,7 +38308,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__618(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__624(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__624(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime__618(rest, acc, stack, context, line, offset)
@@ -38876,7 +38868,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__648(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__654(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__654(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime__648(rest, acc, stack, context, line, offset)
@@ -39112,7 +39104,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__665(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__671(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__671(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime__665(rest, acc, stack, context, line, offset)
@@ -39944,7 +39936,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__716(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__722(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__722(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 54 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime__716(rest, acc, stack, context, line, offset)
@@ -40288,7 +40280,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__716(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__729(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__729(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 54 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime__716(rest, acc, stack, context, line, offset)
@@ -40330,7 +40322,7 @@ defmodule DateTimeParser.Combinators do
     )
   end
 
-  defp parse_datetime__732(<<":", _::binary>> = rest, acc, stack, context, line, offset) do
+  defp parse_datetime__732(<<":", _::binary>> = rest, _acc, stack, context, line, offset) do
     [_, acc | stack] = stack
     parse_datetime__716(rest, acc, stack, context, line, offset)
   end
@@ -40496,7 +40488,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__734(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__738(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__738(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 54 and x0 <= 57 do
     [_, acc | stack] = stack
     parse_datetime__734(rest, acc, stack, context, line, offset)
@@ -40839,7 +40831,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__734(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__745(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__745(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 54 and x0 <= 57 do
     [_, acc | stack] = stack
     parse_datetime__734(rest, acc, stack, context, line, offset)
@@ -41182,7 +41174,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__734(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__752(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__752(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 54 and x0 <= 57 do
     [_, acc | stack] = stack
     parse_datetime__734(rest, acc, stack, context, line, offset)
@@ -41410,14 +41402,10 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__773(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__776(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
-       when x0 === 116 or x0 === 109 or x0 === 97 or x0 === 115 or x0 === 100 or x0 === 116 or
-              x0 === 97 or
-              x0 === 115 or x0 === 100 or x0 === 116 or x0 === 101 or x0 === 115 or x0 === 100 or
-              x0 === 116 or
-              x0 === 111 or x0 === 115 or x0 === 100 or x0 === 116 or x0 === 108 or x0 === 107 or
-              x0 === 107 or
-              x0 === 107 or x0 === 97 or x0 === 97 or x0 === 97 or x0 === 97 or x0 === 115 do
+  defp parse_datetime__776(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
+       when x0 === 116 or x0 === 109 or x0 === 97 or x0 === 115 or x0 === 100 or x0 === 101 or
+              x0 === 111 or
+              x0 === 108 or x0 === 107 do
     [acc | stack] = stack
     parse_datetime__773(rest, acc, stack, context, line, offset)
   end
@@ -42354,7 +42342,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__831(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__846(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__846(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime__831(rest, acc, stack, context, line, offset)
@@ -42704,7 +42692,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__831(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__858(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__858(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 54 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime__831(rest, acc, stack, context, line, offset)
@@ -43048,7 +43036,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__831(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__865(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__865(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 54 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_datetime__831(rest, acc, stack, context, line, offset)
@@ -43090,7 +43078,7 @@ defmodule DateTimeParser.Combinators do
     )
   end
 
-  defp parse_datetime__868(<<":", _::binary>> = rest, acc, stack, context, line, offset) do
+  defp parse_datetime__868(<<":", _::binary>> = rest, _acc, stack, context, line, offset) do
     [_, acc | stack] = stack
     parse_datetime__831(rest, acc, stack, context, line, offset)
   end
@@ -43256,7 +43244,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__870(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__874(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__874(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 54 and x0 <= 57 do
     [_, acc | stack] = stack
     parse_datetime__870(rest, acc, stack, context, line, offset)
@@ -43599,7 +43587,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__870(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__881(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__881(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 54 and x0 <= 57 do
     [_, acc | stack] = stack
     parse_datetime__870(rest, acc, stack, context, line, offset)
@@ -43942,7 +43930,7 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__870(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__888(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_datetime__888(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 54 and x0 <= 57 do
     [_, acc | stack] = stack
     parse_datetime__870(rest, acc, stack, context, line, offset)
@@ -44170,14 +44158,10 @@ defmodule DateTimeParser.Combinators do
     parse_datetime__909(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_datetime__912(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
-       when x0 === 116 or x0 === 109 or x0 === 97 or x0 === 115 or x0 === 100 or x0 === 116 or
-              x0 === 97 or
-              x0 === 115 or x0 === 100 or x0 === 116 or x0 === 101 or x0 === 115 or x0 === 100 or
-              x0 === 116 or
-              x0 === 111 or x0 === 115 or x0 === 100 or x0 === 116 or x0 === 108 or x0 === 107 or
-              x0 === 107 or
-              x0 === 107 or x0 === 97 or x0 === 97 or x0 === 97 or x0 === 97 or x0 === 115 do
+  defp parse_datetime__912(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
+       when x0 === 116 or x0 === 109 or x0 === 97 or x0 === 115 or x0 === 100 or x0 === 101 or
+              x0 === 111 or
+              x0 === 108 or x0 === 107 do
     [acc | stack] = stack
     parse_datetime__909(rest, acc, stack, context, line, offset)
   end
@@ -44537,7 +44521,7 @@ defmodule DateTimeParser.Combinators do
      rest, context, line, offset}
   end
 
-  defp parse_date_us__17(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_date_us__17(<<x0, _::binary>> = rest, _acc, _stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     {:error,
      "did not expect numeric day from 01-31 while processing numeric day from 01-31, followed by date separator or nothing, followed by word month either fully spelled or 3-letter abbreviation, followed by date separator or nothing, followed by 2 or 4 digit year or 4 digit year, followed by date separator or nothing, followed by numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation, followed by date separator or nothing, followed by numeric day from 01-31 or numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation, followed by date separator or nothing, followed by numeric day from 01-31, followed by date separator or nothing, followed by 2 or 4 digit year or numeric day from 01-31, followed by date separator or nothing, followed by numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation, followed by date separator or nothing, followed by 2 or 4 digit year or 2 or 4 digit year, followed by date separator or nothing, followed by numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation, followed by date separator or nothing, followed by numeric day from 01-31 or numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation, followed by date separator or nothing, followed by numeric day from 01-31 or numeric day from 01-31, followed by date separator or nothing, followed by numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation",
@@ -45064,7 +45048,7 @@ defmodule DateTimeParser.Combinators do
     parse_date_us__41(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_date_us__47(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_date_us__47(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_date_us__41(rest, acc, stack, context, line, offset)
@@ -45468,7 +45452,7 @@ defmodule DateTimeParser.Combinators do
     parse_date_us__66(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_date_us__72(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_date_us__72(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_date_us__66(rest, acc, stack, context, line, offset)
@@ -45695,7 +45679,7 @@ defmodule DateTimeParser.Combinators do
     parse_date_us__54(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_date_us__90(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_date_us__90(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_date_us__54(rest, acc, stack, context, line, offset)
@@ -46294,7 +46278,7 @@ defmodule DateTimeParser.Combinators do
     parse_date_us__123(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_date_us__129(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_date_us__129(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_date_us__123(rest, acc, stack, context, line, offset)
@@ -46521,7 +46505,7 @@ defmodule DateTimeParser.Combinators do
     parse_date_us__97(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_date_us__147(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_date_us__147(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_date_us__97(rest, acc, stack, context, line, offset)
@@ -46771,7 +46755,7 @@ defmodule DateTimeParser.Combinators do
     parse_date_us__154(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_date_us__160(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_date_us__160(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_date_us__154(rest, acc, stack, context, line, offset)
@@ -47310,7 +47294,7 @@ defmodule DateTimeParser.Combinators do
     parse_date_us__184(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_date_us__190(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_date_us__190(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_date_us__184(rest, acc, stack, context, line, offset)
@@ -47837,7 +47821,7 @@ defmodule DateTimeParser.Combinators do
     parse_date_us__223(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_date_us__229(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_date_us__229(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_date_us__223(rest, acc, stack, context, line, offset)
@@ -48064,7 +48048,7 @@ defmodule DateTimeParser.Combinators do
     parse_date_us__211(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_date_us__247(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_date_us__247(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_date_us__211(rest, acc, stack, context, line, offset)
@@ -48744,7 +48728,7 @@ defmodule DateTimeParser.Combinators do
     parse_date_us__288(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_date_us__294(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_date_us__294(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_date_us__288(rest, acc, stack, context, line, offset)
@@ -48971,7 +48955,7 @@ defmodule DateTimeParser.Combinators do
     parse_date_us__268(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_date_us__312(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_date_us__312(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_date_us__268(rest, acc, stack, context, line, offset)
@@ -49221,7 +49205,7 @@ defmodule DateTimeParser.Combinators do
     parse_date_us__319(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_date_us__325(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_date_us__325(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_date_us__319(rest, acc, stack, context, line, offset)
@@ -50028,7 +50012,7 @@ defmodule DateTimeParser.Combinators do
      rest, context, line, offset}
   end
 
-  defp parse_date__17(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_date__17(<<x0, _::binary>> = rest, _acc, _stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     {:error,
      "did not expect numeric day from 01-31 while processing numeric day from 01-31, followed by date separator or nothing, followed by word month either fully spelled or 3-letter abbreviation, followed by date separator or nothing, followed by 2 or 4 digit year or numeric day from 01-31, followed by date separator or nothing, followed by numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation, followed by date separator, followed by 4 digit year or 2 or 4 digit year, followed by date separator or nothing, followed by numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation, followed by date separator or nothing, followed by numeric day from 01-31 or numeric day from 01-31, followed by date separator or nothing, followed by numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation, followed by date separator or nothing, followed by 2 or 4 digit year or numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation, followed by date separator or nothing, followed by numeric day from 01-31, followed by date separator or nothing, followed by 2 or 4 digit year or numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation, followed by date separator or nothing, followed by numeric day from 01-31 or numeric day from 01-31, followed by date separator or nothing, followed by numeric month from 01-12 or word month either fully spelled or 3-letter abbreviation",
@@ -50492,7 +50476,7 @@ defmodule DateTimeParser.Combinators do
     parse_date__41(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_date__47(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_date__47(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_date__41(rest, acc, stack, context, line, offset)
@@ -50840,7 +50824,7 @@ defmodule DateTimeParser.Combinators do
     parse_date__66(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_date__72(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_date__72(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_date__66(rest, acc, stack, context, line, offset)
@@ -51053,7 +51037,7 @@ defmodule DateTimeParser.Combinators do
     parse_date__54(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_date__90(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_date__90(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_date__54(rest, acc, stack, context, line, offset)
@@ -51494,7 +51478,7 @@ defmodule DateTimeParser.Combinators do
     parse_date__109(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_date__115(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_date__115(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_date__109(rest, acc, stack, context, line, offset)
@@ -51707,7 +51691,7 @@ defmodule DateTimeParser.Combinators do
     parse_date__97(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_date__133(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_date__133(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_date__97(rest, acc, stack, context, line, offset)
@@ -52044,7 +52028,7 @@ defmodule DateTimeParser.Combinators do
     parse_date__154(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_date__160(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_date__160(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_date__154(rest, acc, stack, context, line, offset)
@@ -52527,7 +52511,7 @@ defmodule DateTimeParser.Combinators do
     parse_date__184(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_date__190(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_date__190(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_date__184(rest, acc, stack, context, line, offset)
@@ -53084,7 +53068,7 @@ defmodule DateTimeParser.Combinators do
     parse_date__237(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_date__243(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_date__243(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_date__237(rest, acc, stack, context, line, offset)
@@ -53297,7 +53281,7 @@ defmodule DateTimeParser.Combinators do
     parse_date__211(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_date__261(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_date__261(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_date__211(rest, acc, stack, context, line, offset)
@@ -53540,7 +53524,7 @@ defmodule DateTimeParser.Combinators do
     parse_date__268(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_date__274(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_date__274(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_date__268(rest, acc, stack, context, line, offset)
@@ -54023,7 +54007,7 @@ defmodule DateTimeParser.Combinators do
     parse_date__298(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_date__304(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_date__304(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_date__298(rest, acc, stack, context, line, offset)
@@ -54252,7 +54236,7 @@ defmodule DateTimeParser.Combinators do
     parse_date__315(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_date__321(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_date__321(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 48 and x0 <= 57 do
     [_, _, _, acc | stack] = stack
     parse_date__315(rest, acc, stack, context, line, offset)
@@ -54969,7 +54953,7 @@ defmodule DateTimeParser.Combinators do
      rest, context, line, offset}
   end
 
-  defp parse_time__5(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_time__5(<<x0, _::binary>> = rest, _acc, _stack, context, line, offset)
        when x0 >= 54 and x0 <= 57 do
     {:error,
      "did not expect numeric hour from 00-23 while processing numeric hour from 00-23, followed by string \":\", followed by numeric minute from 00-59, followed by string \":\", followed by numeric second from 00-59, followed by string \".\" or nothing, followed by numeric subsecond up to 24 digits or nothing or numeric hour from 00-23, followed by string \":\", followed by numeric minute from 00-59, followed by string \":\"",
@@ -55316,7 +55300,7 @@ defmodule DateTimeParser.Combinators do
      rest, context, line, offset}
   end
 
-  defp parse_time__12(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_time__12(<<x0, _::binary>> = rest, _acc, _stack, context, line, offset)
        when x0 >= 54 and x0 <= 57 do
     {:error,
      "did not expect numeric minute from 00-59 while processing numeric hour from 00-23, followed by string \":\", followed by numeric minute from 00-59, followed by string \":\", followed by numeric second from 00-59, followed by string \".\" or nothing, followed by numeric subsecond up to 24 digits or nothing or numeric hour from 00-23, followed by string \":\", followed by numeric minute from 00-59, followed by string \":\"",
@@ -55359,7 +55343,7 @@ defmodule DateTimeParser.Combinators do
     )
   end
 
-  defp parse_time__15(<<":", _::binary>> = rest, acc, stack, context, line, offset) do
+  defp parse_time__15(<<":", _::binary>> = rest, _acc, _stack, context, line, offset) do
     {:error,
      "did not expect numeric hour from 00-23, followed by string \":\", followed by numeric minute from 00-59, followed by string \":\", followed by numeric second from 00-59, followed by string \".\" or nothing, followed by numeric subsecond up to 24 digits or nothing or numeric hour from 00-23, followed by string \":\", followed by numeric minute from 00-59, followed by string \":\"",
      rest, context, line, offset}
@@ -55526,7 +55510,7 @@ defmodule DateTimeParser.Combinators do
     parse_time__17(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_time__21(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_time__21(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 54 and x0 <= 57 do
     [_, acc | stack] = stack
     parse_time__17(rest, acc, stack, context, line, offset)
@@ -55869,7 +55853,7 @@ defmodule DateTimeParser.Combinators do
     parse_time__17(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_time__28(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_time__28(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 54 and x0 <= 57 do
     [_, acc | stack] = stack
     parse_time__17(rest, acc, stack, context, line, offset)
@@ -56212,7 +56196,7 @@ defmodule DateTimeParser.Combinators do
     parse_time__17(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_time__35(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
+  defp parse_time__35(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
        when x0 >= 54 and x0 <= 57 do
     [_, acc | stack] = stack
     parse_time__17(rest, acc, stack, context, line, offset)
@@ -56412,14 +56396,10 @@ defmodule DateTimeParser.Combinators do
     parse_time__56(rest, acc, stack, context, line, offset)
   end
 
-  defp parse_time__59(<<x0, _::binary>> = rest, acc, stack, context, line, offset)
-       when x0 === 116 or x0 === 109 or x0 === 97 or x0 === 115 or x0 === 100 or x0 === 116 or
-              x0 === 97 or
-              x0 === 115 or x0 === 100 or x0 === 116 or x0 === 101 or x0 === 115 or x0 === 100 or
-              x0 === 116 or
-              x0 === 111 or x0 === 115 or x0 === 100 or x0 === 116 or x0 === 108 or x0 === 107 or
-              x0 === 107 or
-              x0 === 107 or x0 === 97 or x0 === 97 or x0 === 97 or x0 === 97 or x0 === 115 do
+  defp parse_time__59(<<x0, _::binary>> = rest, _acc, stack, context, line, offset)
+       when x0 === 116 or x0 === 109 or x0 === 97 or x0 === 115 or x0 === 100 or x0 === 101 or
+              x0 === 111 or
+              x0 === 108 or x0 === 107 do
     [acc | stack] = stack
     parse_time__56(rest, acc, stack, context, line, offset)
   end

@@ -69,9 +69,7 @@ defmodule DateTimeParser.Parser.Date do
   defp for_context(:best, result, assume_date) do
     DateTimeParser.Parser.first_ok(
       [
-        fn -> for_context(:date, result, assume_date) end,
-        fn -> for_context(:time, result, assume_date) end,
-        fn -> for_context(:datetime, result, assume_date) end
+        fn -> for_context(:date, result, assume_date) end
       ],
       "Could not parse a date"
     )

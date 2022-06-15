@@ -85,11 +85,12 @@ defmodule DateTimeParser.Combinators do
     @timezone_abbreviations
     |> Enum.map(fn abbr -> abbr |> String.codepoints() |> Enum.at(1) end)
     |> Enum.reject(&is_nil/1)
+    |> Enum.uniq()
     |> Enum.map(fn char ->
       <<codepoint::utf8>> = char
       codepoint
     end)
-    |> ascii_char
+    |> ascii_char()
 
   timezone =
     choice([
