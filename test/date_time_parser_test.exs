@@ -373,6 +373,12 @@ defmodule DateTimeParserTest do
     test_date_parsing("9-2-32", ~D[2032-02-09])
   end
 
+  describe "parse_date/1 - MY" do
+    test_date_parsing("Jan 2020", ~D[2020-01-01], assume_date: ~D[0001-12-01])
+    test_date_parsing("October 1995", ~D[1995-10-01], assume_date: ~D[0001-12-01])
+    test_date_parsing("May 1442", ~D[1442-05-01], assume_date: ~D[0001-12-01])
+  end
+
   describe "parse_datetime/1 - YMD" do
     test_datetime_parsing("2021-03-27 12:00 am", ~N[2021-03-27 00:00:00])
     test_datetime_parsing("2021-03-27 12:00 pm", ~N[2021-03-27 12:00:00])

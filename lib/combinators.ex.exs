@@ -280,6 +280,11 @@ defmodule DateTimeParser.Combinators do
     |> concat(date_separator |> optional())
     |> concat(day)
 
+  month_year =
+    month
+    |> concat(choice([string(" "), string(", ")]) |> ignore() |> optional())
+    |> concat(year4)
+
   day_month =
     day
     |> concat(date_separator |> optional())
@@ -323,6 +328,7 @@ defmodule DateTimeParser.Combinators do
       day_month_year4,
       year_month_day,
       day_month_year,
+      month_year,
       month_day_year,
       month_day,
       day_month
@@ -334,6 +340,7 @@ defmodule DateTimeParser.Combinators do
       year4_month_day,
       month_day_year,
       day_month_year,
+      month_year,
       year_month_day,
       month_day,
       day_month
