@@ -1,3 +1,10 @@
+**NOTICE**: This GitHub repo will be archived. Development and maintenance will
+continue at https://github.com/dbernheisel/date_time_parser. The hex.pm package
+will continue receiving updates and will publish from the new repo. [See this
+issue for more details](https://github.com/taxjar/date_time_parser/issues/50).
+
+---
+
 # DateTimeParser
 
 [![Hex.pm Version](http://img.shields.io/hexpm/v/date_time_parser.svg)](https://hex.pm/packages/date_time_parser)
